@@ -33,5 +33,32 @@ public class UsuarioDAO {
         return usuario;
     }
 
+    public boolean save(Usuario usuario) {
+        // A senha deve ser "hasheada" antes de chegar aqui.
+        // O AuthService será responsável por isso.
+        String sql = "INSERT INTO usuarios(login, senha, nome_completo) VALUES(?, ?, ?)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, usuario.getLogin());
+            pstmt.setString(2, usuario.getSenha());
+            pstmt.setString(3, usuario.getNomeCompleto());
+            
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0; // Retorna true se a inserção foi bem-sucedida
+
+        } catch (SQLException e) {
+            // Código 19 é a violação de restrição UNIQUE (login já existe)
+            if (e.getErrorCode() == 19) {
+                System.err.println("Erro ao salvar usuário: O login '" + usuario.getLogin() + "' já existe.");
+            } else {
+                System.err.println("Erro ao salvar usuário: " + e.getMessage());
+            }
+            return false;
+        }
+    }
+
+
     // Aqui você adicionaria outros métodos: save(Usuario u), update(Usuario u), delete(int id), etc.
 }

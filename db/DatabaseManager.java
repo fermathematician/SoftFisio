@@ -1,4 +1,3 @@
-// db/DatabaseManager.java
 package db;
 
 import java.sql.Connection;
@@ -9,45 +8,51 @@ import java.sql.Statement;
 public class DatabaseManager {
 
     private static final String DB_URL = "jdbc:sqlite:fisioterapia.db";
-    private static Connection connectionInstance;
+    
+    // REMOVEMOS a variável estática da conexão.
+    // private static Connection connectionInstance;
 
-    // Construtor privado para evitar instanciação direta
+    // O construtor privado continua, pois não queremos que esta classe seja instanciada.
     private DatabaseManager() {}
 
-    // Método estático para obter a conexão (Singleton)
+    /**
+     * Este método agora retorna uma NOVA conexão com o banco de dados toda vez que é chamado.
+     * Isso é ideal para o SQLite e resolve o problema de conexão fechada.
+     */
     public static Connection getConnection() {
-        if (connectionInstance == null) {
-            try {
-                connectionInstance = DriverManager.getConnection(DB_URL);
-            } catch (SQLException e) {
-                System.err.println("Falha ao criar conexão com o banco de dados: " + e.getMessage());
-                // Em uma aplicação real, seria melhor lançar uma exceção aqui
-                return null;
-            }
+        try {
+            return DriverManager.getConnection(DB_URL);
+        } catch (SQLException e) {
+            System.err.println("Falha ao criar conexão com o banco de dados: " + e.getMessage());
+            // Lançar uma exceção em tempo de execução pode ser uma boa ideia aqui
+            // para parar a aplicação se não for possível conectar.
+            throw new RuntimeException(e);
         }
-        return connectionInstance;
     }
 
+    /**
+     * O método de inicialização continua funcionando perfeitamente,
+     * pois ele também usa o try-with-resources, abrindo e fechando sua própria conexão.
+     */
     public static void initializeDatabase() {
-        // ... (o código de criação das tabelas continua o mesmo)
-        // Adicionaremos a tabela de usuários
-        try (Statement stmt = getConnection().createStatement()) {
-            // Tabela de Usuários para Login
-            stmt.execute("CREATE TABLE IF NOT EXISTS usuarios (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "login TEXT UNIQUE NOT NULL," +
-                    "senha TEXT NOT NULL," + // Em um projeto real, armazene um HASH da senha!
-                    "nome_completo TEXT NOT NULL" +
-                    ");");
+        String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "login TEXT UNIQUE NOT NULL," +
+                "senha TEXT NOT NULL," +
+                "nome_completo TEXT NOT NULL" +
+                ");";
+        
+        // Adicione aqui a criação de outras tabelas se necessário...
 
-            // Insere um usuário padrão se a tabela estiver vazia
-            if (!stmt.executeQuery("SELECT id FROM usuarios LIMIT 1;").next()) {
-                 // NUNCA guarde senhas em texto plano. Isto é apenas para exemplo.
-                 // Use bibliotecas como jBCrypt para gerar um hash seguro.
-                stmt.execute("INSERT INTO usuarios (login, senha, nome_completo) VALUES ('admin', 'admin123', 'Administrador do Sistema');");
-            }
+        try (Connection conn = getConnection(); // Pega uma nova conexão
+             Statement stmt = conn.createStatement()) {
             
-            // ... (criação das outras tabelas como 'pacientes')
+            stmt.execute(sqlUsuarios);
+
+            if (!stmt.executeQuery("SELECT id FROM usuarios LIMIT 1;").next()) {
+                stmt.execute("INSERT INTO usuarios (login, senha, nome_completo) VALUES ('admin', 'admin123', 'Administrador do Sistema');");
+                System.out.println("Usuário 'admin' padrão criado.");
+            }
 
         } catch (SQLException e) {
             System.err.println("Erro ao inicializar tabelas: " + e.getMessage());

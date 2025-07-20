@@ -14,17 +14,17 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Carrega o FXML do diretório 'static'
-        URL fxmlUrl = new File("static/main_view.fxml").toURI().toURL();
+        // Altere 'main_view.fxml' para 'login.fxml'
+        URL fxmlUrl = new File("static/login.fxml").toURI().toURL(); 
         Parent root = FXMLLoader.load(fxmlUrl);
 
-        primaryStage.setTitle("FisioApp");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setTitle("SoftFisio - Login"); // Altere o título inicial
+        primaryStage.setScene(new Scene(root, 400, 400)); // Ajuste o tamanho da janela
         primaryStage.show();
     }
 
     public static void main(String[] args) {
-        // Inicializa o banco de dados ANTES de iniciar a interface gráfica
+        // Inicializa o banco de dados antes de tudo
         DatabaseManager.initializeDatabase();
         launch(args);
     }
