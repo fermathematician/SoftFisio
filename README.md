@@ -83,6 +83,64 @@ O SoftFisio foi projetado utilizando uma **arquitetura em três camadas** para g
         * `db/DatabaseManager.java`: Gerencia a conexão com o banco de dados e a criação inicial das tabelas.
         * `db/*DAO.java`: (Data Access Objects) Classes como `UsuarioDAO` que contêm os comandos SQL específicos para cada entidade (INSERT, SELECT, UPDATE, DELETE).
 
+## 🗃️ Estrutura do Banco de Dados
+
+O SoftFisio utiliza um banco de dados SQLite local (`fisioterapia.db`) para armazenar todas as informações do sistema. A estrutura foi projetada para ser eficiente e escalável, focando na gestão de usuários (fisioterapeutas), pacientes, suas avaliações e sessões de tratamento.
+
+Abaixo estão as tabelas principais e seus respectivos campos:
+
+### `usuarios`
+* **Propósito:** Armazena os dados de cadastro dos fisioterapeutas que acessam o sistema.
+* **Colunas:**
+    * `id_usuario`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único do usuário.
+    * `nome`: `TEXT NOT NULL` - Nome completo do fisioterapeuta.
+    * `email`: `TEXT UNIQUE NOT NULL` - Email do fisioterapeuta (utilizado para login, deve ser único).
+    * `senha_hash`: `TEXT NOT NULL` - Hash da senha do usuário (armazenado de forma segura).
+    * `ativo`: `INTEGER DEFAULT 1` - Status do usuário (1 para ativo, 0 para inativo).
+    * `data_cadastro`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora do cadastro do usuário.
+
+### `pacientes`
+* **Propósito:** Contém as informações de identificação e contato de cada paciente.
+* **Colunas:**
+    * `id_paciente`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único do paciente.
+    * `id_usuario`: `INTEGER NOT NULL` - Chave estrangeira, vincula o paciente ao fisioterapeuta responsável (`FOREIGN KEY REFERENCES usuarios(id_usuario)`).
+    * `nome`: `TEXT NOT NULL` - Nome completo do paciente.
+    * `data_nascimento`: `TEXT` - Data de nascimento do paciente (formato 'YYYY-MM-DD').
+    * `cpf`: `TEXT UNIQUE` - CPF do paciente (opcional, mas recomendado para unicidade).
+    * `genero`: `TEXT` - Gênero do paciente (ex: 'Masculino', 'Feminino', 'Outro').
+    * `telefone`: `TEXT` - Telefone de contato.
+    * `email`: `TEXT` - Email do paciente.
+    * `endereco`: `TEXT` - Endereço completo.
+    * `ocupacao`: `TEXT` - Profissão/ocupação do paciente.
+    * `observacoes_gerais`: `TEXT` - Campo para quaisquer observações adicionais sobre o paciente.
+    * `data_cadastro`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora do cadastro do paciente no sistema.
+
+### `avaliacoes`
+* **Propósito:** Armazena os dados da avaliação inicial e/ou reavaliações do paciente. Um paciente pode ter múltiplas avaliações ao longo do tempo.
+* **Colunas:**
+    * `id_avaliacao`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único da avaliação.
+    * `id_paciente`: `INTEGER NOT NULL` - Chave estrangeira, vincula a avaliação a um paciente específico (`FOREIGN KEY REFERENCES pacientes(id_paciente)`).
+    * `data_avaliacao`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora da realização da avaliação.
+    * `queixa_principal`: `TEXT` - Descrição da queixa principal do paciente.
+    * `historia_doenca_atual`: `TEXT` - Histórico da doença ou condição atual.
+    * `historico_medico_passado`: `TEXT` - Histórico médico prévio, cirurgias, medicamentos.
+    * `exame_fisico`: `TEXT` - Detalhes do exame físico realizado.
+    * `testes_especificos`: `TEXT` - Resultados de testes específicos (ortopédicos, neurológicos, etc.).
+    * `diagnostico_fisioterapeutico`: `TEXT` - O diagnóstico estabelecido pelo fisioterapeuta.
+    * `plano_tratamento`: `TEXT` - Detalhamento do plano de tratamento proposto.
+    * `objetivos_tratamento`: `TEXT` - Metas e objetivos terapêuticos.
+    * `observacoes_adicionais`: `TEXT` - Quaisquer outras observações relevantes sobre a avaliação.
+    * *Nota: Todos os campos de texto longo (`TEXT`) suportam parágrafos e quebras de linha.*
+
+### `sessoes`
+* **Propósito:** Registra o progresso e as intervenções de cada sessão de tratamento realizada.
+* **Colunas:**
+    * `id_sessao`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único da sessão.
+    * `id_paciente`: `INTEGER NOT NULL` - Chave estrangeira, vincula a sessão a um paciente específico (`FOREIGN KEY REFERENCES pacientes(id_paciente)`).
+    * `data_sessao`: `TEXT NOT NULL` - Data e hora da realização da sessão.
+    * `evolucao_texto`: `TEXT NOT NULL` - Texto detalhado sobre a evolução do paciente na sessão e as intervenções realizadas.
+    * `observacoes_sessao`: `TEXT` - Observações adicionais específicas da sessão.
+
 ## 🌳 Estrutura de Diretórios (Tree)
 
 ```
