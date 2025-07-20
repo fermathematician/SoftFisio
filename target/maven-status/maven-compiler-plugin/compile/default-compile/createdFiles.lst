@@ -1,0 +1,6 @@
+src/controllers/LoginController.class
+MainApp.class
+db/DatabaseManager.class
+src/models/Usuario.class
+src/services/AuthService.class
+db/UsuarioDAO.class
