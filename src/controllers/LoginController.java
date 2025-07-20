@@ -29,6 +29,16 @@ public class LoginController {
     }
 
     /**
+     * Este método é feito para quando clicar enter o botão de login seja ativado
+     */
+
+     @FXML
+     private void initialize()
+     {
+        loginButton.setDefaultButton(true);
+     }
+
+    /**
      * Este método é chamado quando o botão de login é clicado (definido no onAction do FXML).
      */
     @FXML

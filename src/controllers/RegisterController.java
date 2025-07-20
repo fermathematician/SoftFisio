@@ -28,6 +28,16 @@ public class RegisterController {
         this.authService = new AuthService();
     }
 
+    /**
+     * Este método é feito para quando clicar enter o botão de registrar seja ativado
+     */
+
+     @FXML
+     private void initialize()
+     {
+        registerButton.setDefaultButton(true);
+     }
+
     @FXML
     private void handleRegisterButtonAction() {
         String nomeCompleto = nomeCompletoField.getText();
