@@ -60,7 +60,7 @@ public class LoginController {
             Parent mainView = FXMLLoader.load(new File("static/main_view.fxml").toURI().toURL());
 
             // Cria uma nova cena e a define na janela
-            stage.setScene(new Scene(mainView, 800, 600));
+            stage.setScene(new Scene(mainView, 1280, 720));
             stage.setTitle("SoftFisio - Painel Principal");
 
         } catch (IOException e) {
@@ -74,7 +74,7 @@ public class LoginController {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             Parent registerView = FXMLLoader.load(new File("static/register.fxml").toURI().toURL());
-            stage.setScene(new Scene(registerView, 400, 450));
+            stage.setScene(new Scene(registerView, 1280, 720));
             stage.setTitle("SoftFisio - Novo Cadastro");
         } catch (IOException e) {
             e.printStackTrace();

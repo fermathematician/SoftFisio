@@ -19,7 +19,7 @@ public class MainApp extends Application {
         Parent root = FXMLLoader.load(fxmlUrl);
 
         primaryStage.setTitle("SoftFisio - Login"); // Altere o título inicial
-        primaryStage.setScene(new Scene(root, 400, 400)); // Ajuste o tamanho da janela
+        primaryStage.setScene(new Scene(root, 1280, 720)); // Ajuste o tamanho da janela
         primaryStage.show();
     }
 

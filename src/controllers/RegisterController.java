@@ -50,7 +50,7 @@ public class RegisterController {
         try {
             Stage stage = (Stage) registerButton.getScene().getWindow();
             Parent loginView = FXMLLoader.load(new File("static/login.fxml").toURI().toURL());
-            stage.setScene(new Scene(loginView, 400, 400));
+            stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();

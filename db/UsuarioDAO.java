@@ -14,7 +14,7 @@ public class UsuarioDAO {
         Usuario usuario = null;
 
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, login);
             ResultSet rs = pstmt.executeQuery();
@@ -39,7 +39,7 @@ public class UsuarioDAO {
         String sql = "INSERT INTO usuarios(login, senha, nome_completo) VALUES(?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, usuario.getLogin());
             pstmt.setString(2, usuario.getSenha());

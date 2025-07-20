@@ -45,7 +45,7 @@ public class DatabaseManager {
         // Adicione aqui a criação de outras tabelas se necessário...
 
         try (Connection conn = getConnection(); // Pega uma nova conexão
-             Statement stmt = conn.createStatement()) {
+            Statement stmt = conn.createStatement()) {
             
             stmt.execute(sqlUsuarios);
 
