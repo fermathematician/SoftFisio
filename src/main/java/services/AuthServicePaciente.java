@@ -22,7 +22,7 @@ public class AuthServicePaciente {
         }
 
         if(genero == null) {
-            return "O genero precisa ser selecionado!";
+            return "O gênero precisa ser selecionado!";
         }
 
         if(telefone.isEmpty()) {

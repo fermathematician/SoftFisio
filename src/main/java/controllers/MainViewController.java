@@ -4,15 +4,18 @@ import db.PacienteDAO;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node; 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField; 
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL; 
 import java.util.List;
 
 import models.Paciente;
@@ -21,13 +24,11 @@ import services.SessaoUsuario;
 
 public class MainViewController {
 
-    // ADICIONADO: Referências aos novos componentes do FXML
     @FXML private Label userNameLabel;
     @FXML private Button logoutButton;
     @FXML private Button newPatientButton;
-    @FXML private TilePane patientTilePane; // O container para os cards
-
-    // REMOVIDO: Todas as referências à TableView e suas colunas
+    @FXML private TextField searchField; 
+    @FXML private TilePane patientTilePane; 
 
     private PacienteDAO pacienteDAO;
 
@@ -35,7 +36,6 @@ public class MainViewController {
     public void initialize() {
         pacienteDAO = new PacienteDAO();
         
-        // Configura o nome do usuário no cabeçalho
         SessaoUsuario sessao = SessaoUsuario.getInstance();
         if (sessao.isLogado()) {
             userNameLabel.setText(sessao.getUsuarioLogado().getNomeCompleto());
@@ -43,16 +43,15 @@ public class MainViewController {
             userNameLabel.setText("Usuário Desconhecido");
         }
 
-        // Carrega os pacientes quando a view é inicializada
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterPatients(newValue);
+        });
+
         Platform.runLater(this::loadPatients);
     }
 
-    /**
-     * Carrega a lista de pacientes, cria um card para cada um e os exibe no TilePane.
-     */
     @FXML
     private void loadPatients() {
-        // Limpa os cards existentes antes de carregar novos
         patientTilePane.getChildren().clear();
 
         SessaoUsuario sessao = SessaoUsuario.getInstance();
@@ -62,19 +61,19 @@ public class MainViewController {
 
             for (Paciente paciente : pacientesDoUsuario) {
                 try {
-                    // 1. Cria um FXMLLoader para o nosso card
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/patient_card.fxml"));
-                    
-                    // 2. Carrega o FXML do card. O resultado é o nó raiz (o VBox do card)
+                    URL fxmlUrl = getClass().getResource("/static/patient_card.fxml");
+                    if (fxmlUrl == null) {
+                        System.err.println("ERRO CRÍTICO: Não foi possível encontrar 'patient_card.fxml'.");
+                        continue;
+                    }
+
+                    FXMLLoader loader = new FXMLLoader(fxmlUrl);
                     VBox cardNode = loader.load();
 
-                    // 3. Pega o controller associado a este card específico
+                    cardNode.setUserData(paciente);
+
                     PatientCardController cardController = loader.getController();
-
-                    // 4. Passa os dados do paciente para o controller do card
                     cardController.setData(paciente);
-
-                    // 5. Adiciona o card (o VBox) ao nosso TilePane
                     patientTilePane.getChildren().add(cardNode);
 
                 } catch (IOException e) {
@@ -86,11 +85,29 @@ public class MainViewController {
             System.err.println("Nenhum usuário logado. Nenhum card para carregar.");
         }
     }
+    
+    /**
+     * Filtra os cards de paciente visíveis com base no texto da busca.
+     * @param query O texto digitado no campo de busca.
+     */
+    private void filterPatients(String query) {
+        String lowerCaseQuery = query.toLowerCase().trim();
+
+        for (Node node : patientTilePane.getChildren()) {
+            Paciente paciente = (Paciente) node.getUserData();
+            
+            if (paciente != null) {
+                boolean isVisible = paciente.getNomeCompleto().toLowerCase().contains(lowerCaseQuery);
+                
+                node.setVisible(isVisible);
+                node.setManaged(isVisible);
+            }
+        }
+    }
 
     @FXML
     private void handleNewPatient() {
         try {
-            // CORRIGIDO: Usando a forma correta de carregar recursos
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/cadastrar_paciente.fxml"));
             Parent cadastrarPacienteView = loader.load();
 
@@ -104,8 +121,6 @@ public class MainViewController {
 
     @FXML
     private void handleLogout() {
-        // A lógica de logout que já fizemos antes
-        // ... (pode adicionar a caixa de diálogo de confirmação aqui) ...
         SessaoUsuario.getInstance().logout();
         try {
             Stage stage = (Stage) logoutButton.getScene().getWindow();

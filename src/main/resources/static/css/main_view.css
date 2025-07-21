@@ -49,9 +49,11 @@
     -fx-border-color: #dcdcdc;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-padding: 8px 12px;
+    -fx-padding: 10px 12px;
     -fx-prompt-text-fill: #aaa;
+    -fx-pref-width: 250px; 
 }
+
 .search-field:focused {
     -fx-border-color: #007AFF;
 }
