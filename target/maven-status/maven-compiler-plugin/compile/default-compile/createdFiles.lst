@@ -1,7 +1,0 @@
-src/controllers/LoginController.class
-MainApp.class
-db/DatabaseManager.class
-src/services/AuthService.class
-src/models/Usuario.class
-src/controllers/RegisterController.class
-db/UsuarioDAO.class
