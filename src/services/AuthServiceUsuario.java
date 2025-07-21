@@ -4,11 +4,11 @@ package src.services;
 import db.UsuarioDAO;
 import src.models.Usuario;
 
-public class AuthService {
+public class AuthServiceUsuario {
 
     private UsuarioDAO usuarioDAO;
 
-    public AuthService() {
+    public AuthServiceUsuario() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
@@ -70,6 +70,6 @@ public class AuthService {
         Usuario novoUsuario = new Usuario(0, login, senhaParaSalvar, nomeCompleto);
         boolean sucesso = usuarioDAO.save(novoUsuario);
 
-        return sucesso ? "" : "Ocorreu um erro inesperado ao salvar no banco de dados.";
+        return sucesso ? "" : "Ocorreu um erro inesperado ao cadastrar o usuário no banco de dados.";
     }
 }

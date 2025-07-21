@@ -20,18 +20,18 @@ public class PacienteDAO {
      * @return true se o paciente foi salvo com sucesso, false caso contrário.
      */
     public boolean save(Paciente paciente) {
-        String sql = "INSERT INTO pacientes(id_usuario, nome, data_nascimento, cpf, genero, telefone, email, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, paciente.getIdUsuario());
             pstmt.setString(2, paciente.getNomeCompleto());
-            pstmt.setString(3, paciente.getDataNascimento().toString()); // Converte LocalDate para String
-            pstmt.setString(4, paciente.getCpf());
-            pstmt.setString(5, paciente.getGenero());
-            pstmt.setString(6, paciente.getTelefone());
-            pstmt.setString(7, paciente.getEmail());
+            pstmt.setString(3, paciente.getCpf());
+            pstmt.setString(4, paciente.getGenero());
+            pstmt.setString(5, paciente.getTelefone());
+            pstmt.setString(6, paciente.getEmail());
+            pstmt.setString(7, paciente.getDataNascimento().toString()); // Converte LocalDate para String
             pstmt.setString(8, paciente.getDataCadastro().toString()); // Converte LocalDateTime para String
 
             int affectedRows = pstmt.executeUpdate();
@@ -69,11 +69,11 @@ public class PacienteDAO {
                     rs.getInt("id_paciente"),
                     rs.getInt("id_usuario"),
                     rs.getString("nome"),
-                    LocalDate.parse(rs.getString("data_nascimento")), // Converte String para LocalDate
                     rs.getString("cpf"),
                     rs.getString("genero"),
                     rs.getString("telefone"),
-                    rs.getString("email")
+                    rs.getString("email"),
+                    LocalDate.parse(rs.getString("data_nascimento")) // Converte String para LocalDate
                     // data_cadastro será definida automaticamente no construtor ou adicionada posteriormente se necessário
                 );               
             }
@@ -104,11 +104,11 @@ public class PacienteDAO {
                     rs.getInt("id_paciente"),
                     rs.getInt("id_usuario"),
                     rs.getString("nome"),
-                    LocalDate.parse(rs.getString("data_nascimento")),
                     rs.getString("cpf"),
                     rs.getString("genero"),
                     rs.getString("telefone"),
-                    rs.getString("email")
+                    rs.getString("email"),
+                    LocalDate.parse(rs.getString("data_nascimento"))
                 );
                 pacientes.add(paciente);
             }
@@ -126,18 +126,18 @@ public class PacienteDAO {
      * @return true se o paciente foi atualizado com sucesso, false caso contrário.
      */
     public boolean update(Paciente paciente) {
-        String sql = "UPDATE pacientes SET id_usuario = ?, nome = ?, data_nascimento = ?, cpf = ?, genero = ?, telefone = ?, email = ? WHERE id_paciente = ?";
+        String sql = "UPDATE pacientes SET id_usuario = ?, nome = ?, cpf = ?, genero = ?, telefone = ?, email = ?, data_nascimento = ? WHERE id_paciente = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, paciente.getIdUsuario());
             pstmt.setString(2, paciente.getNomeCompleto());
-            pstmt.setString(3, paciente.getDataNascimento().toString());
-            pstmt.setString(4, paciente.getCpf());
-            pstmt.setString(5, paciente.getGenero());
-            pstmt.setString(6, paciente.getTelefone());
-            pstmt.setString(7, paciente.getEmail());
+            pstmt.setString(3, paciente.getCpf());
+            pstmt.setString(4, paciente.getGenero());
+            pstmt.setString(5, paciente.getTelefone());
+            pstmt.setString(6, paciente.getEmail());
+            pstmt.setString(7, paciente.getDataNascimento().toString());
             pstmt.setInt(8, paciente.getId()); // O ID para o WHERE clause
 
             int affectedRows = pstmt.executeUpdate();

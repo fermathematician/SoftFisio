@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import src.services.AuthService;
+import src.services.AuthServiceUsuario;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +22,10 @@ public class RegisterController {
     @FXML private Button registerButton;
     @FXML private Label mensagemLabel;
 
-    private final AuthService authService;
+    private final AuthServiceUsuario authService;
 
     public RegisterController() {
-        this.authService = new AuthService();
+        this.authService = new AuthServiceUsuario();
     }
 
     /**

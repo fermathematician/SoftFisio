@@ -2,8 +2,9 @@ package src.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 
-import db.PacienteDAO;
+import src.services.AuthServicePaciente;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
@@ -20,25 +22,23 @@ import src.models.Paciente;
 
 public class CadastrarPacienteController {
 
-    @FXML
-    private TextField nameField;
-    @FXML
-    private DatePicker dobPicker;
-    @FXML
-    private TextField cpfField;
-    @FXML
-    private ComboBox<String> genderComboBox;
-    @FXML
-    private TextField phoneField;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private Button cancelButton;
-    @FXML
-    private Button saveButton;
+    @FXML private TextField nameField;
+    @FXML private TextField cpfField;
+    @FXML private ComboBox<String> genderComboBox;
+    @FXML private TextField phoneField;
+    @FXML private TextField emailField;
+    @FXML private DatePicker dobPicker;
+    @FXML private Button cancelButton;
+    @FXML private Button saveButton;
+    @FXML private Label mensagemLabel;
 
-    private PacienteDAO pacienteDAO;
     private int idUsuarioLogado;
+
+    private final AuthServicePaciente authService;
+
+    public CadastrarPacienteController() {
+        authService = new AuthServicePaciente();
+    }
 
     /**
      * O método initialize é chamado automaticamente pelo JavaFX
@@ -47,8 +47,6 @@ public class CadastrarPacienteController {
      */
     @FXML
     public void initialize() {
-        pacienteDAO = new PacienteDAO();
-        // Preenche o ComboBox com as opções de gênero
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
     }
 
@@ -67,33 +65,22 @@ public class CadastrarPacienteController {
      */
     @FXML
     private void handleSave() {
-        // 1. Validação simples: verifica se o campo de nome não está vazio.
-        if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
-            showAlert(AlertType.ERROR, "Erro de Validação", "O campo 'Nome Completo' é obrigatório.");
-            return;
-        }
+        int idUsuarioLogado = 1;
+        String nome = nameField.getText();
+        String cpf = cpfField.getText();
+        String genero = genderComboBox.getValue();
+        String telefone = phoneField.getText();
+        String email = emailField.getText();
+        LocalDate dataNascimento = dobPicker.getValue();
+        
+        String resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento);
 
-        // 2. Cria um novo objeto Paciente com os dados do formulário.
-        // O ID 0 é um placeholder, pois o banco de dados irá gerar o ID real.
-        Paciente novoPaciente = new Paciente(
-            0,
-            idUsuarioLogado,
-            nameField.getText(),
-            dobPicker.getValue(),
-            cpfField.getText(),
-            genderComboBox.getValue(),
-            phoneField.getText(),
-            emailField.getText()
-        );
-
-        // 3. Tenta salvar o paciente usando o DAO.
-        boolean sucesso = pacienteDAO.save(novoPaciente);
-
-        if (sucesso) {
-            showAlert(AlertType.INFORMATION, "Sucesso", "Paciente cadastrado com sucesso!");
-            closeWindow();
+        if (resultado.isEmpty()) {
+            mensagemLabel.setText("Paciente cadastrar com sucesso!");
+            mensagemLabel.setStyle("-fx-text-fill: green;");
         } else {
-            showAlert(AlertType.ERROR, "Erro no Cadastro", "Não foi possível salvar o paciente. Verifique os dados (um CPF duplicado pode ser a causa) ou contate o suporte.");
+            mensagemLabel.setText(resultado);
+            mensagemLabel.setStyle("-fx-text-fill: red;");
         }
     }
 
@@ -113,16 +100,6 @@ public class CadastrarPacienteController {
         }
     }
 
-    /**
-     * Método utilitário para exibir alertas para o usuário.
-     */
-    private void showAlert(AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
     private void closeWindow() {
         // Pega o "Palco" (Stage) a partir de qualquer componente da cena, como o botão salvar.
         Stage stage = (Stage) saveButton.getScene().getWindow();

@@ -6,8 +6,8 @@ import java.time.LocalDateTime; // Importa LocalDateTime para lidar com a data d
 
 public class Paciente {
     private int id;
-    private String nomeCompleto;
     private int idUsuario;
+    private String nomeCompleto;
     private String cpf; // CPF do paciente (opcional, mas recomendado para unicidade)
     private String genero; // Gênero do paciente
     private String telefone; // Telefone de contato
@@ -16,8 +16,8 @@ public class Paciente {
     private LocalDateTime dataCadastro; // Data e hora do cadastro do paciente no sistema
 
     // Construtor
-    public Paciente(int id, int idUsuario, String nomeCompleto, LocalDate dataNascimento, String cpf, String genero,
-                    String telefone, String email) {
+    public Paciente(int id, int idUsuario, String nomeCompleto, String cpf, String genero,
+                    String telefone, String email, LocalDate dataNascimento) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.nomeCompleto = nomeCompleto;
