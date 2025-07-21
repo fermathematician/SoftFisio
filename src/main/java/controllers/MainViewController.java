@@ -1,124 +1,101 @@
 package controllers;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import db.PacienteDAO;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
-import models.Usuario;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableCell; 
-import java.util.List; 
+import javafx.scene.control.Label;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-import java.net.URL;
+import java.io.IOException;
+import java.util.List;
 
-import db.PacienteDAO;
 import models.Paciente;
+import models.Usuario;
 import services.SessaoUsuario;
 
 public class MainViewController {
 
-    @FXML private TableView<Paciente> patientTable;
-    @FXML private TableColumn<Paciente, Integer> idColumn;
-    @FXML private TableColumn<Paciente, String> nameColumn;
-    @FXML private TableColumn<Paciente, String> cpfColumn;
-    @FXML private TableColumn<Paciente, LocalDate> dobColumn;
-    @FXML private TableColumn<Paciente, String> genderColumn;
-    @FXML private TableColumn<Paciente, String> phoneColumn;
-    @FXML private TableColumn<Paciente, String> emailColumn;
-    @FXML private Button newPacienteButton;
+    // ADICIONADO: Referências aos novos componentes do FXML
+    @FXML private Label userNameLabel;
     @FXML private Button logoutButton;
+    @FXML private Button newPatientButton;
+    @FXML private TilePane patientTilePane; // O container para os cards
+
+    // REMOVIDO: Todas as referências à TableView e suas colunas
 
     private PacienteDAO pacienteDAO;
-    private ObservableList<Paciente> patientList;
 
-    // Método initialize é chamado automaticamente após o FXML ser carregado
     @FXML
     public void initialize() {
         pacienteDAO = new PacienteDAO();
-        patientList = FXCollections.observableArrayList();
-
-        // Configura as colunas da TableView para mapear as propriedades do objeto Paciente
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("nomeCompleto"));
-        cpfColumn.setCellValueFactory(new PropertyValueFactory<>("cpf"));
-        genderColumn.setCellValueFactory(new PropertyValueFactory<>("genero"));
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("telefone"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-
-        // Formata a coluna de data de nascimento (LocalDate)
-        dobColumn.setCellValueFactory(new PropertyValueFactory<>("dataNascimento"));
-        dobColumn.setCellFactory(column -> new TableCell<Paciente, LocalDate>() { // <<<<<<<< CORRIGIDO: Tipo genérico do TableCell
-            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-            @Override
-            protected void updateItem(LocalDate item, boolean empty) { // <<<<<<<< CORRIGIDO: Assinatura do método
-                super.updateItem(item, empty); // <<<<<<<< CORRIGIDO: Chamar o super.updateItem
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(formatter.format(item));
-                }
-            }
-        });
-
-        // Associa a lista observável à TableView
-        patientTable.setItems(patientList);
+        
+        // Configura o nome do usuário no cabeçalho
+        SessaoUsuario sessao = SessaoUsuario.getInstance();
+        if (sessao.isLogado()) {
+            userNameLabel.setText(sessao.getUsuarioLogado().getNomeCompleto());
+        } else {
+            userNameLabel.setText("Usuário Desconhecido");
+        }
 
         // Carrega os pacientes quando a view é inicializada
-        // É uma boa prática carregar em um Platform.runLater para evitar problemas de threading
-        Platform.runLater(() -> loadPatients());
+        Platform.runLater(this::loadPatients);
     }
 
     /**
-     * Carrega a lista de pacientes do banco de dados e atualiza a TableView.
+     * Carrega a lista de pacientes, cria um card para cada um e os exibe no TilePane.
      */
     @FXML
     private void loadPatients() {
-        SessaoUsuario sessao = SessaoUsuario.getInstance();
+        // Limpa os cards existentes antes de carregar novos
+        patientTilePane.getChildren().clear();
 
+        SessaoUsuario sessao = SessaoUsuario.getInstance();
         if (sessao.isLogado()) {
             Usuario usuarioLogado = sessao.getUsuarioLogado();
-            int loggedInUserId = usuarioLogado.getId();
+            List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(usuarioLogado.getId());
 
-            List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(loggedInUserId);
-            
-            patientList.clear();
-            patientList.addAll(pacientesDoUsuario); 
-            
-            System.out.println("Pacientes carregados para o usuário ID " + loggedInUserId + ": " + patientList.size());
+            for (Paciente paciente : pacientesDoUsuario) {
+                try {
+                    // 1. Cria um FXMLLoader para o nosso card
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/patient_card.fxml"));
+                    
+                    // 2. Carrega o FXML do card. O resultado é o nó raiz (o VBox do card)
+                    VBox cardNode = loader.load();
 
+                    // 3. Pega o controller associado a este card específico
+                    PatientCardController cardController = loader.getController();
+
+                    // 4. Passa os dados do paciente para o controller do card
+                    cardController.setData(paciente);
+
+                    // 5. Adiciona o card (o VBox) ao nosso TilePane
+                    patientTilePane.getChildren().add(cardNode);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("Cards de pacientes carregados: " + pacientesDoUsuario.size());
         } else {
-            patientList.clear();
-            System.err.println("Nenhum usuário logado encontrado. A lista de pacientes não pode ser carregada.");
+            System.err.println("Nenhum usuário logado. Nenhum card para carregar.");
         }
     }
 
-    /**
-     * Lida com a ação do botão "Novo Paciente".
-     * Aqui você abriria uma nova janela/modal para o cadastro de um novo paciente.
-     */
     @FXML
     private void handleNewPatient() {
-        System.out.println("Botão 'Novo Paciente' clicado! Abrindo janela de cadastro...");
-        
         try {
-            Stage stage = (Stage) newPacienteButton.getScene().getWindow();
-            // Correção aqui:
-            URL fxmlUrl = getClass().getResource("/static/cadastrar_paciente.fxml");
-            Parent cadastrarPacienteView = FXMLLoader.load(fxmlUrl);
+            // CORRIGIDO: Usando a forma correta de carregar recursos
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/cadastrar_paciente.fxml"));
+            Parent cadastrarPacienteView = loader.load();
 
-            stage.setScene(new Scene(cadastrarPacienteView, 1280, 720));
+            Stage stage = (Stage) newPatientButton.getScene().getWindow();
+            stage.setScene(new Scene(cadastrarPacienteView)); // Tamanho é definido no FXML
             stage.setTitle("SoftFisio - Cadastrar Paciente");
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,22 +104,16 @@ public class MainViewController {
 
     @FXML
     private void handleLogout() {
+        // A lógica de logout que já fizemos antes
+        // ... (pode adicionar a caixa de diálogo de confirmação aqui) ...
         SessaoUsuario.getInstance().logout();
-        System.out.println("Usuario deslogou!");
-
         try {
             Stage stage = (Stage) logoutButton.getScene().getWindow();
-            // Correção aqui:
-            URL fxmlUrl = getClass().getResource("/static/login.fxml");
-            Parent loginView = FXMLLoader.load(fxmlUrl);
-            
+            Parent loginView = FXMLLoader.load(getClass().getResource("/static/login.fxml"));
             stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    // Métodos para outras ações (editar, deletar paciente) seriam adicionados aqui
-    // Ex: handleEditPatient(), handleDeletePatient()
 }

@@ -1,5 +1,5 @@
 models/Usuario.class
-controllers/MainViewController$1.class
+controllers/PatientCardController.class
 MainApp.class
 db/DatabaseManager.class
 services/AuthServicePaciente.class

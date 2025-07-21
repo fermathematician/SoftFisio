@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox styleClass="patient-card" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PatientCardController">
+   <children>
+      <Label fx:id="patientNameLabel" styleClass="card-title" text="Nome Completo do Paciente" />
+      <Label fx:id="patientCpfLabel" styleClass="card-subtitle" text="111.222.333-44" />
+      <Separator prefWidth="200.0">
+         <VBox.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </VBox.margin>
+      </Separator>
+      <VBox spacing="8.0" styleClass="card-details">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label fx:id="phoneLabel" text="(43) 99999-9999" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label fx:id="emailLabel" text="paciente.email@exemplo.com" />
+               </children>
+            </HBox>
+             <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label fx:id="dobLabel" text="01 de Janeiro de 2000" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Region VBox.vgrow="ALWAYS" />
+      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+         <children>
+            <Button mnemonicParsing="false" styleClass="secondary-button" text="Editar" />
+            <Button mnemonicParsing="false" styleClass="primary-button" text="Ver Ficha" />
+         </children>
+         <VBox.margin>
+            <Insets top="20.0" />
+         </VBox.margin>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+   </padding>
+</VBox>

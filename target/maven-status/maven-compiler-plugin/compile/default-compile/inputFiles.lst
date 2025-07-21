@@ -7,6 +7,7 @@
 /home/fernando/Programming/SoftFisio/src/main/java/services/AuthServiceUsuario.java
 /home/fernando/Programming/SoftFisio/src/main/java/controllers/CadastrarPacienteController.java
 /home/fernando/Programming/SoftFisio/src/main/java/MainApp.java
+/home/fernando/Programming/SoftFisio/src/main/java/controllers/PatientCardController.java
 /home/fernando/Programming/SoftFisio/src/main/java/db/UsuarioDAO.java
 /home/fernando/Programming/SoftFisio/src/main/java/db/PacienteDAO.java
 /home/fernando/Programming/SoftFisio/src/main/java/controllers/MainViewController.java
