@@ -35,7 +35,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Button>
-                  <Button onAction="#loadPatients" text="Recarregar Lista">
+                  <Button fx:id="logoutButton" onAction="#handleLogout" text="Sair">
                      <HBox.margin>
                         <Insets right="20.0" />
                      </HBox.margin>

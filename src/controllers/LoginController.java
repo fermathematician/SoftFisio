@@ -60,8 +60,6 @@ public class LoginController {
             mensagemLabel.setText("Login ou senha inválidos. Tente novamente.");
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
-
-        System.out.println("Estou usando");
     }
 
     /**

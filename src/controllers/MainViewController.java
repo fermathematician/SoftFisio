@@ -28,24 +28,16 @@ import java.util.List; // <<<<<<<< ADICIONAR ESTA IMPORTAÇÃO
 
 public class MainViewController {
 
-    @FXML
-    private TableView<Paciente> patientTable;
-    @FXML
-    private TableColumn<Paciente, Integer> idColumn;
-    @FXML
-    private TableColumn<Paciente, String> nameColumn;
-    @FXML
-    private TableColumn<Paciente, String> cpfColumn;
-    @FXML
-    private TableColumn<Paciente, LocalDate> dobColumn;
-    @FXML
-    private TableColumn<Paciente, String> genderColumn;
-    @FXML
-    private TableColumn<Paciente, String> phoneColumn;
-    @FXML
-    private TableColumn<Paciente, String> emailColumn;
-
+    @FXML private TableView<Paciente> patientTable;
+    @FXML private TableColumn<Paciente, Integer> idColumn;
+    @FXML private TableColumn<Paciente, String> nameColumn;
+    @FXML private TableColumn<Paciente, String> cpfColumn;
+    @FXML private TableColumn<Paciente, LocalDate> dobColumn;
+    @FXML private TableColumn<Paciente, String> genderColumn;
+    @FXML private TableColumn<Paciente, String> phoneColumn;
+    @FXML private TableColumn<Paciente, String> emailColumn;
     @FXML private Button newPacienteButton;
+    @FXML private Button logoutButton;
 
     private PacienteDAO pacienteDAO;
     private ObservableList<Paciente> patientList;
@@ -90,8 +82,6 @@ public class MainViewController {
 
     /**
      * Carrega a lista de pacientes do banco de dados e atualiza a TableView.
-     * Atualmente, está buscando todos os pacientes (como se fosse um admin ou único fisioterapeuta).
-     * Em um sistema real com login, você passaria o ID do usuário logado.
      */
     @FXML
     private void loadPatients() {
@@ -127,6 +117,21 @@ public class MainViewController {
             Parent cadastrarPacienteView = FXMLLoader.load(new File("static/cadastrar_paciente.fxml").toURI().toURL());
             stage.setScene(new Scene(cadastrarPacienteView, 1280, 720));
             stage.setTitle("SoftFisio - Cadastrar Paciente");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleLogout() {
+        SessaoUsuario.getInstance().logout();
+        System.out.println("Usuario deslogou!");
+
+        try {
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Parent loginView = FXMLLoader.load(new File("static/login.fxml").toURI().toURL());
+            stage.setScene(new Scene(loginView, 1280, 720));
+            stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();
         }
