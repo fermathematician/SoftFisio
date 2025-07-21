@@ -1,8 +1,7 @@
-// src/models/Usuario.java
-package src.models;
+package models;
 
-import java.time.LocalDate; // Importa LocalDate para lidar com datas de nascimento
-import java.time.LocalDateTime; // Importa LocalDateTime para lidar com a data de cadastro
+import java.time.LocalDate; 
+import java.time.LocalDateTime; 
 
 public class Paciente {
     private int id;

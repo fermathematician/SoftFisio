@@ -1,11 +1,11 @@
-// db/UsuarioDAO.java
 package db;
 
-import src.models.Usuario; // Importa a classe de modelo
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import models.Usuario; 
 
 public class UsuarioDAO {
 

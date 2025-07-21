@@ -1,6 +1,6 @@
-package src.services;
+package services;
 
-import src.models.Usuario;
+import models.Usuario;
 
 public class SessaoUsuario {
 

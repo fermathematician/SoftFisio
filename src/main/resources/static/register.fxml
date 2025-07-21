@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.controllers.LoginController">
+<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
          <children>
@@ -23,23 +23,25 @@
    <center>
       <VBox alignment="CENTER" spacing="20.0">
          <children>
-            <Label styleClass="title" text="LOGIN" />
-            <Label styleClass="subtitle" text="Insira suas credenciais."/>
+            <Label styleClass="title" text="CRIAR CONTA" />
+            <Label styleClass="subtitle" text="Preencha os campos para criar uma conta." />
             
             <VBox alignment="TOP_LEFT" spacing="15.0" styleClass="login-card">
                <children>
-                  <Label styleClass="input-label" text="Digite seu nome de usuário" />
-                  <TextField fx:id="loginField" promptText="Seu nome de usuário" styleClass="text-input-line" />
+                  <Label styleClass="input-label" text="Nome Completo" />
+                  <TextField fx:id="nomeCompletoField" promptText="Seu nome completo" styleClass="text-input-line" />
                   
-                  <Label styleClass="input-label" text="Digite sua senha" />
-                  <PasswordField fx:id="senhaField" promptText="Sua senha" styleClass="text-input-line" />
+                  <Label styleClass="input-label" text="Usuário (login)" />
+                  <TextField fx:id="loginField" promptText="Seu nome de usuário" styleClass="text-input-line" />
+
+                  <Label styleClass="input-label" text="Senha" />
+                  <PasswordField fx:id="senhaField" promptText="Mínimo 6 caracteres" styleClass="text-input-line" />
                   
                   <VBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLoginButtonAction" styleClass="login-button" text="Entrar" />
+                        <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegisterButtonAction" styleClass="login-button" text="Cadastrar" />
                         
-                        <Button fx:id="goToRegisterButton" mnemonicParsing="false" onAction="#handleGoToRegisterButtonAction" styleClass="link-button" text="Não tem uma conta? Cadastre-se" />
-                        
+                        <Button fx:id="backToLoginButton" mnemonicParsing="false" onAction="#handleBackToLoginButtonAction" styleClass="link-button" text="Já tem uma conta? Faça o login" />
                      </children>
                      <VBox.margin>
                         <Insets top="20.0" />

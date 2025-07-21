@@ -1,4 +1,4 @@
-package src.controllers;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,10 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import src.services.AuthServiceUsuario;
 
-import java.io.File;
 import java.io.IOException;
+
+import java.net.URL;
+
+import services.AuthServiceUsuario;
 
 public class RegisterController {
 
@@ -59,7 +61,10 @@ public class RegisterController {
     private void handleBackToLoginButtonAction() {
         try {
             Stage stage = (Stage) registerButton.getScene().getWindow();
-            Parent loginView = FXMLLoader.load(new File("static/login.fxml").toURI().toURL());
+            // Correção aqui:
+            URL fxmlUrl = getClass().getResource("/static/login.fxml");
+            Parent loginView = FXMLLoader.load(fxmlUrl);
+
             stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {

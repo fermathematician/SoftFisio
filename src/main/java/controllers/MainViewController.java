@@ -1,9 +1,5 @@
-// src/controllers/MainViewController.java
-package src.controllers;
+package controllers;
 
-import db.PacienteDAO;
-import src.models.Paciente;
-import src.services.SessaoUsuario;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,11 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import src.models.Usuario;
+import models.Usuario;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,8 +17,14 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableCell; // <<<<<<<< ADICIONAR ESTA IMPORTAÇÃO
-import java.util.List; // <<<<<<<< ADICIONAR ESTA IMPORTAÇÃO
+import javafx.scene.control.TableCell; 
+import java.util.List; 
+
+import java.net.URL;
+
+import db.PacienteDAO;
+import models.Paciente;
+import services.SessaoUsuario;
 
 public class MainViewController {
 
@@ -114,7 +114,10 @@ public class MainViewController {
         
         try {
             Stage stage = (Stage) newPacienteButton.getScene().getWindow();
-            Parent cadastrarPacienteView = FXMLLoader.load(new File("static/cadastrar_paciente.fxml").toURI().toURL());
+            // Correção aqui:
+            URL fxmlUrl = getClass().getResource("/static/cadastrar_paciente.fxml");
+            Parent cadastrarPacienteView = FXMLLoader.load(fxmlUrl);
+
             stage.setScene(new Scene(cadastrarPacienteView, 1280, 720));
             stage.setTitle("SoftFisio - Cadastrar Paciente");
         } catch (IOException e) {
@@ -129,14 +132,17 @@ public class MainViewController {
 
         try {
             Stage stage = (Stage) logoutButton.getScene().getWindow();
-            Parent loginView = FXMLLoader.load(new File("static/login.fxml").toURI().toURL());
+            // Correção aqui:
+            URL fxmlUrl = getClass().getResource("/static/login.fxml");
+            Parent loginView = FXMLLoader.load(fxmlUrl);
+            
             stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+    
     // Métodos para outras ações (editar, deletar paciente) seriam adicionados aqui
     // Ex: handleEditPatient(), handleDeletePatient()
 }

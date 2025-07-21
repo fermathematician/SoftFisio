@@ -1,5 +1,5 @@
 // src/models/Usuario.java
-package src.models;
+package models;
 
 public class Usuario {
     private int id;

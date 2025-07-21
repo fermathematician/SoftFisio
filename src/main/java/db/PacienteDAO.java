@@ -1,15 +1,14 @@
-// db/PacienteDAO.java
 package db;
 
-import src.models.Paciente; // Importa a classe de modelo Paciente
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import models.Paciente;
 
 public class PacienteDAO {
 

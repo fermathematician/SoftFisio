@@ -1,10 +1,9 @@
-package src.services;
+package services;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import db.PacienteDAO;
-import src.models.Paciente;
+import models.Paciente;
 
 public class AuthServicePaciente {
     private PacienteDAO pacienteDAO;

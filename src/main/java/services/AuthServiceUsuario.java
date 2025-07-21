@@ -1,8 +1,8 @@
 // src/services/AuthService.java
-package src.services;
+package services;
 
 import db.UsuarioDAO;
-import src.models.Usuario;
+import models.Usuario;
 
 public class AuthServiceUsuario {
 

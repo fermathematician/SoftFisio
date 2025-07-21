@@ -1,6 +1,5 @@
-package src.controllers;
+package controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -9,17 +8,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import src.services.AuthServicePaciente;
-import src.services.SessaoUsuario;
-import src.models.Paciente;
+
+import java.net.URL;
+
+import services.AuthServicePaciente;
+import services.SessaoUsuario;
 
 public class CadastrarPacienteController {
 
@@ -32,8 +31,6 @@ public class CadastrarPacienteController {
     @FXML private Button cancelButton;
     @FXML private Button saveButton;
     @FXML private Label mensagemLabel;
-
-    private int idUsuarioLogado;
 
     private final AuthServicePaciente authService;
 
@@ -48,16 +45,8 @@ public class CadastrarPacienteController {
      */
     @FXML
     public void initialize() {
+        saveButton.setDefaultButton(true);
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
-    }
-
-    /**
-     * Este método é chamado a partir do MainViewController para passar o ID
-     * do fisioterapeuta que está logado no sistema.
-     * @param id O ID do usuário logado.
-     */
-    public void setUsuarioId(int id) {
-        this.idUsuarioLogado = id;
     }
 
     /**
@@ -102,17 +91,14 @@ public class CadastrarPacienteController {
     private void handleCancel() {
         try {
             Stage stage = (Stage) cancelButton.getScene().getWindow();
-            Parent registerView = FXMLLoader.load(new File("static/main_view.fxml").toURI().toURL());
+            // Correção aqui:
+            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
+            Parent registerView = FXMLLoader.load(fxmlUrl);
+            
             stage.setScene(new Scene(registerView, 1280, 720));
             stage.setTitle("SoftFisio - Lista de pacientes");
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void closeWindow() {
-        // Pega o "Palco" (Stage) a partir de qualquer componente da cena, como o botão salvar.
-        Stage stage = (Stage) saveButton.getScene().getWindow();
-        stage.close();
     }
 }
