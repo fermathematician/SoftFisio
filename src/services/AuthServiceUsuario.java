@@ -18,21 +18,22 @@ public class AuthServiceUsuario {
      * @param senha A senha fornecida pelo usuário.
      * @return true se a autenticação for bem-sucedida, false caso contrário.
      */
-    public boolean autenticar(String login, String senha) {
+    public Usuario autenticar(String login, String senha) {
         if (login == null || login.trim().isEmpty() || senha == null || senha.isEmpty()) {
-            return false; // Validação básica de entrada
+            return null; // Validação básica de entrada
         }
 
         Usuario usuario = usuarioDAO.findByLogin(login);
 
         if (usuario == null) {
-            return false; // Usuário não encontrado
+            return null; // Usuário não encontrado
         }
 
-        // ATENÇÃO: Comparação de senha em texto plano.
-        // Em um projeto real, use uma biblioteca de hashing para comparar.
-        // Ex: return BCrypt.checkpw(senha, usuario.getSenha());
-        return usuario.getSenha().equals(senha);
+        if (usuario.getSenha().equals(senha)) {
+            return usuario;
+        } else {
+            return null; // Senha incorreta
+        }
     }
 
     /**

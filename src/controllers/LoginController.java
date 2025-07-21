@@ -9,6 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import src.models.Usuario;
+import src.services.SessaoUsuario;
 import src.services.AuthServiceUsuario;
 
 import java.io.File;
@@ -31,7 +33,6 @@ public class LoginController {
     /**
      * Este método é feito para quando clicar enter o botão de login seja ativado
      */
-
      @FXML
      private void initialize()
      {
@@ -46,16 +47,21 @@ public class LoginController {
         String login = loginField.getText();
         String senha = senhaField.getText();
 
-        if (authService.autenticar(login, senha)) {
+        Usuario usuarioAutenticado = authService.autenticar(login, senha);
+
+        if (usuarioAutenticado != null) {
+            SessaoUsuario.getInstance().login(usuarioAutenticado);
+            
             mensagemLabel.setText("Login bem-sucedido! Navegando...");
             mensagemLabel.setStyle("-fx-text-fill: green;");
             
-            // Navega para a tela principal
             navigateToMainView();
         } else {
             mensagemLabel.setText("Login ou senha inválidos. Tente novamente.");
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
+
+        System.out.println("Estou usando");
     }
 
     /**

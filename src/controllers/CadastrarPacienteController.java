@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 
-import src.services.AuthServicePaciente;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +17,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import src.services.AuthServicePaciente;
+import src.services.SessaoUsuario;
 import src.models.Paciente;
 
 public class CadastrarPacienteController {
@@ -65,21 +66,30 @@ public class CadastrarPacienteController {
      */
     @FXML
     private void handleSave() {
-        int idUsuarioLogado = 1;
-        String nome = nameField.getText();
-        String cpf = cpfField.getText();
-        String genero = genderComboBox.getValue();
-        String telefone = phoneField.getText();
-        String email = emailField.getText();
-        LocalDate dataNascimento = dobPicker.getValue();
-        
-        String resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento);
+        SessaoUsuario sessao = SessaoUsuario.getInstance();
 
-        if (resultado.isEmpty()) {
-            mensagemLabel.setText("Paciente cadastrar com sucesso!");
-            mensagemLabel.setStyle("-fx-text-fill: green;");
+        if (sessao.isLogado()) {
+            int idUsuarioLogado = sessao.getUsuarioLogado().getId();
+
+            String nome = nameField.getText();
+            String cpf = cpfField.getText();
+            String genero = genderComboBox.getValue();
+            String telefone = phoneField.getText();
+            String email = emailField.getText();
+            LocalDate dataNascimento = dobPicker.getValue();
+            
+            String resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento);
+
+            if (resultado.isEmpty()) {
+                mensagemLabel.setText("Paciente cadastrado com sucesso!");
+                mensagemLabel.setStyle("-fx-text-fill: green;");
+            } else {
+                mensagemLabel.setText(resultado); // Exibe a mensagem de erro vinda do serviço
+                mensagemLabel.setStyle("-fx-text-fill: red;");
+            }
+
         } else {
-            mensagemLabel.setText(resultado);
+            mensagemLabel.setText("Erro: Nenhum usuário autenticado. Faça o login novamente.");
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
     }

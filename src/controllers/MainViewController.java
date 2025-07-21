@@ -3,6 +3,7 @@ package src.controllers;
 
 import db.PacienteDAO;
 import src.models.Paciente;
+import src.services.SessaoUsuario;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import src.models.Usuario;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,14 +95,23 @@ public class MainViewController {
      */
     @FXML
     private void loadPatients() {
-        // Exemplo: Usando um ID de usuário fictício (1) para carregar pacientes.
-        // Em um cenário real, o ID do usuário logado viria de algum serviço de autenticação.
-        int loggedInUserId = 1; // Substitua pelo ID do usuário logado
+        SessaoUsuario sessao = SessaoUsuario.getInstance();
 
-        List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(loggedInUserId);
-        patientList.clear(); // Limpa a lista antes de adicionar os novos dados
-        patientList.addAll(pacientesDoUsuario); // Adiciona todos os pacientes encontrados
-        System.out.println("Pacientes carregados: " + patientList.size()); // Log para depuração
+        if (sessao.isLogado()) {
+            Usuario usuarioLogado = sessao.getUsuarioLogado();
+            int loggedInUserId = usuarioLogado.getId();
+
+            List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(loggedInUserId);
+            
+            patientList.clear();
+            patientList.addAll(pacientesDoUsuario); 
+            
+            System.out.println("Pacientes carregados para o usuário ID " + loggedInUserId + ": " + patientList.size());
+
+        } else {
+            patientList.clear();
+            System.err.println("Nenhum usuário logado encontrado. A lista de pacientes não pode ser carregada.");
+        }
     }
 
     /**
