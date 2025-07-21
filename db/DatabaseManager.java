@@ -41,7 +41,7 @@ public class DatabaseManager {
     public static void initializeDatabase() {
         // SQL para criar a tabela de usuários
         String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios (" +
-                "id_usuario INTEGER PRIMARY KEY AUTOINCREMENT," + // Renomeado para id_usuario conforme sua documentação
+                "id_usuario INTEGER PRIMARY KEY AUTOINCREMENT," + 
                 "login TEXT UNIQUE NOT NULL," +
                 "senha TEXT NOT NULL," +
                 "nome_completo TEXT NOT NULL" +
@@ -52,7 +52,7 @@ public class DatabaseManager {
                 "id_paciente INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "id_usuario INTEGER NOT NULL," +
                 "nome TEXT NOT NULL," +
-                "data_nascimento TEXT," + // Formato YYYY-MM-DD
+                "data_nascimento TEXT," + 
                 "cpf TEXT UNIQUE," +
                 "genero TEXT," +
                 "telefone TEXT," +
@@ -112,34 +112,6 @@ public class DatabaseManager {
                             pstmt.setString(6, "(11) 98765-4321");
                             pstmt.setString(7, "maria.silva@email.com");
                             pstmt.setString(8, LocalDateTime.now().format(dtcFormatter));
-                            pstmt.executeUpdate();
-                        }
-
-                        // Paciente 2
-                        String sqlInsert2 = "INSERT INTO pacientes(id_usuario, nome, data_nascimento, cpf, genero, telefone, email, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert2)) {
-                            pstmt.setInt(1, adminId);
-                            pstmt.setString(2, "João Santos");
-                            pstmt.setString(3, LocalDate.of(1985, 10, 20).format(dobFormatter));
-                            pstmt.setString(4, "555.666.777-88");
-                            pstmt.setString(5, "Masculino");
-                            pstmt.setString(6, "(21) 99887-6655");
-                            pstmt.setString(7, "joao.santos@email.com");
-                            pstmt.setString(8, LocalDateTime.now().plusMinutes(1).format(dtcFormatter)); // Adiciona 1 minuto
-                            pstmt.executeUpdate();
-                        }
-
-                        // Paciente 3
-                        String sqlInsert3 = "INSERT INTO pacientes(id_usuario, nome, data_nascimento, cpf, genero, telefone, email, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert3)) {
-                            pstmt.setInt(1, adminId);
-                            pstmt.setString(2, "Ana Costa");
-                            pstmt.setString(3, LocalDate.of(2000, 1, 1).format(dobFormatter));
-                            pstmt.setString(4, "999.888.777-66");
-                            pstmt.setString(5, "Feminino");
-                            pstmt.setString(6, "(31) 97777-5555");
-                            pstmt.setString(7, "ana.costa@email.com");
-                            pstmt.setString(8, LocalDateTime.now().plusMinutes(2).format(dtcFormatter)); // Adiciona 2 minutos
                             pstmt.executeUpdate();
                         }
 

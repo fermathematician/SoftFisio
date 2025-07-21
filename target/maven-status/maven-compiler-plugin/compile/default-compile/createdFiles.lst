@@ -2,8 +2,11 @@ src/controllers/MainViewController$1.class
 MainApp.class
 db/DatabaseManager.class
 src/services/AuthService.class
+src/controllers/CadastrarPacienteController.class
+src/models/Usuario.class
+src/controllers/RegisterController.class
+src/controllers/MainViewController.class
+src/controllers/LoginController.class
 db/PacienteDAO.class
 src/models/Paciente.class
-src/models/Usuario.class
 db/UsuarioDAO.class
-src/controllers/MainViewController.class

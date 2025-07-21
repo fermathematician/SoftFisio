@@ -6,12 +6,21 @@ import src.models.Paciente;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javafx.application.Platform;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableCell; // <<<<<<<< ADICIONAR ESTA IMPORTAÇÃO
 import java.util.List; // <<<<<<<< ADICIONAR ESTA IMPORTAÇÃO
 
@@ -33,6 +42,8 @@ public class MainViewController {
     private TableColumn<Paciente, String> phoneColumn;
     @FXML
     private TableColumn<Paciente, String> emailColumn;
+
+    @FXML private Button newPacienteButton;
 
     private PacienteDAO pacienteDAO;
     private ObservableList<Paciente> patientList;
@@ -98,26 +109,16 @@ public class MainViewController {
      */
     @FXML
     private void handleNewPatient() {
-        System.out.println("Botão 'Novo Paciente' clicado!");
-        // Exemplo: Para abrir uma nova janela, você faria algo assim:
-        /*
+        System.out.println("Botão 'Novo Paciente' clicado! Abrindo janela de cadastro...");
+        
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/new_patient_view.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Novo Paciente");
-            stage.initModality(Modality.APPLICATION_MODAL); // Torna a janela modal
-            stage.showAndWait(); // Espera a janela ser fechada
-
-            // Após fechar a janela de novo paciente, recarrega a lista
-            loadPatients();
-
+            Stage stage = (Stage) newPacienteButton.getScene().getWindow();
+            Parent cadastrarPacienteView = FXMLLoader.load(new File("static/cadastrar_paciente.fxml").toURI().toURL());
+            stage.setScene(new Scene(cadastrarPacienteView, 1280, 720));
+            stage.setTitle("SoftFisio - Cadastrar Paciente");
         } catch (IOException e) {
             e.printStackTrace();
-            // Lidar com o erro ao carregar a nova view
         }
-        */
     }
 
     // Métodos para outras ações (editar, deletar paciente) seriam adicionados aqui

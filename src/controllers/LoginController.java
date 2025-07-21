@@ -71,7 +71,7 @@ public class LoginController {
 
             // Cria uma nova cena e a define na janela
             stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Painel Principal");
+            stage.setTitle("SoftFisio - Lista de pacientes");
 
         } catch (IOException e) {
             e.printStackTrace();

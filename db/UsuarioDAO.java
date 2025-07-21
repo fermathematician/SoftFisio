@@ -21,7 +21,7 @@ public class UsuarioDAO {
 
             if (rs.next()) {
                 usuario = new Usuario(
-                    rs.getInt("id"),
+                    rs.getInt("id_usuario"),
                     rs.getString("login"),
                     rs.getString("senha"),
                     rs.getString("nome_completo")

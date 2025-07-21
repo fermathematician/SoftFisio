@@ -30,7 +30,7 @@
          <children>
             <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="200.0">
                <children>
-                  <Button onAction="#handleNewPatient" text="Novo Paciente">
+                  <Button fx:id="newPacienteButton" onAction="#handleNewPatient" text="Novo Paciente">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
