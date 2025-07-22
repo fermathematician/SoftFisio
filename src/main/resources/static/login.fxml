@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.controllers.LoginController">
+<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
          <children>

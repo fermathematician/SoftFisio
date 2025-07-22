@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/main_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainViewController">
+   <top>
+      <HBox alignment="CENTER_LEFT" styleClass="header">
+         <children>
+            <Label styleClass="company-name" text="NOME DA EMPRESA" />
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox alignment="CENTER_RIGHT" spacing="15.0">
+               <children>
+                  <Label fx:id="userNameLabel" styleClass="user-name-label" text="Nome do Usuário" />
+                  <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Sair" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="40.0" right="40.0" top="10.0" />
+         </padding>
+      </HBox>
+   </top>
+   <center>
+      <VBox styleClass="content-pane" spacing="20.0">
+         <children>
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Label styleClass="page-title" text="Meus Pacientes" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="searchField" promptText="Pesquisar paciente..." styleClass="search-field" />
+                  <Button fx:id="newPatientButton" mnemonicParsing="false" onAction="#handleNewPatient" styleClass="primary-button" text="+ Novo Paciente" />
+               </children>
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+               <content>
+                  <TilePane fx:id="patientTilePane" hgap="20.0" prefColumns="2" vgap="20.0" />
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

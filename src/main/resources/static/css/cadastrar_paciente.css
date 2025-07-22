@@ -1,0 +1,98 @@
+.root {
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.header {
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.company-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #333333;
+}
+
+.title {
+    -fx-font-size: 32px;
+    -fx-font-weight: 800; 
+    -fx-text-fill: #1d1d1f;
+}
+
+.subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: #86868b;
+}
+
+.form-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 20, 0.0, 0, 5);
+    -fx-max-width: 800px; /* Mais largo para o formulário */
+}
+
+.input-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #555555;
+}
+
+/* Estilo unificado para todos os campos de entrada */
+.text-input {
+    -fx-font-size: 14px;
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+}
+
+.text-input:focused {
+    -fx-border-color: #007AFF;
+    -fx-background-color: #ffffff;
+}
+
+/* Estilo para ComboBox e DatePicker não ficarem diferentes */
+.combo-box .arrow, .date-picker .arrow {
+    -fx-background-color: #007AFF;
+}
+
+/* Botão de Salvar (ação primária) */
+.save-button {
+    -fx-background-color: #007AFF; /* Azul padrão para consistência */
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 25px;
+    -fx-cursor: hand;
+}
+
+.save-button:hover {
+    -fx-background-color: #0854a5;
+}
+
+/* Botão de Voltar (ação secundária) */
+.secondary-button {
+    -fx-background-color: #e9ecef; /* Cinza claro */
+    -fx-text-fill: #495057; /* Texto escuro */
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 25px;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #dce1e6;
+}
+
+.error-label {
+    -fx-text-fill: #d32f2f;
+    -fx-font-size: 12px;
+    -fx-min-height: 20px; 
+    -fx-alignment: center;
+}

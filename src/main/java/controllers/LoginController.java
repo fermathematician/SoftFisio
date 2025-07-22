@@ -1,4 +1,4 @@
-package src.controllers;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,10 +9,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import src.services.AuthService;
+import models.Usuario;
 
-import java.io.File;
 import java.io.IOException;
+
+import java.net.URL;
+
+import services.SessaoUsuario;
+import services.AuthServiceUsuario;
 
 public class LoginController {
 
@@ -22,16 +26,15 @@ public class LoginController {
     @FXML private Button loginButton;
     @FXML private Label mensagemLabel;
 
-    private final AuthService authService;
+    private final AuthServiceUsuario authService;
 
     public LoginController() {
-        this.authService = new AuthService();
+        this.authService = new AuthServiceUsuario();
     }
 
     /**
      * Este método é feito para quando clicar enter o botão de login seja ativado
      */
-
      @FXML
      private void initialize()
      {
@@ -46,11 +49,14 @@ public class LoginController {
         String login = loginField.getText();
         String senha = senhaField.getText();
 
-        if (authService.autenticar(login, senha)) {
+        Usuario usuarioAutenticado = authService.autenticar(login, senha);
+
+        if (usuarioAutenticado != null) {
+            SessaoUsuario.getInstance().login(usuarioAutenticado);
+            
             mensagemLabel.setText("Login bem-sucedido! Navegando...");
             mensagemLabel.setStyle("-fx-text-fill: green;");
             
-            // Navega para a tela principal
             navigateToMainView();
         } else {
             mensagemLabel.setText("Login ou senha inválidos. Tente novamente.");
@@ -63,15 +69,13 @@ public class LoginController {
      */
     private void navigateToMainView() {
         try {
-            // Pega a "janela" atual a partir de qualquer componente da tela
             Stage stage = (Stage) loginButton.getScene().getWindow();
-
-            // Carrega o FXML da tela principal
-            Parent mainView = FXMLLoader.load(new File("static/main_view.fxml").toURI().toURL());
-
-            // Cria uma nova cena e a define na janela
+            // Correção aqui:
+            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
+            Parent mainView = FXMLLoader.load(fxmlUrl);
+            
             stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Painel Principal");
+            stage.setTitle("SoftFisio - Lista de pacientes");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +87,10 @@ public class LoginController {
     private void handleGoToRegisterButtonAction() {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
-            Parent registerView = FXMLLoader.load(new File("static/register.fxml").toURI().toURL());
+            // Correção aqui:
+            URL fxmlUrl = getClass().getResource("/static/register.fxml");
+            Parent registerView = FXMLLoader.load(fxmlUrl);
+            
             stage.setScene(new Scene(registerView, 1280, 720));
             stage.setTitle("SoftFisio - Novo Cadastro");
         } catch (IOException e) {
