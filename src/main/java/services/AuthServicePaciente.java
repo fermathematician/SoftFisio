@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import db.PacienteDAO;
 import models.Paciente;
-import services.SessaoUsuario;
 
 public class AuthServicePaciente {
     private PacienteDAO pacienteDAO;
@@ -44,9 +43,7 @@ public class AuthServicePaciente {
         return sucesso ? "" : "Já existe um paciente com o cpf digitado!";
     }
 
-    // ... aqui termina o seu método cadastrar()
 
-    // COLE TODO ESTE BLOCO DE CÓDIGO AQUI:
     /**
      * Valida e atualiza os dados de um paciente existente.
      * @param idPaciente O ID original do paciente que está sendo editado.

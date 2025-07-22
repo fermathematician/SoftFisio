@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 import java.net.URL;
 import models.Paciente;
 import services.AuthServicePaciente;
-import services.SessaoUsuario;
 
 public class EditarPacienteController {
 
@@ -74,7 +73,6 @@ public class EditarPacienteController {
      */
     @FXML
     private void handleSave() {
- 
             String nome = nameField.getText();
             String cpf = cpfField.getText();
             String genero = genderComboBox.getValue();
