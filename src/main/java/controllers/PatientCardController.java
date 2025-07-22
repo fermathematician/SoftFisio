@@ -1,34 +1,49 @@
-// Local: src/controllers/PatientCardController.java
 package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import models.Paciente;
+import javafx.scene.layout.Region;
 import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert; 
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType; 
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional; 
+
+import models.Paciente;
+import services.AuthServicePaciente; 
 
 public class PatientCardController {
+
+    public interface OnPatientDeletedListener {
+        void onPatientDeleted(Paciente paciente);
+    }
 
     @FXML private Label patientNameLabel;
     @FXML private Label patientCpfLabel;
     @FXML private Label phoneLabel;
     @FXML private Label emailLabel;
     @FXML private Label dobLabel;
-
+    @FXML private Region deleteIcon;
     @FXML private Button editButton;
-    private Paciente paciente;
 
-    /**
-     * Preenche os componentes do card com os dados de um paciente específico.
-     * Este método será chamado pelo MainViewController após carregar o card.
-     * @param paciente O objeto Paciente contendo os dados a serem exibidos.
-     */
+    private Paciente paciente;
+    private AuthServicePaciente authServicePaciente; 
+    private OnPatientDeletedListener deletionListener;
+
+    public PatientCardController() {
+        this.authServicePaciente = new AuthServicePaciente();
+    }
+    
+    public void setOnPatientDeletedListener(OnPatientDeletedListener listener) {
+        this.deletionListener = listener;
+    }
+    
     public void setData(Paciente paciente) {
         if (paciente != null) {
             this.paciente = paciente;
@@ -37,12 +52,39 @@ public class PatientCardController {
             phoneLabel.setText(paciente.getTelefone());
             emailLabel.setText(paciente.getEmail());
 
-            // Formata a data para um formato mais amigável
             if (paciente.getDataNascimento() != null) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
                 dobLabel.setText(paciente.getDataNascimento().format(formatter));
             } else {
                 dobLabel.setText("Não informada");
+            }
+        }
+    }
+
+    @FXML
+    private void handleDelete() {
+        // Mostra um diálogo de confirmação antes de deletar
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Confirmar Exclusão");
+        confirmationAlert.setHeaderText("Deletar " + this.paciente.getNomeCompleto() + "?");
+        confirmationAlert.setContentText("Esta ação é permanente e não pode ser desfeita.");
+        
+        Optional<ButtonType> result = confirmationAlert.showAndWait();
+        
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            String resultado = authServicePaciente.deletar(this.paciente.getId());
+
+            // Verifica o resultado do serviço
+            if (resultado.isEmpty()) { // Sucesso
+                if (deletionListener != null) {
+                    deletionListener.onPatientDeleted(this.paciente);
+                }
+            } else { 
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Erro");
+                errorAlert.setHeaderText("Não foi possível deletar o paciente.");
+                errorAlert.setContentText(resultado);
+                errorAlert.showAndWait();
             }
         }
     }

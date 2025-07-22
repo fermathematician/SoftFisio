@@ -10,8 +10,21 @@
 
 <VBox styleClass="patient-card" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PatientCardController">
    <children>
-      <Label fx:id="patientNameLabel" styleClass="card-title" text="Nome Completo do Paciente" />
-      <Label fx:id="patientCpfLabel" styleClass="card-subtitle" text="111.222.333-44" />
+     <HBox alignment="CENTER_LEFT" spacing="10">
+         <children>
+            <VBox>
+               <children>
+                  <Label fx:id="patientNameLabel" styleClass="card-title" text="Nome Completo do Paciente"/>
+                  <Label fx:id="patientCpfLabel" styleClass="card-subtitle" text="111.222.333-44"/>
+               </children>
+            </VBox>
+            
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <Region fx:id="deleteIcon" onMouseClicked="#handleDelete" styleClass="delete-icon"/>
+         </children>
+      </HBox>     
+      
       <Separator prefWidth="200.0">
          <VBox.margin>
             <Insets bottom="10.0" top="10.0" />

@@ -125,3 +125,20 @@
 .secondary-button:hover {
     -fx-background-color: #dce1e6;
 }
+
+.delete-icon {
+    -fx-min-width: 15px;
+    -fx-min-height: 20px;
+    -fx-max-width: 15px;
+    -fx-max-height: 20px;
+
+    -fx-background-color: #d9534f; 
+    
+    -fx-cursor: hand;
+
+    -fx-shape: "M19 4h-3.5l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12z";
+}
+
+.delete-icon:hover {
+    -fx-background-color: #c9302c; 
+}
