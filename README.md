@@ -109,7 +109,7 @@ SoftFisio/
 +-- src/
 |   +-- main/
 |       +-- java/
-|       |   +-- MainApp.java                    # Ponto de entrada da aplicação
+|       |   +-- MainApp.java
 |       |   +-- controllers/
 |       |   |   +-- LoginController.java
 |       |   |   +-- RegisterController.java
@@ -141,6 +141,6 @@ SoftFisio/
 |               +-- cadastrar_paciente.fxml
 |               +-- editar_paciente.fxml
 |
-+-- fisioterapia.db                         # Arquivo do banco de dados (gerado na 1ª execução)
-+-- pom.xml                                 # Arquivo de configuração do Maven
-+-- README.md                               # Esta documentação
++-- fisioterapia.db
++-- pom.xml
++-- README.md
