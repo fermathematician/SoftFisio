@@ -22,7 +22,7 @@ import models.Paciente;
 import models.Usuario;
 import services.SessaoUsuario;
 
-public class MainViewController {
+public class MainViewController implements PatientCardController.OnPatientDeletedListener {
 
     @FXML private Label userNameLabel;
     @FXML private Button logoutButton;
@@ -74,6 +74,9 @@ public class MainViewController {
 
                     PatientCardController cardController = loader.getController();
                     cardController.setData(paciente);
+                    
+                    cardController.setOnPatientDeletedListener(this);
+
                     patientTilePane.getChildren().add(cardNode);
 
                 } catch (IOException e) {
@@ -112,7 +115,7 @@ public class MainViewController {
             Parent cadastrarPacienteView = loader.load();
 
             Stage stage = (Stage) newPatientButton.getScene().getWindow();
-            stage.setScene(new Scene(cadastrarPacienteView)); // Tamanho é definido no FXML
+            stage.setScene(new Scene(cadastrarPacienteView)); 
             stage.setTitle("SoftFisio - Cadastrar Paciente");
         } catch (IOException e) {
             e.printStackTrace();
@@ -130,5 +133,10 @@ public class MainViewController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    @Override
+    public void onPatientDeleted(Paciente paciente) {
+        loadPatients();
     }
 }

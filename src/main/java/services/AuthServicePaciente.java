@@ -43,7 +43,6 @@ public class AuthServicePaciente {
         return sucesso ? "" : "Já existe um paciente com o cpf digitado!";
     }
 
-
     /**
      * Valida e atualiza os dados de um paciente existente.
      * @param idPaciente O ID original do paciente que está sendo editado.
@@ -94,4 +93,18 @@ public class AuthServicePaciente {
         // 5. Retorna o resultado para o controlador.
         return sucesso ? "" : "Não foi possível atualizar. O CPF informado pode já pertencer a outro paciente.";
     } 
+
+    /**
+     * Valida e solicita a exclusão de um paciente.
+     * @param idPaciente O ID do paciente a ser deletado.
+     * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
+     */
+    public String deletar(int idPaciente) {
+        if (idPaciente <= 0) {
+            return "ID do paciente inválido.";
+        }
+
+        boolean sucesso = pacienteDAO.delete(idPaciente);
+        return sucesso ? "" : "Não foi possível deletar o paciente do banco de dados.";
+    }
 }
