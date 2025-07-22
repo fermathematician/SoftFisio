@@ -1,12 +1,12 @@
 # SoftFisio - Sistema de Gestão para Fisioterapia
 
-*Última atualização: 19 de julho de 2025*
+*Última atualização: 21 de julho de 2025*
 
 ## 📖 Sobre o Projeto
 
-O **SoftFisio** é um software de desktop, de código aberto, projetado para simplificar a rotina de fisioterapeutas e clínicas. A aplicação permite o gerenciamento completo de pacientes, o agendamento de sessões e o acompanhamento detalhado da evolução de cada tratamento, tudo em uma interface local, rápida e segura.
+O **SoftFisio** é um software de desktop, de código aberto, projetado para simplificar a rotina de fisioterapeutas. A aplicação, em seu estágio atual, oferece um sistema seguro de autenticação de usuários (fisioterapeutas) e o gerenciamento completo do cadastro de seus pacientes (CRUD - Criar, Ler, Atualizar e Deletar).
 
-O sistema é construído sobre uma base de tecnologias robustas e amplamente utilizadas no mercado, garantindo estabilidade e a possibilidade de futuras expansões.
+O sistema é construído sobre uma base de tecnologias robustas e amplamente utilizadas no mercado, garantindo estabilidade e uma fundação sólida para a implementação de futuras funcionalidades, como agendamento de sessões e prontuários de avaliação.
 
 ## 🛠️ Tecnologias e Versões
 
@@ -15,7 +15,7 @@ O projeto utiliza um conjunto de ferramentas modernas e estáveis do ecossistema
 | Tecnologia | Versão | Propósito |
 | :--- | :--- | :--- |
 | **Java (JDK)** | 11+ | Linguagem principal da aplicação. |
-| **JavaFX** | 17.0.2 | Framework para construção da interface gráfica. |
+| **JavaFX** | 17.0.2+ | Framework para construção da interface gráfica. |
 | **SQLite JDBC**| 3.45.1.0 | Driver de conexão para o banco de dados local. |
 | **Apache Maven** | 3.6+ | Ferramenta de automação para build e gerenciamento de dependências. |
 
@@ -26,12 +26,12 @@ Para clonar e executar este projeto em sua máquina local, siga os passos abaixo
 ### Pré-requisitos
 * **Git:** Para clonar o repositório.
 * **JDK 11 ou superior:** Essencial para executar a aplicação.
+* **Apache Maven:** Necessário para gerenciar as dependências e executar a aplicação.
 * **Conexão com a Internet:** Para o download automático das dependências na primeira execução.
 
 ### Passo a Passo
 
 1.  **Clone o repositório:**
-    Abra seu terminal e execute o seguinte comando:
     ```bash
     git clone [https://github.com/fermathematician/SoftFisio.git](https://github.com/fermathematician/SoftFisio.git)
     ```
@@ -41,127 +41,66 @@ Para clonar e executar este projeto em sua máquina local, siga os passos abaixo
     cd SoftFisio
     ```
 
-3.  **Execute o script de configuração:**
-    Este script inteligente irá verificar as dependências (como o Maven) e instalá-las se necessário (em sistemas Ubuntu/Debian). Ele também irá compilar o projeto.
-    ```bash
-    # Dê permissão de execução ao script (apenas na primeira vez)
-    chmod +x setup.sh
-
-    # Rode o script
-    ./setup.sh
-    ```
-    *Na primeira execução, o script pode pedir sua senha de administrador para instalar o Maven.*
-
-4.  **Execute a Aplicação:**
-    Após a configuração ser concluída com sucesso, inicie o software com o comando:
+3.  **Execute a Aplicação:**
+    Use o Maven para compilar o projeto e iniciar o software com o comando:
     ```bash
     mvn javafx:run
     ```
-    Na primeira vez que o programa iniciar, ele criará um arquivo de banco de dados `fisioterapia.db` na raiz do projeto com tabelas e um usuário administrador padrão (`login: admin`, `senha: admin123`).
+    Na primeira vez que o programa iniciar, ele criará um arquivo de banco de dados `fisioterapia.db` na raiz do projeto. Este banco de dados virá populado com um usuário administrador padrão para testes.
+    * **Login:** `admin`
+    * **Senha:** `admin123`
 
 ## 🏛️ Arquitetura do Sistema
 
 O SoftFisio foi projetado utilizando uma **arquitetura em três camadas** para garantir a separação de responsabilidades, facilitando a manutenção e a escalabilidade do código.
 
-`Frontend (Controllers)` **↔** `Backend (Services)` **↔** `Database (DAO)`
+`View (FXML)` → `Controller` **↔** `Service (Lógica de Negócio)` **↔** `DAO (Acesso a Dados)`
 
-1.  **Módulo Frontend (Camada de Apresentação):**
-    * **Responsabilidade:** Exibir a interface gráfica e capturar as interações do usuário. É a única camada que "conhece" o JavaFX.
+1.  **Camada de Apresentação (View/Controller):**
+    * **Responsabilidade:** Exibir a interface gráfica, capturar as interações do usuário e delegar as operações para a camada de Serviço. É a única camada que "conhece" o JavaFX.
     * **Componentes:**
-        * `static/*.fxml`: Arquivos XML que definem a estrutura visual das janelas.
-        * `src/controllers/*.java`: Classes Java que controlam a lógica da interface (ex: `LoginController`), respondendo a cliques de botão e preenchimento de campos. Elas delegam as operações para a camada de Serviço.
+        * `resources/static/*.fxml`: Arquivos XML que definem a estrutura visual das janelas.
+        * `controllers/*.java`: Classes que controlam a lógica da interface (ex: `LoginController`, `PatientCardController`), respondendo a eventos e formatando dados para exibição.
 
-2.  **Módulo Backend (Camada de Serviço/Lógica de Negócio):**
-    * **Responsabilidade:** Orquestrar as regras de negócio da aplicação. Serve como uma ponte entre o Frontend e os dados, sem ter conhecimento de nenhum deles.
+2.  **Camada de Serviço (Lógica de Negócio):**
+    * **Responsabilidade:** Orquestrar as regras de negócio da aplicação, como validações e coordenação de operações. Serve como uma ponte entre os Controllers e os DAOs.
     * **Componentes:**
-        * `src/services/*.java`: Classes como `AuthService` que contêm a lógica principal (ex: como validar um login).
-        * `src/models/*.java`: Classes "puras" (POJOs) como `Usuario` e `Paciente`, que apenas representam as estruturas de dados do sistema.
+        * `services/*.java`: Classes como `AuthServiceUsuario` e `AuthServicePaciente` que contêm a lógica principal (ex: "para cadastrar um usuário, a senha deve ter no mínimo 6 caracteres").
+        * `models/*.java`: Classes "puras" (POJOs) como `Usuario` e `Paciente`, que apenas representam as entidades do sistema.
 
-3.  **Módulo de Banco de Dados (Camada de Acesso a Dados - DAO):**
-    * **Responsabilidade:** Ser a única parte do sistema que interage diretamente com o banco de dados SQLite. Abstrai toda a complexidade do SQL.
+3.  **Camada de Acesso a Dados (DAO):**
+    * **Responsabilidade:** Ser a única parte do sistema que interage diretamente com o banco de dados SQLite, executando os comandos SQL.
     * **Componentes:**
         * `db/DatabaseManager.java`: Gerencia a conexão com o banco de dados e a criação inicial das tabelas.
-        * `db/*DAO.java`: (Data Access Objects) Classes como `UsuarioDAO` que contêm os comandos SQL específicos para cada entidade (INSERT, SELECT, UPDATE, DELETE).
+        * `db/*DAO.java`: (Data Access Objects) Classes como `UsuarioDAO` e `PacienteDAO` que contêm os comandos SQL específicos (INSERT, SELECT, UPDATE, DELETE) para cada tabela.
 
 ## 🗃️ Estrutura do Banco de Dados
 
-O SoftFisio utiliza um banco de dados SQLite local (`fisioterapia.db`) para armazenar todas as informações do sistema. A estrutura foi projetada para ser eficiente e escalável, focando na gestão de usuários (fisioterapeutas), pacientes, suas avaliações e sessões de tratamento.
-
-Abaixo estão as tabelas principais e seus respectivos campos:
+O SoftFisio utiliza um banco de dados SQLite local (`fisioterapia.db`) para armazenar todas as informações. As tabelas atuais são:
 
 ### `usuarios`
 * **Propósito:** Armazena os dados de cadastro dos fisioterapeutas que acessam o sistema.
 * **Colunas:**
     * `id_usuario`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único do usuário.
-    * `nome`: `TEXT NOT NULL` - Nome completo do fisioterapeuta.
-    * `email`: `TEXT UNIQUE NOT NULL` - Email do fisioterapeuta (utilizado para login, deve ser único).
-    * `senha_hash`: `TEXT NOT NULL` - Hash da senha do usuário (armazenado de forma segura).
+    * `login`: `TEXT UNIQUE NOT NULL` - Nome de usuário para acesso ao sistema.
+    * `senha`: `TEXT NOT NULL` - Senha do usuário (atualmente em texto plano).
+    * `nome_completo`: `TEXT NOT NULL` - Nome completo do fisioterapeuta.
 
 ### `pacientes`
 * **Propósito:** Contém as informações de identificação e contato de cada paciente.
 * **Colunas:**
     * `id_paciente`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único do paciente.
-    * `id_usuario`: `INTEGER NOT NULL` - Chave estrangeira, vincula o paciente ao fisioterapeuta responsável (`FOREIGN KEY REFERENCES usuarios(id_usuario)`).
+    * `id_usuario`: `INTEGER NOT NULL` - Chave estrangeira que vincula o paciente ao fisioterapeuta responsável (`FOREIGN KEY REFERENCES usuarios(id_usuario)`).
     * `nome`: `TEXT NOT NULL` - Nome completo do paciente.
-    * `data_nascimento`: `TEXT` - Data de nascimento do paciente (formato 'YYYY-MM-DD').
     * `cpf`: `TEXT UNIQUE` - CPF do paciente (opcional, mas recomendado para unicidade).
-    * `genero`: `TEXT` - Gênero do paciente (ex: 'Masculino', 'Feminino', 'Outro').
+    * `genero`: `TEXT` - Gênero do paciente.
     * `telefone`: `TEXT` - Telefone de contato.
     * `email`: `TEXT` - Email do paciente.
-    * `data_cadastro`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora do cadastro do paciente no sistema.
+    * `data_nascimento`: `TEXT` - Data de nascimento (formato 'YYYY-MM-DD').
+    * `data_cadastro`: `TEXT` - Data e hora do cadastro do paciente.
 
-### `avaliacoes`
-* **Propósito:** Armazena os dados da avaliação inicial e/ou reavaliações do paciente. Um paciente pode ter múltiplas avaliações ao longo do tempo.
-* **Colunas:**
-    * `id_avaliacao`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único da avaliação.
-    * `id_paciente`: `INTEGER NOT NULL` - Chave estrangeira, vincula a avaliação a um paciente específico (`FOREIGN KEY REFERENCES pacientes(id_paciente)`).
-    * `data_avaliacao`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora da realização da avaliação.
-    * `queixa_principal`: `TEXT` - Descrição da queixa principal do paciente.
-    * `historia_doenca_atual`: `TEXT` - Histórico da doença ou condição atual.
-    * `historico_medico_passado`: `TEXT` - Histórico médico prévio, cirurgias, medicamentos.
-    * `exame_fisico`: `TEXT` - Detalhes do exame físico realizado.
-    * `testes_especificos`: `TEXT` - Resultados de testes específicos (ortopédicos, neurológicos, etc.).
-    * `diagnostico_fisioterapeutico`: `TEXT` - O diagnóstico estabelecido pelo fisioterapeuta.
-    * `plano_tratamento`: `TEXT` - Detalhamento do plano de tratamento proposto.
-    * `objetivos_tratamento`: `TEXT` - Metas e objetivos terapêuticos.
-    * `observacoes_adicionais`: `TEXT` - Quaisquer outras observações relevantes sobre a avaliação.
-    * *Nota: Todos os campos de texto longo (`TEXT`) suportam parágrafos e quebras de linha.*
+*(Nota: As tabelas para `avaliacoes` e `sessoes` estão planejadas para futuras versões do sistema.)*
 
-### `sessoes`
-* **Propósito:** Registra o progresso e as intervenções de cada sessão de tratamento realizada.
-* **Colunas:**
-    * `id_sessao`: `INTEGER PRIMARY KEY AUTOINCREMENT` - Identificador único da sessão.
-    * `id_paciente`: `INTEGER NOT NULL` - Chave estrangeira, vincula a sessão a um paciente específico (`FOREIGN KEY REFERENCES pacientes(id_paciente)`).
-    * `data_sessao`: `TEXT NOT NULL` - Data e hora da realização da sessão.
-    * `evolucao_texto`: `TEXT NOT NULL` - Texto detalhado sobre a evolução do paciente na sessão e as intervenções realizadas.
-    * `observacoes_sessao`: `TEXT` - Observações adicionais específicas da sessão.
+## 🌳 Estrutura de Diretórios (Corrigida)
 
-## 🌳 Estrutura de Diretórios (Tree)
-
-```
-SoftFisio/
-├── db/
-│   ├── DatabaseManager.java  # Gerencia a conexão e inicialização do BD
-│   └── UsuarioDAO.java       # Operações CRUD para a tabela 'usuarios'
-│
-├── src/
-│   ├── controllers/
-│   │   └── LoginController.java # Controla a tela de login
-│   │
-│   ├── models/
-│   │   └── Usuario.java        # Representa a entidade 'usuario'
-│   │
-│   ├── services/
-│   │   └── AuthService.java    # Contém a lógica de autenticação
-│   │
-│   └── MainApp.java            # Ponto de entrada da aplicação JavaFX
-│
-├── static/
-│   └── main_view.fxml          # Estrutura da janela principal/boas-vindas
-│
-├── fisioterapia.db             # Arquivo do banco de dados (gerado na 1ª execução)
-├── pom.xml                     # Arquivo de configuração do Maven com as dependências
-├── README.md                   # Esta documentação
-└── setup.sh                    # Script de configuração do ambiente
-```
----
+A estrutura segue o padrão de projetos Maven.
