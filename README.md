@@ -106,41 +106,53 @@ O SoftFisio utiliza um banco de dados SQLite local (`fisioterapia.db`) para arma
 A estrutura segue o padrão de projetos Maven.
 
 SoftFisio/
-+-- src/
-|   +-- main/
-|       +-- java/
-|       |   +-- MainApp.java
-|       |   +-- controllers/
-|       |   |   +-- LoginController.java
-|       |   |   +-- RegisterController.java
-|       |   |   +-- MainViewController.java
-|       |   |   +-- PatientCardController.java
-|       |   |   +-- CadastrarPacienteController.java
-|       |   |   +-- EditarPacienteController.java
-|       |   +-- db/
-|       |   |   +-- DatabaseManager.java
-|       |   |   +-- UsuarioDAO.java
-|       |   |   +-- PacienteDAO.java
-|       |   +-- models/
-|       |   |   +-- Usuario.java
-|       |   |   +-- Paciente.java
-|       |   +-- services/
-|       |       +-- AuthServiceUsuario.java
-|       |       +-- AuthServicePaciente.java
-|       |       +-- SessaoUsuario.java
-|       +-- resources/
-|           +-- static/
-|               +-- css/
-|               |   +-- login-register.css
-|               |   +-- main_view.css
-|               |   +-- cadastrar_paciente.css
-|               +-- login.fxml
-|               +-- register.fxml
-|               +-- main_view.fxml
-|               +-- patient_card.fxml
-|               +-- cadastrar_paciente.fxml
-|               +-- editar_paciente.fxml
-|
-+-- fisioterapia.db
-+-- pom.xml
-+-- README.md
+
+├── db/
+
+│   ├── DatabaseManager.java  # Gerencia a conexão e inicialização do BD
+
+│   └── UsuarioDAO.java       # Operações CRUD para a tabela 'usuarios'
+
+│
+
+├── src/
+
+│   ├── controllers/
+
+│   │   └── LoginController.java # Controla a tela de login
+
+│   │
+
+│   ├── models/
+
+│   │   └── Usuario.java        # Representa a entidade 'usuario'
+
+│   │
+
+│   ├── services/
+
+│   │   └── AuthService.java    # Contém a lógica de autenticação
+
+│   │
+
+│   └── MainApp.java            # Ponto de entrada da aplicação JavaFX
+
+│
+
+├── static/
+
+│   └── main_view.fxml          # Estrutura da janela principal/boas-vindas
+
+│
+
+├── fisioterapia.db             # Arquivo do banco de dados (gerado na 1ª execução)
+
+├── pom.xml                     # Arquivo de configuração do Maven com as dependências
+
+├── README.md                   # Esta documentação
+
+└── setup.sh                    # Script de configuração do ambiente
+
+```
+
+---
