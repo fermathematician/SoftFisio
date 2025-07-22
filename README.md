@@ -96,8 +96,6 @@ Abaixo estão as tabelas principais e seus respectivos campos:
     * `nome`: `TEXT NOT NULL` - Nome completo do fisioterapeuta.
     * `email`: `TEXT UNIQUE NOT NULL` - Email do fisioterapeuta (utilizado para login, deve ser único).
     * `senha_hash`: `TEXT NOT NULL` - Hash da senha do usuário (armazenado de forma segura).
-    * `ativo`: `INTEGER DEFAULT 1` - Status do usuário (1 para ativo, 0 para inativo).
-    * `data_cadastro`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora do cadastro do usuário.
 
 ### `pacientes`
 * **Propósito:** Contém as informações de identificação e contato de cada paciente.
@@ -110,9 +108,6 @@ Abaixo estão as tabelas principais e seus respectivos campos:
     * `genero`: `TEXT` - Gênero do paciente (ex: 'Masculino', 'Feminino', 'Outro').
     * `telefone`: `TEXT` - Telefone de contato.
     * `email`: `TEXT` - Email do paciente.
-    * `endereco`: `TEXT` - Endereço completo.
-    * `ocupacao`: `TEXT` - Profissão/ocupação do paciente.
-    * `observacoes_gerais`: `TEXT` - Campo para quaisquer observações adicionais sobre o paciente.
     * `data_cadastro`: `TEXT DEFAULT CURRENT_TIMESTAMP` - Data e hora do cadastro do paciente no sistema.
 
 ### `avaliacoes`
