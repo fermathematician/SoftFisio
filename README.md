@@ -104,3 +104,43 @@ O SoftFisio utiliza um banco de dados SQLite local (`fisioterapia.db`) para arma
 ## 🌳 Estrutura de Diretórios (Corrigida)
 
 A estrutura segue o padrão de projetos Maven.
+
+SoftFisio/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   ├── MainApp.java                    # Ponto de entrada da aplicação
+│       │   ├── controllers/
+│       │   │   ├── LoginController.java
+│       │   │   ├── RegisterController.java
+│       │   │   ├── MainViewController.java
+│       │   │   ├── PatientCardController.java
+│       │   │   ├── CadastrarPacienteController.java
+│       │   │   └── EditarPacienteController.java
+│       │   ├── db/
+│       │   │   ├── DatabaseManager.java
+│       │   │   ├── UsuarioDAO.java
+│       │   │   └── PacienteDAO.java
+│       │   ├── models/
+│       │   │   ├── Usuario.java
+│       │   │   └── Paciente.java
+│       │   └── services/
+│       │       ├── AuthServiceUsuario.java
+│       │       ├── AuthServicePaciente.java
+│       │       └── SessaoUsuario.java
+│       └── resources/
+│           └── static/
+│               ├── css/
+│               │   ├── login-register.css
+│               │   ├── main_view.css
+│               │   └── cadastrar_paciente.css
+│               ├── login.fxml
+│               ├── register.fxml
+│               ├── main_view.fxml
+│               ├── patient_card.fxml
+│               ├── cadastrar_paciente.fxml
+│               └── editar_paciente.fxml
+│
+├── fisioterapia.db                         # Arquivo do banco de dados (gerado na 1ª execução)
+├── pom.xml                                 # Arquivo de configuração do Maven
+└── README.md                               # Esta documentação
