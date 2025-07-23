@@ -6,11 +6,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.Locale;
 
 public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Locale.setDefault(Locale.of("pt", "BR"));
         URL fxmlUrl = getClass().getResource("/static/login.fxml");
 
         if (fxmlUrl == null) {
