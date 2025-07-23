@@ -53,7 +53,7 @@
       <HBox alignment="CENTER_RIGHT" spacing="10.0">
          <children>
             <Button fx:id="editButton" onAction="#handleEdit" mnemonicParsing="false" styleClass="secondary-button" text="Editar" />
-            <Button mnemonicParsing="false" styleClass="primary-button" text="Ver Ficha" />
+            <Button fx:id="viewRecordButton" onAction="#handleViewRecord" mnemonicParsing="false" styleClass="primary-button" text="Ver Ficha" />
          </children>
          <VBox.margin>
             <Insets top="20.0" />
