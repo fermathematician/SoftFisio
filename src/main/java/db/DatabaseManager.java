@@ -3,27 +3,20 @@ package db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement; // Importado para usar PreparedStatement para buscar o ID do admin
-import java.sql.ResultSet;       // Importado para usar ResultSet
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;     // Importado para datas de nascimento
-import java.time.LocalDateTime; // Importado para datas de cadastro
-import java.time.format.DateTimeFormatter; // Importado para formatar datas
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DatabaseManager {
 
     private static final String DB_URL = "jdbc:sqlite:fisioterapia.db";
 
-    // O construtor privado continua, pois não queremos que esta classe seja instanciada.
     private DatabaseManager() {}
 
-    /**
-     * Este método agora retorna uma NOVA conexão com o banco de dados toda vez que é chamado.
-     * Isso é ideal para o SQLite e resolve o problema de conexão fechada.
-     * @return Uma nova conexão JDBC.
-     * @throws RuntimeException se houver uma falha ao criar a conexão.
-     */
     public static Connection getConnection() {
         try {
             return DriverManager.getConnection(DB_URL);
@@ -34,14 +27,12 @@ public class DatabaseManager {
     }
 
     /**
-     * Inicializa o banco de dados, criando as tabelas 'usuarios' e 'pacientes'
-     * se elas ainda não existirem. Também insere um usuário 'admin' padrão
-     * e 4 pacientes de exemplo se as tabelas estiverem vazias.
+     * Inicializa o banco de dados, criando as tabelas se elas ainda não existirem.
      */
     public static void initializeDatabase() {
         // SQL para criar a tabela de usuários
         String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios (" +
-                "id_usuario INTEGER PRIMARY KEY AUTOINCREMENT," + 
+                "id_usuario INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "login TEXT UNIQUE NOT NULL," +
                 "senha TEXT NOT NULL," +
                 "nome_completo TEXT NOT NULL" +
@@ -57,52 +48,57 @@ public class DatabaseManager {
                 "telefone TEXT," +
                 "email TEXT," +
                 "data_nascimento TEXT," +
-                "data_cadastro TEXT DEFAULT CURRENT_TIMESTAMP," + // Formato YYYY-MM-DD HH:MM:SS.SSS
+                "data_cadastro TEXT DEFAULT CURRENT_TIMESTAMP," +
                 "FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)" +
+                ");";
+
+        // SQL para a nova tabela 'sessoes'
+        String sqlSessoes = "CREATE TABLE IF NOT EXISTS sessoes (" +
+                "id_sessao INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "id_paciente INTEGER NOT NULL," +
+                "data_sessao TEXT NOT NULL," +
+                "evolucao_texto TEXT NOT NULL," +
+                "observacoes_sessao TEXT," +
+                "FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente)" +
                 ");";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // 1. Criar a tabela de usuários
+            // Criar as tabelas
             stmt.execute(sqlUsuarios);
             System.out.println("Tabela 'usuarios' verificada/criada.");
+            stmt.execute(sqlPacientes);
+            System.out.println("Tabela 'pacientes' verificada/criada.");
+            stmt.execute(sqlSessoes);
+            System.out.println("Tabela 'sessoes' verificada/criada.");
 
-            // 2. Inserir usuário 'admin' se não existir
+            // Inserir usuário 'admin' se não existir
             int adminId = -1;
             try (ResultSet rs = stmt.executeQuery("SELECT id_usuario FROM usuarios WHERE login = 'admin';")) {
-                if (!rs.next()) { // Se o admin não existe
+                if (!rs.next()) {
                     stmt.execute("INSERT INTO usuarios (login, senha, nome_completo) VALUES ('admin', 'admin123', 'Administrador do Sistema');");
                     System.out.println("Usuário 'admin' padrão criado.");
-                    // Obter o ID do admin recém-criado
                     try (ResultSet rsAdmin = stmt.executeQuery("SELECT id_usuario FROM usuarios WHERE login = 'admin';")) {
                         if (rsAdmin.next()) {
                             adminId = rsAdmin.getInt("id_usuario");
                         }
                     }
                 } else {
-                    adminId = rs.getInt("id_usuario"); // Admin já existe, pega o ID
-                    System.out.println("Usuário 'admin' já existe (ID: " + adminId + ").");
+                    adminId = rs.getInt("id_usuario");
                 }
             }
 
-            // 3. Criar a tabela de pacientes
-            stmt.execute(sqlPacientes);
-            System.out.println("Tabela 'pacientes' verificada/criada.");
-
-            // 4. Inserir pacientes de exemplo se a tabela de pacientes estiver vazia
-            if (adminId != -1) { // Garante que o ID do admin foi obtido
+            // Inserir pacientes de exemplo se a tabela estiver vazia
+            if (adminId != -1) {
                 try (ResultSet rs = stmt.executeQuery("SELECT id_paciente FROM pacientes LIMIT 1;")) {
-                    if (!rs.next()) { // Se a tabela de pacientes está vazia
+                    if (!rs.next()) {
                         System.out.println("Inserindo pacientes de exemplo para o admin (ID: " + adminId + ").");
 
-                        // Formato para data de nascimento (LocalDate)
                         DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        // Formato para data de cadastro (LocalDateTime)
-                        DateTimeFormatter dtcFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
+                        
                         // Paciente 1
-                        String sqlInsert1 = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                        String sqlInsert1 = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento) VALUES(?, ?, ?, ?, ?, ?, ?)";
                         try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert1)) {
                             pstmt.setInt(1, adminId);
                             pstmt.setString(2, "Maria Silva");
@@ -111,13 +107,12 @@ public class DatabaseManager {
                             pstmt.setString(5, "(11) 98765-4321");
                             pstmt.setString(6, "maria.silva@email.com");
                             pstmt.setString(7, LocalDate.of(1990, 5, 15).format(dobFormatter));
-                            pstmt.setString(8, LocalDateTime.now().format(dtcFormatter));
                             pstmt.executeUpdate();
                         }
 
-                        // Paciente 4
-                        String sqlInsert4 = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert4)) {
+                        // Paciente 2
+                        String sqlInsert2 = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento) VALUES(?, ?, ?, ?, ?, ?, ?)";
+                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert2)) {
                             pstmt.setInt(1, adminId);
                             pstmt.setString(2, "Pedro Almeida");
                             pstmt.setString(3, "222.333.444-55");
@@ -125,21 +120,15 @@ public class DatabaseManager {
                             pstmt.setString(5, "(41) 96666-4444");
                             pstmt.setString(6, "pedro.almeida@email.com");
                             pstmt.setString(7, LocalDate.of(1975, 7, 3).format(dobFormatter));
-                            pstmt.setString(8, LocalDateTime.now().plusMinutes(3).format(dtcFormatter)); // Adiciona 3 minutos
                             pstmt.executeUpdate();
                         }
-                        System.out.println("4 pacientes de exemplo inseridos.");
-                    } else {
-                        System.out.println("Tabela 'pacientes' já contém dados. Não inserindo pacientes de exemplo.");
+                        System.out.println("Pacientes de exemplo inseridos.");
                     }
                 }
-            } else {
-                System.err.println("Não foi possível obter o ID do usuário 'admin'. Pacientes de exemplo não foram inseridos.");
             }
-
         } catch (SQLException e) {
             System.err.println("Erro ao inicializar tabelas ou inserir dados: " + e.getMessage());
-            e.printStackTrace(); // Para ver o stack trace completo
+            e.printStackTrace();
         }
     }
 }

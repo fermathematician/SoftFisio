@@ -31,10 +31,14 @@ public class PatientCardController {
     @FXML private Label dobLabel;
     @FXML private Region deleteIcon;
     @FXML private Button editButton;
+     @FXML private Button viewRecordButton; // <-- ADICIONE ESTA LINHA
 
     private Paciente paciente;
     private AuthServicePaciente authServicePaciente; 
     private OnPatientDeletedListener deletionListener;
+    
+
+    
 
     public PatientCardController() {
         this.authServicePaciente = new AuthServicePaciente();
@@ -58,6 +62,30 @@ public class PatientCardController {
             } else {
                 dobLabel.setText("Não informada");
             }
+        }
+    }
+
+    @FXML
+    private void handleViewRecord() {
+        try {
+            // Carrega o FXML da tela de prontuário
+            URL fxmlUrl = getClass().getResource("/static/TreatmentView.fxml");
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            // Pega a instância do controlador da tela carregada
+            TreatmentViewController controller = loader.getController();
+            
+            // Passa o paciente deste card para o controlador do prontuário
+            controller.initData(this.paciente);
+
+            // Exibe a nova cena na mesma janela
+            Stage stage = (Stage) viewRecordButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 1280, 720));
+            stage.setTitle("SoftFisio - Prontuário do Paciente");
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
