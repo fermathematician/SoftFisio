@@ -87,7 +87,7 @@
                   <HBox alignment="CENTER_RIGHT" spacing="15.0">
                      <children>
                         <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" styleClass="secondary-button" text="Voltar" />
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSave" styleClass="save-button" text="Salvar Paciente" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSave" styleClass="save-button" text="Salvar" />
                      </children>
                      <VBox.margin>
                         <Insets top="10.0" />

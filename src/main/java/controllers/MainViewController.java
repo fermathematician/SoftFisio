@@ -1,6 +1,5 @@
 package controllers;
 
-import db.PacienteDAO;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.net.URL; 
 import java.util.List;
 
+import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;
 import services.SessaoUsuario;
