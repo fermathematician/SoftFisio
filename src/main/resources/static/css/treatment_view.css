@@ -34,7 +34,7 @@
     -fx-border-radius: 12px;
     -fx-background-radius: 12px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 15, 0.0, 0, 4);
-    -fx-min-height: 200px;
+    -fx-min-height: 250px;
     -fx-padding: 15px;
 }
 
@@ -66,6 +66,7 @@
     -fx-font-weight: bold;
     -fx-padding: 10px 20px;
     -fx-cursor: hand;
+    -fx-pref-width: 150px; 
 }
 .primary-button:hover {
     -fx-background-color: #0854a5;
@@ -100,4 +101,18 @@
     -fx-font-size: 18px;
     -fx-font-weight: 600; /* semi-bold */
     -fx-text-fill: #000000;
+}
+
+.delete-icon {
+    -fx-min-width: 15px;
+    -fx-min-height: 20px;
+    -fx-max-width: 15px;
+    -fx-max-height: 20px;
+    -fx-background-color: #d9534f; /* Cor vermelha */
+    -fx-cursor: hand;
+    -fx-shape: "M19 4h-3.5l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12z"; /* Forma de lixeira */
+}
+
+.delete-icon:hover {
+    -fx-background-color: #c9302c; /* Vermelho mais escuro ao passar o mouse */
 }

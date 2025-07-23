@@ -53,4 +53,14 @@ public class ProntuarioService {
         // No futuro, poderia ter lógicas mais complexas aqui.
         return sessaoDAO.findByPacienteId(idPaciente);
     }
+
+    public String deletarSessao(int idSessao) {
+        if(idSessao <= 0) {
+            return "O id da sessão é inválido";
+        }
+
+        boolean sucesso = sessaoDAO.delete(idSessao);
+
+        return sucesso ? "" : "Não foi possivel deletar a sessao do banco de dados";
+    }
 }

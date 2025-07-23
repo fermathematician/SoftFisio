@@ -74,5 +74,20 @@ public class SessaoDAO {
         return sessoes;
     }
 
-    // Futuramente, podemos adicionar métodos update() e delete() aqui.
+    public boolean delete(int id) {
+        String sql = "DELETE FROM sessoes WHERE id_sessao = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao deletar paciente: " + e.getMessage());
+            return false;
+        }
+    }
 }

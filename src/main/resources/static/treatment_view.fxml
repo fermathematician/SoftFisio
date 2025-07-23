@@ -52,12 +52,12 @@
             <Insets bottom="10.0" top="10.0" />
          </VBox.margin>
       </Separator>
-                     <VBox spacing="10.0">
-                           <children>
-                              <Label text="Sessões" styleClass="section-title"/>
-                              
-                              <VBox fx:id="sessionsVBox" spacing="15.0" />
-                           </children>
+                     <VBox spacing="10.0" maxWidth="1000">
+                        <children>
+                           <Label text="Sessões" styleClass="section-title"/>
+                           
+                           <VBox fx:id="sessionsVBox" spacing="20.0" />
+                        </children>
                      </VBox>
                      
                   </children>
