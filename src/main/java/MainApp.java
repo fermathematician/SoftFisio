@@ -12,7 +12,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Locale.setDefault(Locale.of("pt", "BR"));
+        Locale.setDefault(new Locale("pt", "BR"));
         URL fxmlUrl = getClass().getResource("/static/login.fxml");
 
         if (fxmlUrl == null) {

@@ -69,7 +69,7 @@ public class PatientCardController {
     private void handleViewRecord() {
         try {
             // Carrega o FXML da tela de prontuário
-            URL fxmlUrl = getClass().getResource("/static/TreatmentView.fxml");
+            URL fxmlUrl = getClass().getResource("/static/treatment_view.fxml");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
 

@@ -18,6 +18,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import models.Paciente;
 import models.Sessao;
 import services.ProntuarioService;
@@ -90,25 +91,27 @@ public class TreatmentViewController {
      * @return um VBox estilizado contendo as informações da sessão.
      */
     private VBox createSessionCard(Sessao sessao) {
-        VBox card = new VBox(5); // 5 é o espaçamento entre elementos
+        VBox card = new VBox(5);
         card.setPadding(new Insets(15));
-        card.getStyleClass().add("patient-card"); // Reutiliza o estilo do card de paciente
+        card.getStyleClass().add("patient-card");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy 'às' HH:mm");
         Label dateLabel = new Label(sessao.getDataSessao().format(formatter));
-        dateLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        // ANTES: dateLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        dateLabel.getStyleClass().add("session-date-label"); // DEPOIS
 
         Separator separator = new Separator();
         
         Label evolutionLabel = new Label(sessao.getEvolucaoTexto());
-        evolutionLabel.setWrapText(true); // Faz o texto quebrar a linha se for longo
+        evolutionLabel.setWrapText(true);
 
         card.getChildren().addAll(dateLabel, separator, evolutionLabel);
         
-        // Adiciona as observações se existirem
         if (sessao.getObservacoesSessao() != null && !sessao.getObservacoesSessao().isEmpty()) {
             Label obsLabelTitle = new Label("Observações:");
-            obsLabelTitle.setStyle("-fx-font-weight: bold; -fx-padding: 10px 0 0 0;");
+            // ANTES: obsLabelTitle.setStyle("-fx-font-weight: bold; -fx-padding: 10px 0 0 0;");
+            obsLabelTitle.getStyleClass().add("session-observation-title"); // DEPOIS
+
             Label obsLabel = new Label(sessao.getObservacoesSessao());
             obsLabel.setWrapText(true);
             card.getChildren().addAll(obsLabelTitle, obsLabel);
@@ -116,6 +119,7 @@ public class TreatmentViewController {
 
         return card;
     }
+
 
     /**
      * Ação do botão "Salvar Sessão".

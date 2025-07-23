@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Separator?>
+
+<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
+   <top>
+      <VBox styleClass="header" spacing="5.0">
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label fx:id="patientNameLabel" styleClass="page-title" text="Nome do Paciente" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="backButton" onAction="#handleBackButton" mnemonicParsing="false" styleClass="secondary-button" text="Voltar à Lista" />
+               </children>
+            </HBox>
+            <Label fx:id="patientInfoLabel" styleClass="card-subtitle" text="CPF: 000.000.000-00 | Idade: X anos" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
+         </padding>
+      </VBox>
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
+         <content>
+               <VBox spacing="20.0" alignment="TOP_CENTER">
+                  <children>
+
+                     <VBox maxWidth="800.0" spacing="10.0" styleClass="patient-card">
+                           <children>
+                              <Label styleClass="card-title" text="Nova Sessão" />
+                              <TextArea fx:id="newSessionTextArea" prefHeight="150.0" promptText="Descreva a evolução do paciente e as intervenções realizadas nesta sessão..." wrapText="true" />
+                              <HBox alignment="CENTER_RIGHT">
+                                 <children>
+                                       <Button fx:id="saveSessionButton" onAction="#handleSaveSessao" mnemonicParsing="false" styleClass="primary-button" text="Salvar Sessão" />
+                                 </children>
+                              </HBox>
+                           </children>
+                     </VBox>
+
+<Separator prefWidth="200.0">
+         <VBox.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </VBox.margin>
+      </Separator>
+                     <VBox spacing="10.0">
+                           <children>
+                              <Label text="Sessões" styleClass="section-title"/>
+                              
+                              <VBox fx:id="sessionsVBox" spacing="15.0" />
+                           </children>
+                     </VBox>
+                     
+                  </children>
+                  <padding>
+                     <Insets top="25.0" bottom="25.0" left="40.0" right="40.0" />
+                  </padding>
+               </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
