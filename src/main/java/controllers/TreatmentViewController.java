@@ -32,17 +32,13 @@ import services.ProntuarioService;
 
 public class TreatmentViewController {
 
-    // Componentes da área de informações do paciente
     @FXML private Label patientNameLabel;
     @FXML private Label patientInfoLabel;
     @FXML private Button backButton;
-
-    // Componentes da área de nova sessão
     @FXML private TextArea newSessionTextArea;
     @FXML private Button saveSessionButton;
-
-    // Componente que vai conter a lista de sessões
     @FXML private VBox sessionsVBox;
+    @FXML private Button editButton;
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
@@ -135,10 +131,10 @@ public class TreatmentViewController {
         bottomBar.setAlignment(Pos.CENTER_RIGHT); // Alinha o botão à direita
         bottomBar.setPadding(new Insets(15, 0, 0, 0)); // Espaço acima do botão
 
-        Button editButton = new Button("Editar");
+        editButton = new Button("Editar");
         editButton.getStyleClass().add("primary-button"); // Botão azul com texto branco
         editButton.setOnAction(event -> {
-            System.out.println("Editar sessão ID: " + sessao.getId());
+            handleEdit(sessao);
         });
         bottomBar.getChildren().add(editButton);
         
@@ -206,7 +202,6 @@ public class TreatmentViewController {
     /**
      * Ação do botão deletar
      */
-
      @FXML
      private void handleDelete(Sessao sessao) {
         // Mostra um diálogo de confirmação antes de deletar
@@ -232,14 +227,34 @@ public class TreatmentViewController {
             }
         }
      }
-
+    
      /**
       * Ação do botão de editar
       */
-
       @FXML
-      private void handleEdit() {
-        System.out.println("Editando");
-      }
+      private void handleEdit(Sessao sessao) {
+        try {
+            
+            // Carrega o NOVO arquivo FXML de edição
+            URL fxmlUrl = getClass().getResource("/static/editar_sessao.fxml");
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            // Pega a instância do NOVO controlador (EditarPacienteController)
+            EditarSessaoController controller = loader.getController();
+            
+            // Passa a sessao deste card para o controlador da tela de edição
+            controller.initData(sessao, pacienteAtual);
+
+            // Exibe a nova cena na mesma janelapaciente
+            Stage stage = (Stage) editButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 1280, 720));
+            stage.setTitle("SoftFisio - Editar Sessão");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Em uma aplicação real, seria bom mostrar um alerta de erro para o usuário.
+        }     
+    }
 
 }

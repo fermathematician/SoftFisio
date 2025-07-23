@@ -54,6 +54,17 @@ public class ProntuarioService {
         return sessaoDAO.findByPacienteId(idPaciente);
     }
 
+    public String atualizarSessao(int idSessao, int idPaciente, LocalDateTime dataSessao, String evolucaoTexto, String observacoes) {
+        if(evolucaoTexto == null || evolucaoTexto.trim().isEmpty()) {
+            return "O campo 'Evolucao da sessao é obrigatório";
+        }
+
+        Sessao sessaoAtualizada = new Sessao(idSessao, idPaciente, dataSessao, evolucaoTexto, observacoes);
+        boolean sucesso = sessaoDAO.update(sessaoAtualizada);
+
+        return sucesso ? "" : "Ocorreu um erro inesperado ao atualizar a sessão no banco de dados";
+    }
+
     public String deletarSessao(int idSessao) {
         if(idSessao <= 0) {
             return "O id da sessão é inválido";
