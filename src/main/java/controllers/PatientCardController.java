@@ -31,14 +31,11 @@ public class PatientCardController {
     @FXML private Label dobLabel;
     @FXML private Region deleteIcon;
     @FXML private Button editButton;
-     @FXML private Button viewRecordButton; // <-- ADICIONE ESTA LINHA
+    @FXML private Button viewRecordButton; 
 
     private Paciente paciente;
     private AuthServicePaciente authServicePaciente; 
-    private OnPatientDeletedListener deletionListener;
-    
-
-    
+    private OnPatientDeletedListener deletionListener;    
 
     public PatientCardController() {
         this.authServicePaciente = new AuthServicePaciente();
