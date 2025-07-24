@@ -11,26 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Separator?>
 
-<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
-   <top>
-      <VBox styleClass="header" spacing="5.0">
-         <children>
-            <HBox alignment="CENTER_LEFT">
-               <children>
-                  <Label fx:id="patientNameLabel" styleClass="page-title" text="Nome do Paciente" />
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Button fx:id="backButton" onAction="#handleBackButton" mnemonicParsing="false" styleClass="secondary-button" text="Voltar à Lista" />
-               </children>
-            </HBox>
-            <Label fx:id="patientInfoLabel" styleClass="card-subtitle" text="CPF: 000.000.000-00 | Idade: X anos" />
-         </children>
-         <padding>
-            <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
-         </padding>
-      </VBox>
-   </top>
-   <center>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
          <content>
                <VBox spacing="20.0" alignment="TOP_CENTER">
                   <children>
@@ -67,5 +48,3 @@
                </VBox>
          </content>
       </ScrollPane>
-   </center>
-</BorderPane>
