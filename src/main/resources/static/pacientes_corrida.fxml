@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/main_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainViewController">
+<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/main_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PacientesCorridaController">
    <top>
       <HBox alignment="CENTER_LEFT" styleClass="header">
          <children>
@@ -34,10 +34,10 @@
          <children>
             <HBox alignment="CENTER" spacing="10.0">
                <children>
-                  <Label styleClass="page-title" text="Meus Pacientes" />
+                  <Label styleClass="page-title" text="Meus Pacientes Corrida" />
                   <Region HBox.hgrow="ALWAYS" />
                   <TextField fx:id="searchField" promptText="Pesquisar paciente..." styleClass="search-field" />
-                  <Button fx:id="pacienteCorridaButton" mnemonicParsing="false" onAction="#handlePacienteCorrida" styleClass="secondary-button" text="Ver Pacientes Corrida" />
+                  <Button fx:id="verComunsButton" mnemonicParsing="false" onAction="#handleVerComuns" styleClass="secondary-button" text="Ver Pacientes Comuns" />
                   <Button fx:id="newPatientButton" mnemonicParsing="false" onAction="#handleNewPatient" styleClass="primary-button" text="+ Novo Paciente" />
                </children>
             </HBox>

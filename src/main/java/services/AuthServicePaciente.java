@@ -1,7 +1,6 @@
 package services;
 
 import java.time.LocalDate;
-
 import db.PacienteDAO;
 import models.Paciente;
 
@@ -12,32 +11,47 @@ public class AuthServicePaciente {
         pacienteDAO = new PacienteDAO();
     }
 
-    public String cadastrar(int idUsuario, String nomeCompleto,  String cpf, String genero, String telefone, String email, LocalDate dataNascimento) {
-        if(nomeCompleto.isEmpty()) {
+    /**
+     * Valida e cadastra um novo paciente.
+     * @param idUsuario O ID do usuário que está cadastrando.
+     * @param nomeCompleto O nome do paciente.
+     * @param cpf O CPF do paciente.
+     * @param genero O gênero do paciente.
+     * @param telefone O telefone do paciente.
+     * @param email O email do paciente.
+     * @param dataNascimento A data de nascimento do paciente.
+     * @param isPacienteCorrida Um booleano indicando se é um paciente de corrida.
+     * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
+     */
+    public String cadastrar(int idUsuario, String nomeCompleto, String cpf, String genero, String telefone, String email, LocalDate dataNascimento, boolean isPacienteCorrida) {
+        if (nomeCompleto.isEmpty()) {
             return "O nome precisa ser preenchido!";
         }
         
-        if(cpf.isEmpty()) {
+        if (cpf.isEmpty()) {
             return "O cpf precisa ser preenchido!";
         }
 
-        if(genero == null) {
+        if (genero == null) {
             return "O gênero precisa ser selecionado!";
         }
 
-        if(telefone.isEmpty()) {
+        if (telefone.isEmpty()) {
             return "O telefone precisa ser preenchido!";
         }
 
-        if(email.isEmpty()) {
-            return "O email precisa ser preechido!";
+        if (email.isEmpty()) {
+            return "O email precisa ser preenchido!";
         }
        
-        if(dataNascimento == null) {
+        if (dataNascimento == null) {
             return "A data de nascimento precisa ser selecionada!";
         }
 
-        Paciente paciente = new Paciente(0, idUsuario, nomeCompleto, cpf, genero, telefone, email, dataNascimento);
+        // Cria o objeto Paciente, agora passando a informação se é um paciente de corrida.
+        // Assumindo que o construtor do Paciente foi atualizado para aceitar o booleano.
+        Paciente paciente = new Paciente(0, idUsuario, nomeCompleto, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
+        
         boolean sucesso = pacienteDAO.save(paciente);
 
         return sucesso ? "" : "Já existe um paciente com o cpf digitado!";
@@ -52,10 +66,11 @@ public class AuthServicePaciente {
      * @param telefone O novo telefone do paciente.
      * @param email O novo email do paciente.
      * @param dataNascimento A nova data de nascimento do paciente.
+     * @param isPacienteCorrida O novo status de paciente de corrida.
      * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
      */
-    public String atualizar(int idPaciente, String nomeCompleto, String cpf, String genero, String telefone, String email, LocalDate dataNascimento) {
-        // 1. Validação dos campos (a mesma do cadastro)
+    public String atualizar(int idPaciente, String nomeCompleto, String cpf, String genero, String telefone, String email, LocalDate dataNascimento, boolean isPacienteCorrida) {
+        // 1. Validação dos campos
         if (nomeCompleto.isEmpty()) {
             return "O nome precisa ser preenchido!";
         }
@@ -75,22 +90,20 @@ public class AuthServicePaciente {
             return "A data de nascimento precisa ser selecionada!";
         }
 
-        // 2. Precisamos saber qual usuário está fazendo a alteração.
-        //    Pegamos essa informação da sessão.
+        // 2. Obter o usuário logado
         SessaoUsuario sessao = SessaoUsuario.getInstance();
         if (!sessao.isLogado()) {
             return "Erro: Usuário não está logado.";
         }
         int idUsuarioLogado = sessao.getUsuarioLogado().getId();
 
-        // 3. Cria um novo objeto Paciente com os dados atualizados.
-        //    É crucial usar o 'idPaciente' original para que o DAO saiba qual registro atualizar.
-        Paciente pacienteAtualizado = new Paciente(idPaciente, idUsuarioLogado, nomeCompleto, cpf, genero, telefone, email, dataNascimento);
+        // 3. Cria o objeto Paciente com os dados atualizados, incluindo o status de corrida.
+        Paciente pacienteAtualizado = new Paciente(idPaciente, idUsuarioLogado, nomeCompleto, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
         
-        // 4. Chama o método 'update' do DAO, que já existe.
+        // 4. Chama o método 'update' do DAO
         boolean sucesso = pacienteDAO.update(pacienteAtualizado);
 
-        // 5. Retorna o resultado para o controlador.
+        // 5. Retorna o resultado
         return sucesso ? "" : "Não foi possível atualizar. O CPF informado pode já pertencer a outro paciente.";
     } 
 

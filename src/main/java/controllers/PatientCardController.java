@@ -31,30 +31,31 @@ public class PatientCardController {
     @FXML private Label dobLabel;
     @FXML private Region deleteIcon;
     @FXML private Button editButton;
-     @FXML private Button viewRecordButton; // <-- ADICIONE ESTA LINHA
+    @FXML private Button viewRecordButton; 
 
     private Paciente paciente;
     private AuthServicePaciente authServicePaciente; 
-    private OnPatientDeletedListener deletionListener;
-    
-
-    
+    private OnPatientDeletedListener deletionListener;    
+    private boolean isPatientCorridaView;
 
     public PatientCardController() {
         this.authServicePaciente = new AuthServicePaciente();
+
+        isPatientCorridaView = false;
     }
     
     public void setOnPatientDeletedListener(OnPatientDeletedListener listener) {
         this.deletionListener = listener;
     }
     
-    public void setData(Paciente paciente) {
+    public void setData(Paciente paciente, boolean isPatientCorridaView) {
         if (paciente != null) {
             this.paciente = paciente;
             patientNameLabel.setText(paciente.getNomeCompleto());
             patientCpfLabel.setText(paciente.getCpf());
             phoneLabel.setText(paciente.getTelefone());
             emailLabel.setText(paciente.getEmail());
+            this.isPatientCorridaView = isPatientCorridaView; 
 
             if (paciente.getDataNascimento() != null) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
@@ -77,7 +78,7 @@ public class PatientCardController {
             TreatmentViewController controller = loader.getController();
             
             // Passa o paciente deste card para o controlador do prontuário
-            controller.initData(this.paciente);
+            controller.initData(this.paciente, isPatientCorridaView);
 
             // Exibe a nova cena na mesma janela
             Stage stage = (Stage) viewRecordButton.getScene().getWindow();
@@ -131,7 +132,7 @@ public class PatientCardController {
             EditarPacienteController controller = loader.getController();
             
             // Passa o paciente deste card para o controlador da tela de edição
-            controller.initData(this.paciente);
+            controller.initData(this.paciente, isPatientCorridaView);
 
             // Exibe a nova cena na mesma janela
             Stage stage = (Stage) editButton.getScene().getWindow();

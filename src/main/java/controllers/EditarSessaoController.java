@@ -26,9 +26,11 @@ public class EditarSessaoController {
     private final ProntuarioService prontuarioService;
     private Sessao sessao;
     private Paciente paciente;
+    private boolean isPatientCorridaView;
 
     public EditarSessaoController() {
         prontuarioService = new ProntuarioService();
+        isPatientCorridaView = false;
     }
 
     /**
@@ -36,9 +38,10 @@ public class EditarSessaoController {
      * @param sessao O objeto da sessão a ser editada.
      * @param paciente O paciente dono da sessão (para exibir o nome).
      */
-    public void initData(Sessao sessao, Paciente paciente) {
+    public void initData(Sessao sessao, Paciente paciente, boolean isPatientCorridaView) {
         this.sessao = sessao;
         this.paciente = paciente;
+        this.isPatientCorridaView = isPatientCorridaView;
 
         // Preenche o cabeçalho
         patientNameLabel.setText(paciente.getNomeCompleto());
@@ -60,7 +63,7 @@ public class EditarSessaoController {
             TreatmentViewController controller = loader.getController();
             
             // Passa o paciente deste card para o controlador do prontuário
-            controller.initData(this.paciente);
+            controller.initData(this.paciente, isPatientCorridaView);
 
             // Exibe a nova cena na mesma janela
             Stage stage = (Stage) backButton.getScene().getWindow();

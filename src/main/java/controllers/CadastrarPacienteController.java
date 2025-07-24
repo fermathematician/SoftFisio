@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.net.URL;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -9,13 +10,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+// ADICIONADO: Import do CheckBox
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-import java.net.URL;
 
 import services.AuthServicePaciente;
 import services.SessaoUsuario;
@@ -31,28 +32,27 @@ public class CadastrarPacienteController {
     @FXML private Button cancelButton;
     @FXML private Button saveButton;
     @FXML private Label mensagemLabel;
+    @FXML private CheckBox pacienteCorridaCheckBox;
+
+    private boolean isPacienteCorridaView;
 
     private final AuthServicePaciente authService;
 
     public CadastrarPacienteController() {
         authService = new AuthServicePaciente();
+        isPacienteCorridaView = false;
     }
 
-    /**
-     * O método initialize é chamado automaticamente pelo JavaFX
-     * após o arquivo FXML ter sido completamente carregado.
-     * É ideal para configurações iniciais dos componentes.
-     */
+    public void setIsPacienteCorridaView(boolean isPacienteCorridaView) {
+        this.isPacienteCorridaView = isPacienteCorridaView;
+    }
+
     @FXML
     public void initialize() {
         saveButton.setDefaultButton(true);
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
     }
 
-    /**
-     * Chamado quando o botão "Salvar" é clicado.
-     * Valida os campos, cria um novo objeto Paciente e o salva no banco.
-     */
     @FXML
     private void handleSave() {
         SessaoUsuario sessao = SessaoUsuario.getInstance();
@@ -66,14 +66,19 @@ public class CadastrarPacienteController {
             String telefone = phoneField.getText();
             String email = emailField.getText();
             LocalDate dataNascimento = dobPicker.getValue();
+
+            // ADICIONADO: Captura o valor do CheckBox (true se marcado, false se não)
+            boolean isPacienteCorrida = pacienteCorridaCheckBox.isSelected();
             
-            String resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento);
+            // ADICIONADO: Passa o valor do CheckBox para o método do serviço
+            String resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
 
             if (resultado.isEmpty()) {
                 mensagemLabel.setText("Paciente cadastrado com sucesso!");
                 mensagemLabel.setStyle("-fx-text-fill: green;");
+                // Você pode adicionar um código para limpar os campos aqui, se desejar
             } else {
-                mensagemLabel.setText(resultado); // Exibe a mensagem de erro vinda do serviço
+                mensagemLabel.setText(resultado);
                 mensagemLabel.setStyle("-fx-text-fill: red;");
             }
 
@@ -83,20 +88,27 @@ public class CadastrarPacienteController {
         }
     }
 
-    /**
-     * Chamado quando o botão "Cancelar" é clicado.
-     * Simplesmente fecha a janela de cadastro.
-     */
     @FXML
     private void handleCancel() {
         try {
-            Stage stage = (Stage) cancelButton.getScene().getWindow();
-            // Correção aqui:
-            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-            Parent registerView = FXMLLoader.load(fxmlUrl);
+            if(isPacienteCorridaView == true) {
+                Stage stage = (Stage) cancelButton.getScene().getWindow();
+                URL fxmlUrl = getClass().getResource("/static/pacientes_corrida.fxml");
+
+                Parent pacienteCorridaView = FXMLLoader.load(fxmlUrl);
             
-            stage.setScene(new Scene(registerView, 1280, 720));
-            stage.setTitle("SoftFisio - Lista de pacientes");
+                stage.setScene(new Scene(pacienteCorridaView, 1280, 720));
+                stage.setTitle("SoftFisio - Lista de pacientes corrida");
+            }else {
+                Stage stage = (Stage) cancelButton.getScene().getWindow();
+                URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
+
+                Parent mainView = FXMLLoader.load(fxmlUrl);
+            
+                stage.setScene(new Scene(mainView, 1280, 720));
+                stage.setTitle("SoftFisio - Lista de pacientes");
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

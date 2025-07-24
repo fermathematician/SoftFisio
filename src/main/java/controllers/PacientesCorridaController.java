@@ -22,14 +22,14 @@ import models.Paciente;
 import models.Usuario;
 import services.SessaoUsuario;
 
-public class MainViewController implements PatientCardController.OnPatientDeletedListener {
+public class PacientesCorridaController implements PatientCardController.OnPatientDeletedListener {
 
     @FXML private Label userNameLabel;
     @FXML private Button logoutButton;
     @FXML private Button newPatientButton;
     @FXML private TextField searchField; 
     @FXML private TilePane patientTilePane; 
-    @FXML private Button pacienteCorridaButton;
+    @FXML private Button verComunsButton;
 
     private PacienteDAO pacienteDAO;
 
@@ -58,8 +58,8 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         SessaoUsuario sessao = SessaoUsuario.getInstance();
         if (sessao.isLogado()) {
             Usuario usuarioLogado = sessao.getUsuarioLogado();
-            // Corrigido: Carregando pacientes comuns (false) na tela principal.
-            List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(usuarioLogado.getId(), false);
+            // Lógica principal alterada: Carregando pacientes de corrida (true)
+            List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(usuarioLogado.getId(), true);
 
             for (Paciente paciente : pacientesDoUsuario) {
                 try {
@@ -75,7 +75,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
                     cardNode.setUserData(paciente);
 
                     PatientCardController cardController = loader.getController();
-                    cardController.setData(paciente, false);
+                    cardController.setData(paciente, true);
                     
                     cardController.setOnPatientDeletedListener(this);
 
@@ -85,7 +85,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
                     e.printStackTrace();
                 }
             }
-            System.out.println("Cards de pacientes comuns carregados: " + pacientesDoUsuario.size());
+            System.out.println("Cards de pacientes de corrida carregados: " + pacientesDoUsuario.size());
         } else {
             System.err.println("Nenhum usuário logado. Nenhum card para carregar.");
         }
@@ -107,16 +107,16 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     }
 
     @FXML
-    private void handlePacienteCorrida() {
+    private void handleVerComuns() {
         try {
-            URL fxmlUrl = getClass().getResource("/static/pacientes_corrida.fxml");
-            Parent corridaView = FXMLLoader.load(fxmlUrl);
+            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
+            Parent mainView = FXMLLoader.load(fxmlUrl);
             
-            Stage stage = (Stage) pacienteCorridaButton.getScene().getWindow();
-            stage.setScene(new Scene(corridaView, 1280, 720));
-            stage.setTitle("SoftFisio - Pacientes de Corrida");
+            Stage stage = (Stage) verComunsButton.getScene().getWindow();
+            stage.setScene(new Scene(mainView, 1280, 720));
+            stage.setTitle("SoftFisio - Meus Pacientes");
         } catch (IOException e) {
-            System.err.println("Erro ao carregar a tela de pacientes de corrida. Verifique se o arquivo 'pacientes_corrida.fxml' existe.");
+            System.err.println("Erro ao carregar a tela principal. Verifique se o arquivo 'main_view.fxml' existe.");
             e.printStackTrace();
         }
     }
@@ -128,7 +128,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
             Parent cadastrarPacienteView = loader.load();
 
             CadastrarPacienteController cadastrarPacienteController = loader.getController();
-            cadastrarPacienteController.setIsPacienteCorridaView(false);
+            cadastrarPacienteController.setIsPacienteCorridaView(true);
 
             Stage stage = (Stage) newPatientButton.getScene().getWindow();
             stage.setScene(new Scene(cadastrarPacienteView)); 

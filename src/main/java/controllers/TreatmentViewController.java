@@ -42,9 +42,12 @@ public class TreatmentViewController {
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
+    private boolean isPatientCorridaView;
 
     public TreatmentViewController() {
         this.prontuarioService = new ProntuarioService();
+
+        isPatientCorridaView = false;
     }
     
     @FXML
@@ -56,8 +59,9 @@ public class TreatmentViewController {
     /**
      * Ponto de entrada do controlador. Recebe o paciente da tela anterior.
      */
-    public void initData(Paciente paciente) {
+    public void initData(Paciente paciente, boolean isPatientCorridaView) {
         this.pacienteAtual = paciente;
+        this.isPatientCorridaView = isPatientCorridaView;
         setupHeader();
         loadSessoes();
     }
@@ -168,12 +172,24 @@ public class TreatmentViewController {
     @FXML
     private void handleBackButton() {
         try {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-            Parent mainView = FXMLLoader.load(fxmlUrl);
+            if(isPatientCorridaView == true) {
+                Stage stage = (Stage) backButton.getScene().getWindow();
+                URL fxmlUrl = getClass().getResource("/static/pacientes_corrida.fxml");
+
+                Parent pacienteCorridaView = FXMLLoader.load(fxmlUrl);
             
-            stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Lista de pacientes");
+                stage.setScene(new Scene(pacienteCorridaView, 1280, 720));
+                stage.setTitle("SoftFisio - Lista de pacientes corrida");
+            }else {
+                Stage stage = (Stage) backButton.getScene().getWindow();
+                URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
+
+                Parent mainView = FXMLLoader.load(fxmlUrl);
+            
+                stage.setScene(new Scene(mainView, 1280, 720));
+                stage.setTitle("SoftFisio - Lista de pacientes");
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -234,7 +250,6 @@ public class TreatmentViewController {
       @FXML
       private void handleEdit(Sessao sessao) {
         try {
-            
             // Carrega o NOVO arquivo FXML de edição
             URL fxmlUrl = getClass().getResource("/static/editar_sessao.fxml");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
@@ -244,7 +259,7 @@ public class TreatmentViewController {
             EditarSessaoController controller = loader.getController();
             
             // Passa a sessao deste card para o controlador da tela de edição
-            controller.initData(sessao, pacienteAtual);
+            controller.initData(sessao, pacienteAtual, isPatientCorridaView);
 
             // Exibe a nova cena na mesma janelapaciente
             Stage stage = (Stage) editButton.getScene().getWindow();
