@@ -75,7 +75,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
                     cardNode.setUserData(paciente);
 
                     PatientCardController cardController = loader.getController();
-                    cardController.setData(paciente, false);
+                    cardController.setData(paciente);
                     
                     cardController.setOnPatientDeletedListener(this);
 
@@ -126,9 +126,6 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/cadastrar_paciente.fxml"));
             Parent cadastrarPacienteView = loader.load();
-
-            CadastrarPacienteController cadastrarPacienteController = loader.getController();
-            cadastrarPacienteController.setIsPacienteCorridaView(false);
 
             Stage stage = (Stage) newPatientButton.getScene().getWindow();
             stage.setScene(new Scene(cadastrarPacienteView)); 

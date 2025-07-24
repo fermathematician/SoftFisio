@@ -32,19 +32,14 @@ public class CadastrarPacienteController {
     @FXML private Button cancelButton;
     @FXML private Button saveButton;
     @FXML private Label mensagemLabel;
-    @FXML private CheckBox pacienteCorridaCheckBox;
 
-    private boolean isPacienteCorridaView;
+    // ADICIONADO: Referência para o CheckBox do FXML
+    @FXML private CheckBox pacienteCorridaCheckBox;
 
     private final AuthServicePaciente authService;
 
     public CadastrarPacienteController() {
         authService = new AuthServicePaciente();
-        isPacienteCorridaView = false;
-    }
-
-    public void setIsPacienteCorridaView(boolean isPacienteCorridaView) {
-        this.isPacienteCorridaView = isPacienteCorridaView;
     }
 
     @FXML
@@ -91,24 +86,12 @@ public class CadastrarPacienteController {
     @FXML
     private void handleCancel() {
         try {
-            if(isPacienteCorridaView == true) {
-                Stage stage = (Stage) cancelButton.getScene().getWindow();
-                URL fxmlUrl = getClass().getResource("/static/pacientes_corrida.fxml");
-
-                Parent pacienteCorridaView = FXMLLoader.load(fxmlUrl);
+            Stage stage = (Stage) cancelButton.getScene().getWindow();
+            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
+            Parent mainView = FXMLLoader.load(fxmlUrl);
             
-                stage.setScene(new Scene(pacienteCorridaView, 1280, 720));
-                stage.setTitle("SoftFisio - Lista de pacientes corrida");
-            }else {
-                Stage stage = (Stage) cancelButton.getScene().getWindow();
-                URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-
-                Parent mainView = FXMLLoader.load(fxmlUrl);
-            
-                stage.setScene(new Scene(mainView, 1280, 720));
-                stage.setTitle("SoftFisio - Lista de pacientes");
-            }
-
+            stage.setScene(new Scene(mainView, 1280, 720));
+            stage.setTitle("SoftFisio - Lista de Pacientes");
         } catch (IOException e) {
             e.printStackTrace();
         }

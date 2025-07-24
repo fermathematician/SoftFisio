@@ -75,7 +75,7 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
                     cardNode.setUserData(paciente);
 
                     PatientCardController cardController = loader.getController();
-                    cardController.setData(paciente, true);
+                    cardController.setData(paciente);
                     
                     cardController.setOnPatientDeletedListener(this);
 
@@ -126,9 +126,6 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/cadastrar_paciente.fxml"));
             Parent cadastrarPacienteView = loader.load();
-
-            CadastrarPacienteController cadastrarPacienteController = loader.getController();
-            cadastrarPacienteController.setIsPacienteCorridaView(true);
 
             Stage stage = (Stage) newPatientButton.getScene().getWindow();
             stage.setScene(new Scene(cadastrarPacienteView)); 

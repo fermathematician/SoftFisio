@@ -38,11 +38,9 @@ public class EditarPacienteController {
 
     private final AuthServicePaciente authService;
     private Paciente pacienteParaEditar;
-    private boolean isPatientCorridaView;
 
     public EditarPacienteController() {
         authService = new AuthServicePaciente();
-        isPatientCorridaView = false;
     }
 
     @FXML
@@ -51,9 +49,8 @@ public class EditarPacienteController {
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
     }
 
-    public void initData(Paciente paciente, boolean isPacienteCorridaView) {
+    public void initData(Paciente paciente) {
         this.pacienteParaEditar = paciente;
-        this.isPatientCorridaView = isPacienteCorridaView;
 
         // Preenche todos os campos do formulário com os dados atuais do paciente.
         nameField.setText(paciente.getNomeCompleto());
@@ -94,23 +91,13 @@ public class EditarPacienteController {
     @FXML
     private void handleCancel() {
         try {
-            if(isPatientCorridaView == true) {
-                Stage stage = (Stage) cancelButton.getScene().getWindow();
-                URL fxmlUrl = getClass().getResource("/static/pacientes_corrida.fxml");
+            Stage stage = (Stage) cancelButton.getScene().getWindow();
+            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
 
-                Parent pacienteCorridaView = FXMLLoader.load(fxmlUrl);
+            Parent mainView = FXMLLoader.load(fxmlUrl);
             
-                stage.setScene(new Scene(pacienteCorridaView, 1280, 720));
-                stage.setTitle("SoftFisio - Lista de pacientes corrida");
-            }else {
-                Stage stage = (Stage) cancelButton.getScene().getWindow();
-                URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-
-                Parent mainView = FXMLLoader.load(fxmlUrl);
-            
-                stage.setScene(new Scene(mainView, 1280, 720));
-                stage.setTitle("SoftFisio - Lista de pacientes");
-            }
+            stage.setScene(new Scene(mainView, 1280, 720));
+            stage.setTitle("SoftFisio - Lista de pacientes");
 
         } catch (IOException e) {
             e.printStackTrace();
