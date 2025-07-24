@@ -1,4 +1,3 @@
-// db/DatabaseManager.java
 package db;
 
 import java.sql.Connection;
@@ -8,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class DatabaseManager {
 
@@ -39,17 +37,18 @@ public class DatabaseManager {
 
         // SQL para criar a tabela de pacientes
         String sqlPacientes = "CREATE TABLE IF NOT EXISTS pacientes (" +
-                "id_paciente INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "id_usuario INTEGER NOT NULL," +
-                "nome TEXT NOT NULL," +
-                "cpf TEXT UNIQUE," +
-                "genero TEXT," +
-                "telefone TEXT," +
-                "email TEXT," +
-                "data_nascimento TEXT," +
-                "data_cadastro TEXT DEFAULT CURRENT_TIMESTAMP," +
-                "FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)" +
-                ");";
+            "id_paciente INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "id_usuario INTEGER NOT NULL," +
+            "nome TEXT NOT NULL," +
+            "cpf TEXT UNIQUE," +
+            "genero TEXT," +
+            "telefone TEXT," +
+            "email TEXT," +
+            "data_nascimento TEXT," +
+            "data_cadastro TEXT DEFAULT CURRENT_TIMESTAMP," +
+            "paciente_corrida BOOLEAN DEFAULT FALSE," + 
+            "FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)" +
+            ");";
 
         // SQL para a nova tabela 'sessoes'
         String sqlSessoes = "CREATE TABLE IF NOT EXISTS sessoes (" +
@@ -94,31 +93,33 @@ public class DatabaseManager {
                     if (!rs.next()) {
                         System.out.println("Inserindo pacientes de exemplo para o admin (ID: " + adminId + ").");
 
-                        DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        String sqlInsert = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, paciente_corrida) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
                         
-                        // Paciente 1
-                        String sqlInsert1 = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento) VALUES(?, ?, ?, ?, ?, ?, ?)";
-                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert1)) {
+                        // Paciente 1 (Comum)
+                        System.out.println("-> Inserindo paciente comum de exemplo: Maria Silva");
+                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert)) {
                             pstmt.setInt(1, adminId);
                             pstmt.setString(2, "Maria Silva");
                             pstmt.setString(3, "111.222.333-44");
                             pstmt.setString(4, "Feminino");
                             pstmt.setString(5, "(11) 98765-4321");
                             pstmt.setString(6, "maria.silva@email.com");
-                            pstmt.setString(7, LocalDate.of(1990, 5, 15).format(dobFormatter));
+                            pstmt.setString(7, LocalDate.of(1990, 5, 15).toString());
+                            pstmt.setBoolean(8, false);
                             pstmt.executeUpdate();
                         }
 
-                        // Paciente 2
-                        String sqlInsert2 = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento) VALUES(?, ?, ?, ?, ?, ?, ?)";
-                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert2)) {
+                        // Paciente 2 (Corrida)
+                        System.out.println("-> Inserindo paciente de corrida de exemplo: Pedro Almeida");
+                        try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert)) {
                             pstmt.setInt(1, adminId);
                             pstmt.setString(2, "Pedro Almeida");
                             pstmt.setString(3, "222.333.444-55");
                             pstmt.setString(4, "Masculino");
                             pstmt.setString(5, "(41) 96666-4444");
                             pstmt.setString(6, "pedro.almeida@email.com");
-                            pstmt.setString(7, LocalDate.of(1975, 7, 3).format(dobFormatter));
+                            pstmt.setString(7, LocalDate.of(1975, 7, 3).toString());
+                            pstmt.setBoolean(8, true);
                             pstmt.executeUpdate();
                         }
                         System.out.println("Pacientes de exemplo inseridos.");

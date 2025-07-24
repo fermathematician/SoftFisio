@@ -19,7 +19,7 @@ public class PacienteDAO {
      * @return true se o paciente foi salvo com sucesso, false caso contrário.
      */
     public boolean save(Paciente paciente) {
-        String sql = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro, paciente_corrida) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -30,8 +30,9 @@ public class PacienteDAO {
             pstmt.setString(4, paciente.getGenero());
             pstmt.setString(5, paciente.getTelefone());
             pstmt.setString(6, paciente.getEmail());
-            pstmt.setString(7, paciente.getDataNascimento().toString()); // Converte LocalDate para String
-            pstmt.setString(8, paciente.getDataCadastro().toString()); // Converte LocalDateTime para String
+            pstmt.setString(7, paciente.getDataNascimento().toString());
+            pstmt.setString(8, paciente.getDataCadastro().toString());
+            pstmt.setBoolean(9, paciente.isPacienteCorrida());
 
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
@@ -72,8 +73,8 @@ public class PacienteDAO {
                     rs.getString("genero"),
                     rs.getString("telefone"),
                     rs.getString("email"),
-                    LocalDate.parse(rs.getString("data_nascimento")) // Converte String para LocalDate
-                    // data_cadastro será definida automaticamente no construtor ou adicionada posteriormente se necessário
+                    LocalDate.parse(rs.getString("data_nascimento")),
+                    rs.getBoolean("paciente_corrida")
                 );               
             }
         } catch (SQLException e) {
@@ -83,19 +84,24 @@ public class PacienteDAO {
     }
 
     /**
-     * Busca todos os pacientes associados a um determinado ID de usuário.
+     * Busca todos os pacientes associados a um determinado ID de usuário,
+     * filtrando pelo status de "paciente de corrida".
      *
      * @param idUsuario O ID do usuário (fisioterapeuta) para filtrar os pacientes.
-     * @return Uma lista de objetos Paciente.
+     * @param isPacienteCorrida O status de corrida para o filtro (true para pacientes de corrida, false para comuns).
+     * @return Uma lista de objetos Paciente que correspondem ao filtro.
      */
-    public List<Paciente> findByUsuarioId(int idUsuario) {
-        String sql = "SELECT * FROM pacientes WHERE id_usuario = ?";
+    public List<Paciente> findByUsuarioId(int idUsuario, boolean isPacienteCorrida) { 
+        // ALTERADO: Adicionada a condição para a coluna 'paciente_corrida'
+        String sql = "SELECT * FROM pacientes WHERE id_usuario = ? AND paciente_corrida = ?";
         List<Paciente> pacientes = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idUsuario);
+            pstmt.setBoolean(2, isPacienteCorrida); 
+
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -107,7 +113,8 @@ public class PacienteDAO {
                     rs.getString("genero"),
                     rs.getString("telefone"),
                     rs.getString("email"),
-                    LocalDate.parse(rs.getString("data_nascimento"))
+                    LocalDate.parse(rs.getString("data_nascimento")),
+                    rs.getBoolean("paciente_corrida")
                 );
                 pacientes.add(paciente);
             }
@@ -125,7 +132,7 @@ public class PacienteDAO {
      * @return true se o paciente foi atualizado com sucesso, false caso contrário.
      */
     public boolean update(Paciente paciente) {
-        String sql = "UPDATE pacientes SET id_usuario = ?, nome = ?, cpf = ?, genero = ?, telefone = ?, email = ?, data_nascimento = ? WHERE id_paciente = ?";
+        String sql = "UPDATE pacientes SET id_usuario = ?, nome = ?, cpf = ?, genero = ?, telefone = ?, email = ?, data_nascimento = ?, paciente_corrida = ? WHERE id_paciente = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -137,7 +144,8 @@ public class PacienteDAO {
             pstmt.setString(5, paciente.getTelefone());
             pstmt.setString(6, paciente.getEmail());
             pstmt.setString(7, paciente.getDataNascimento().toString());
-            pstmt.setInt(8, paciente.getId()); // O ID para o WHERE clause
+            pstmt.setBoolean(8, paciente.isPacienteCorrida());
+            pstmt.setInt(9, paciente.getId());
 
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
