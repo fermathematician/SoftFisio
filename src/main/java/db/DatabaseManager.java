@@ -60,6 +60,18 @@ public class DatabaseManager {
                 "FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente)" +
                 ");";
 
+        String sqlAvaliacoes = "CREATE TABLE IF NOT EXISTS avaliacoes (" +
+        "id_avaliacao INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "id_paciente INTEGER NOT NULL," +
+        "data_avaliacao TEXT NOT NULL," +
+        "queixa_principal TEXT," +
+        "historico_doenca_atual TEXT," +
+        "exames_fisicos TEXT," +
+        "diagnostico_fisioterapeutico TEXT," +
+        "plano_tratamento TEXT," +
+        "FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente)" +
+        ");";
+
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
 
@@ -70,6 +82,8 @@ public class DatabaseManager {
             System.out.println("Tabela 'pacientes' verificada/criada.");
             stmt.execute(sqlSessoes);
             System.out.println("Tabela 'sessoes' verificada/criada.");
+            stmt.execute(sqlAvaliacoes);
+            System.out.println("Tabela 'avaliacoes' verificada/criada.");
 
             // Inserir usuário 'admin' se não existir
             int adminId = -1;
@@ -131,4 +145,5 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
+
 }

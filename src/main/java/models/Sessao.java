@@ -2,7 +2,7 @@ package models;
 
 import java.time.LocalDateTime;
 
-public class Sessao {
+public class Sessao implements HistoricoItem {
 
     private final int id;
     private final int idPaciente;
@@ -11,7 +11,7 @@ public class Sessao {
     private final String observacoesSessao;
 
     // Construtor para criar um objeto Sessao com todos os seus dados
-    public Sessao(int id, int idPaciente, LocalDateTime dataSessao, String evolucaoTexto, String observacoesSessao) {
+    public Sessao (int id, int idPaciente, LocalDateTime dataSessao, String evolucaoTexto, String observacoesSessao) {
         this.id = id;
         this.idPaciente = idPaciente;
         this.dataSessao = dataSessao;
@@ -40,4 +40,14 @@ public class Sessao {
     public String getObservacoesSessao() {
         return observacoesSessao;
     }
+
+    @Override
+    public LocalDateTime getDataHora() {
+        return this.dataSessao;
+}
+
+    @Override
+    public String getTipo() {
+        return "Sessão";   
+}
 }

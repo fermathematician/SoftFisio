@@ -32,9 +32,6 @@ import services.ProntuarioService;
 
 public class TreatmentViewController {
 
-    @FXML private Label patientNameLabel;
-    @FXML private Label patientInfoLabel;
-    @FXML private Button backButton;
     @FXML private TextArea newSessionTextArea;
     @FXML private Button saveSessionButton;
     @FXML private VBox sessionsVBox;
@@ -53,23 +50,10 @@ public class TreatmentViewController {
         saveSessionButton.setDefaultButton(true);
     }
 
-    /**
-     * Ponto de entrada do controlador. Recebe o paciente da tela anterior.
-     */
     public void initData(Paciente paciente) {
-        this.pacienteAtual = paciente;
-        setupHeader();
-        loadSessoes();
-    }
-
-    /**
-     * Preenche o cabeçalho com as informações do paciente.
-     */
-    private void setupHeader() {
-        patientNameLabel.setText(pacienteAtual.getNomeCompleto());
-        int idade = Period.between(pacienteAtual.getDataNascimento(), LocalDateTime.now().toLocalDate()).getYears();
-        patientInfoLabel.setText("CPF: " + pacienteAtual.getCpf() + " | Idade: " + idade + " anos");
-    }
+    this.pacienteAtual = paciente;
+    loadSessoes();
+}
 
     /**
      * Carrega as sessões do banco de dados e as exibe na tela.
@@ -161,24 +145,6 @@ public class TreatmentViewController {
 
         return card;
     }
-
-    /**
-     * Ação do botão "Voltar à Lista".
-     */
-    @FXML
-    private void handleBackButton() {
-        try {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-            Parent mainView = FXMLLoader.load(fxmlUrl);
-            
-            stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Lista de pacientes");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Ação do botão "Salvar Sessão".
      */

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+
+<BorderPane fx:id="prontuarioRoot" prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProntuarioViewController">
+   <top>
+      <VBox spacing="5.0" styleClass="header">
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label fx:id="patientNameLabel" styleClass="page-title" text="Nome do Paciente" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBackButton" styleClass="secondary-button" text="Voltar à Lista" />
+               </children>
+            </HBox>
+            <Label fx:id="patientInfoLabel" styleClass="card-subtitle" text="CPF: 000.000.000-00 | Idade: X anos" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
+         </padding>
+      </VBox>
+   </top>
+   <center>
+      <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab text="Sessões">
+               <content>
+                  <fx:include fx:id="sessoesTabContent" source="treatment_view.fxml" />
+               </content>
+          </Tab>
+          <Tab text="Avaliação">
+       <content>
+          <fx:include fx:id="avaliacaoTabContent" source="avaliacao_view.fxml" />
+       </content>
+         </Tab>
+          <Tab text="Histórico Completo">
+           <content>
+              <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                 <content>
+                    <VBox fx:id="historicoVBox" spacing="20.0" styleClass="content-pane">
+                       <padding>
+                          <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
+                       </padding>
+                    </VBox>
+                 </content>
+              </ScrollPane>
+           </content>
+         </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+</BorderPane>
