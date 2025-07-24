@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoViewController">
+   <content>
+      <VBox alignment="TOP_CENTER" spacing="20.0">
+         <children>
+            <VBox maxWidth="800.0" spacing="15.0" styleClass="patient-card">
+               <children>
+                  <Label styleClass="card-title" text="Nova Avaliação Fisioterapêutica" />
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Queixa Principal" />
+                        <TextArea fx:id="queixaPrincipalArea" prefHeight="80.0" wrapText="true" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Histórico da Doença Atual (HDA)" />
+                        <TextArea fx:id="hdaArea" prefHeight="120.0" wrapText="true" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Exames Físicos" />
+                        <TextArea fx:id="examesFisicosArea" prefHeight="120.0" wrapText="true" />
+                     </children>
+                  </VBox>
+                   <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
+                        <TextArea fx:id="diagnosticoArea" prefHeight="120.0" wrapText="true" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Plano de Tratamento" />
+                        <TextArea fx:id="planoTratamentoArea" prefHeight="120.0" wrapText="true" />
+                     </children>
+                  </VBox>
+
+                  <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />
+
+                  <VBox alignment="CENTER_RIGHT">
+                     <children>
+                        <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar Avaliação" prefWidth="200.0" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
+         </padding>
+      </VBox>
+   </content>
+</ScrollPane>

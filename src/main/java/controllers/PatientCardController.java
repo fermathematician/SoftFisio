@@ -65,29 +65,51 @@ public class PatientCardController {
         }
     }
 
-    @FXML
-    private void handleViewRecord() {
-        try {
-            // Carrega o FXML da tela de prontuário
-            URL fxmlUrl = getClass().getResource("/static/treatment_view.fxml");
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
+// Em controllers/PatientCardController.java
 
-            // Pega a instância do controlador da tela carregada
-            TreatmentViewController controller = loader.getController();
-            
-            // Passa o paciente deste card para o controlador do prontuário
-            controller.initData(this.paciente);
-
-            // Exibe a nova cena na mesma janela
-            Stage stage = (Stage) viewRecordButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.setTitle("SoftFisio - Prontuário do Paciente");
-
-        } catch (IOException e) {
-            e.printStackTrace();
+@FXML
+private void handleViewRecord() {
+    System.out.println("DEBUG: Botão 'Ver Ficha' clicado para o paciente: " + this.paciente.getNomeCompleto());
+    try {
+        // 1. Tenta encontrar o arquivo FXML
+        URL fxmlUrl = getClass().getResource("/static/prontuario_view.fxml");
+        if (fxmlUrl == null) {
+            System.err.println("ERRO CRÍTICO: Não foi possível encontrar o arquivo /static/prontuario_view.fxml. Verifique o caminho.");
+            return;
         }
+        System.out.println("DEBUG: Arquivo prontuario_view.fxml encontrado com sucesso.");
+
+        // 2. Tenta carregar o FXML e o seu controller
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        Parent root = loader.load();
+        System.out.println("DEBUG: FXML carregado. Tentando obter o controller...");
+
+        // 3. Tenta obter o controller
+        ProntuarioViewController controller = loader.getController();
+        if (controller == null) {
+            System.err.println("ERRO CRÍTICO: O controller para prontuario_view.fxml não foi injetado. Verifique o fx:controller no arquivo FXML.");
+            return;
+        }
+        System.out.println("DEBUG: Controller obtido com sucesso. Chamando initData...");
+
+        // 4. Tenta passar os dados
+        controller.initData(this.paciente);
+        System.out.println("DEBUG: initData chamado com sucesso. Configurando a cena...");
+
+        // 5. Tenta configurar e mostrar a nova cena
+        Stage stage = (Stage) viewRecordButton.getScene().getWindow();
+        stage.setScene(new Scene(root, 1280, 720));
+        stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
+        System.out.println("DEBUG: Cena configurada. A nova tela deveria estar visível.");
+
+    } catch (IOException e) {
+        System.err.println("### ERRO DE IO AO CARREGAR A TELA DE PRONTUÁRIO ###");
+        e.printStackTrace(); // Isto vai imprimir o erro detalhado no console
+    } catch (Exception e) {
+        System.err.println("### UM ERRO INESPERADO OCORREU ###");
+        e.printStackTrace();
     }
+}
 
     @FXML
     private void handleDelete() {
