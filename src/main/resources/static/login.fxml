@@ -7,7 +7,9 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 
 <BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
    <top>
@@ -32,7 +34,14 @@
                   <TextField fx:id="loginField" promptText="Seu nome de usuário" styleClass="text-input-line" />
                   
                   <Label styleClass="input-label" text="Digite sua senha" />
-                  <PasswordField fx:id="senhaField" promptText="Sua senha" styleClass="text-input-line" />
+                  <StackPane>
+                     <children>
+                        <PasswordField fx:id="senhaField" promptText="Sua senha" styleClass="text-input-line" />
+                        <TextField fx:id="senhaTextField" managed="false" promptText="Sua senha" styleClass="text-input-line" visible="false" />
+
+                        <Region fx:id="toggleSenhaIcon" onMouseClicked="#handleToggleSenhaAction" styleClass="toggle-icon" StackPane.alignment="CENTER_RIGHT" />                     
+                     </children>
+                  </StackPane>
                   
                   <VBox alignment="CENTER" spacing="10.0">
                      <children>

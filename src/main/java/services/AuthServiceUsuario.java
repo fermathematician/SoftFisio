@@ -53,9 +53,6 @@ public class AuthServiceUsuario {
         if (senha == null || senha.length() < 6) {
             return "A senha deve ter pelo menos 6 caracteres.";
         }
-
-        System.out.println(senha);
-        System.out.println(confirmarSenha);
         
         if(confirmarSenha == null || !senha.equals(confirmarSenha)) {
             return "As senhas não coincidem";

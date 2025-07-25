@@ -8,12 +8,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-
 import java.net.URL;
-
 import services.AuthServiceUsuario;
 
 public class RegisterController {
@@ -25,22 +24,74 @@ public class RegisterController {
     @FXML private Button registerButton;
     @FXML private Label mensagemLabel;
 
+    @FXML private TextField senhaTextField;
+    @FXML private Region toggleSenhaIcon;
+    @FXML private TextField confirmarSenhaTextField;
+    @FXML private Region toggleConfirmarSenhaIcon;
+
     private final AuthServiceUsuario authService;
+
+    private boolean isSenhaVisible = false;
+    private boolean isConfirmarSenhaVisible = false;
 
     public RegisterController() {
         this.authService = new AuthServiceUsuario();
     }
 
-    /**
-     * Este método é feito para quando clicar enter o botão de registrar seja ativado
-     */
-
-     @FXML
-     private void initialize()
-     {
+    @FXML
+    private void initialize() {
         registerButton.setDefaultButton(true);
-     }
 
+        // Sincroniza os textos
+        senhaTextField.textProperty().bindBidirectional(senhaField.textProperty());
+        confirmarSenhaTextField.textProperty().bindBidirectional(confirmarSenhaField.textProperty());
+
+        // Define os ícones iniciais
+        toggleSenhaIcon.getStyleClass().add("icon-eye");
+        toggleConfirmarSenhaIcon.getStyleClass().add("icon-eye");
+        
+        // NOVO: Impede que os ícones recebam o foco ao serem clicados.
+        toggleSenhaIcon.setFocusTraversable(false);
+        toggleConfirmarSenhaIcon.setFocusTraversable(false);
+    }
+    
+    @FXML
+    private void handleToggleSenhaAction() {
+        isSenhaVisible = !isSenhaVisible;
+        toggleIcon(isSenhaVisible, senhaField, senhaTextField, toggleSenhaIcon);
+    }
+    
+    @FXML
+    private void handleToggleConfirmarSenhaAction() {
+        isConfirmarSenhaVisible = !isConfirmarSenhaVisible;
+        toggleIcon(isConfirmarSenhaVisible, confirmarSenhaField, confirmarSenhaTextField, toggleConfirmarSenhaIcon);
+    }
+    
+    /**
+     * Método auxiliar ATUALIZADO para também gerenciar o foco.
+     */
+    private void toggleIcon(boolean isVisible, PasswordField passwordField, TextField textField, Region icon) {
+        icon.getStyleClass().removeAll("icon-eye", "icon-eye-slash");
+        
+        textField.setManaged(isVisible);
+        textField.setVisible(isVisible);
+        passwordField.setManaged(!isVisible);
+        passwordField.setVisible(!isVisible);
+
+        if (isVisible) {
+            icon.getStyleClass().add("icon-eye-slash");
+            // NOVO: Devolve o foco para o campo de texto visível
+            textField.requestFocus();
+            textField.positionCaret(textField.getText().length());
+        } else {
+            icon.getStyleClass().add("icon-eye");
+            // NOVO: Devolve o foco para o campo de senha oculto
+            passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getText().length());
+        }
+    }
+
+    // O resto do seu código permanece o mesmo
     @FXML
     private void handleRegisterButtonAction() {
         String nomeCompleto = nomeCompletoField.getText();
@@ -51,10 +102,10 @@ public class RegisterController {
         String resultado = authService.cadastrar(nomeCompleto, login, senha, confimarSenha);
 
         if (resultado.isEmpty()) {
-            mensagemLabel.setText("Cadastro realizado com sucesso!");
+            mensagemLabel.setText("Cadastro realizado com sucesso! Voltando para o login...");
             mensagemLabel.setStyle("-fx-text-fill: green;");
         } else {
-            mensagemLabel.setText(resultado); // Exibe a mensagem de erro do serviço
+            mensagemLabel.setText(resultado);
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
     }
@@ -63,10 +114,8 @@ public class RegisterController {
     private void handleBackToLoginButtonAction() {
         try {
             Stage stage = (Stage) registerButton.getScene().getWindow();
-            // Correção aqui:
             URL fxmlUrl = getClass().getResource("/static/login.fxml");
             Parent loginView = FXMLLoader.load(fxmlUrl);
-
             stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {

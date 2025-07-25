@@ -4,46 +4,84 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import models.Usuario;
 
 import java.io.IOException;
-
 import java.net.URL;
-
 import services.SessaoUsuario;
 import services.AuthServiceUsuario;
 
 public class LoginController {
 
-    // @FXML conecta estas variáveis aos componentes com o mesmo fx:id no FXML
     @FXML private TextField loginField;
     @FXML private PasswordField senhaField;
-    @FXML private Button loginButton;
     @FXML private Label mensagemLabel;
 
+    @FXML private TextField senhaTextField;
+    @FXML private Region toggleSenhaIcon;
+
     private final AuthServiceUsuario authService;
+    private boolean isSenhaVisible = false;
 
     public LoginController() {
         this.authService = new AuthServiceUsuario();
     }
 
-    /**
-     * Este método é feito para quando clicar enter o botão de login seja ativado
-     */
-     @FXML
-     private void initialize()
-     {
-        loginButton.setDefaultButton(true);
-     }
+    @FXML
+    private void initialize() {
+        // Sincroniza o texto entre os dois campos de senha
+        senhaTextField.textProperty().bindBidirectional(senhaField.textProperty());
 
-    /**
-     * Este método é chamado quando o botão de login é clicado (definido no onAction do FXML).
-     */
+        // Define o ícone inicial
+        toggleSenhaIcon.getStyleClass().add("icon-eye");
+        
+        // NOVO: Impede que o ícone receba o foco ao ser clicado.
+        // Esta é a principal correção para o bug.
+        toggleSenhaIcon.setFocusTraversable(false);
+    }
+
+    @FXML
+    private void handleToggleSenhaAction() {
+        isSenhaVisible = !isSenhaVisible;
+
+        // Limpa classes de ícone anteriores para evitar acúmulo
+        toggleSenhaIcon.getStyleClass().removeAll("icon-eye", "icon-eye-slash");
+
+        if (isSenhaVisible) {
+            // MOSTRAR SENHA
+            senhaField.setVisible(false);
+            senhaField.setManaged(false);
+            
+            senhaTextField.setVisible(true);
+            senhaTextField.setManaged(true);
+            
+            toggleSenhaIcon.getStyleClass().add("icon-eye-slash");
+            
+            // NOVO: Devolve o foco para o campo de texto e posiciona o cursor no final.
+            senhaTextField.requestFocus();
+            senhaTextField.positionCaret(senhaTextField.getText().length());
+
+        } else {
+            // OCULTAR SENHA
+            senhaTextField.setVisible(false);
+            senhaTextField.setManaged(false);
+            
+            senhaField.setVisible(true);
+            senhaField.setManaged(true);
+
+            toggleSenhaIcon.getStyleClass().add("icon-eye");
+
+            // NOVO: Devolve o foco para o campo de senha e posiciona o cursor no final.
+            senhaField.requestFocus();
+            senhaField.positionCaret(senhaField.getText().length());
+        }
+    }
+
     @FXML
     private void handleLoginButtonAction() {
         String login = loginField.getText();
@@ -63,14 +101,11 @@ public class LoginController {
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
     }
-
-    /**
-     * Carrega a tela principal (main_view.fxml) e a exibe na mesma janela.
-     */
+    
+    // Seus outros métodos continuam aqui...
     private void navigateToMainView() {
         try {
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            // Correção aqui:
+            Stage stage = (Stage) loginField.getScene().getWindow();
             URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
             Parent mainView = FXMLLoader.load(fxmlUrl);
             
@@ -86,8 +121,7 @@ public class LoginController {
     @FXML
     private void handleGoToRegisterButtonAction() {
         try {
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            // Correção aqui:
+            Stage stage = (Stage) loginField.getScene().getWindow();
             URL fxmlUrl = getClass().getResource("/static/register.fxml");
             Parent registerView = FXMLLoader.load(fxmlUrl);
             
