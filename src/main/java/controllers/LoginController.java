@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -24,6 +25,7 @@ public class LoginController {
 
     @FXML private TextField senhaTextField;
     @FXML private Region toggleSenhaIcon;
+    @FXML private Button loginButton;
 
     private final AuthServiceUsuario authService;
     private boolean isSenhaVisible = false;
@@ -34,22 +36,19 @@ public class LoginController {
 
     @FXML
     private void initialize() {
-        // Sincroniza o texto entre os dois campos de senha
         senhaTextField.textProperty().bindBidirectional(senhaField.textProperty());
 
-        // Define o ícone inicial
         toggleSenhaIcon.getStyleClass().add("icon-eye");
         
-        // NOVO: Impede que o ícone receba o foco ao ser clicado.
-        // Esta é a principal correção para o bug.
         toggleSenhaIcon.setFocusTraversable(false);
+
+        loginButton.setDefaultButton(true);
     }
 
     @FXML
     private void handleToggleSenhaAction() {
         isSenhaVisible = !isSenhaVisible;
 
-        // Limpa classes de ícone anteriores para evitar acúmulo
         toggleSenhaIcon.getStyleClass().removeAll("icon-eye", "icon-eye-slash");
 
         if (isSenhaVisible) {
@@ -62,12 +61,10 @@ public class LoginController {
             
             toggleSenhaIcon.getStyleClass().add("icon-eye-slash");
             
-            // NOVO: Devolve o foco para o campo de texto e posiciona o cursor no final.
             senhaTextField.requestFocus();
             senhaTextField.positionCaret(senhaTextField.getText().length());
 
         } else {
-            // OCULTAR SENHA
             senhaTextField.setVisible(false);
             senhaTextField.setManaged(false);
             
@@ -76,7 +73,6 @@ public class LoginController {
 
             toggleSenhaIcon.getStyleClass().add("icon-eye");
 
-            // NOVO: Devolve o foco para o campo de senha e posiciona o cursor no final.
             senhaField.requestFocus();
             senhaField.positionCaret(senhaField.getText().length());
         }
@@ -102,7 +98,6 @@ public class LoginController {
         }
     }
     
-    // Seus outros métodos continuam aqui...
     private void navigateToMainView() {
         try {
             Stage stage = (Stage) loginField.getScene().getWindow();

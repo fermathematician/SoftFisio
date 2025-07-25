@@ -42,15 +42,12 @@ public class RegisterController {
     private void initialize() {
         registerButton.setDefaultButton(true);
 
-        // Sincroniza os textos
         senhaTextField.textProperty().bindBidirectional(senhaField.textProperty());
         confirmarSenhaTextField.textProperty().bindBidirectional(confirmarSenhaField.textProperty());
 
-        // Define os ícones iniciais
         toggleSenhaIcon.getStyleClass().add("icon-eye");
         toggleConfirmarSenhaIcon.getStyleClass().add("icon-eye");
         
-        // NOVO: Impede que os ícones recebam o foco ao serem clicados.
         toggleSenhaIcon.setFocusTraversable(false);
         toggleConfirmarSenhaIcon.setFocusTraversable(false);
     }
@@ -67,9 +64,6 @@ public class RegisterController {
         toggleIcon(isConfirmarSenhaVisible, confirmarSenhaField, confirmarSenhaTextField, toggleConfirmarSenhaIcon);
     }
     
-    /**
-     * Método auxiliar ATUALIZADO para também gerenciar o foco.
-     */
     private void toggleIcon(boolean isVisible, PasswordField passwordField, TextField textField, Region icon) {
         icon.getStyleClass().removeAll("icon-eye", "icon-eye-slash");
         
@@ -80,18 +74,15 @@ public class RegisterController {
 
         if (isVisible) {
             icon.getStyleClass().add("icon-eye-slash");
-            // NOVO: Devolve o foco para o campo de texto visível
             textField.requestFocus();
             textField.positionCaret(textField.getText().length());
         } else {
             icon.getStyleClass().add("icon-eye");
-            // NOVO: Devolve o foco para o campo de senha oculto
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
         }
     }
 
-    // O resto do seu código permanece o mesmo
     @FXML
     private void handleRegisterButtonAction() {
         String nomeCompleto = nomeCompletoField.getText();
