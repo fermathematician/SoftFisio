@@ -21,6 +21,7 @@ public class RegisterController {
     @FXML private TextField nomeCompletoField;
     @FXML private TextField loginField;
     @FXML private PasswordField senhaField;
+    @FXML private PasswordField confirmarSenhaField;
     @FXML private Button registerButton;
     @FXML private Label mensagemLabel;
 
@@ -45,8 +46,9 @@ public class RegisterController {
         String nomeCompleto = nomeCompletoField.getText();
         String login = loginField.getText();
         String senha = senhaField.getText();
+        String confimarSenha = confirmarSenhaField.getText();
 
-        String resultado = authService.cadastrar(login, senha, nomeCompleto);
+        String resultado = authService.cadastrar(nomeCompleto, login, senha, confimarSenha);
 
         if (resultado.isEmpty()) {
             mensagemLabel.setText("Cadastro realizado com sucesso!");

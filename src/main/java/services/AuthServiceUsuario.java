@@ -43,19 +43,24 @@ public class AuthServiceUsuario {
      * @param nomeCompleto O nome completo do usuário.
      * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
      */
-    public String cadastrar(String login, String senha, String nomeCompleto) {
-        // 1. Validação de entradas
+    public String cadastrar(String nomeCompleto, String login, String senha, String confirmarSenha) {
+        if (nomeCompleto == null || nomeCompleto.trim().isEmpty()) {
+            return "O nome completo é obrigatório.";
+        }
         if (login == null || login.trim().length() < 4) {
             return "O login deve ter pelo menos 4 caracteres.";
         }
         if (senha == null || senha.length() < 6) {
             return "A senha deve ter pelo menos 6 caracteres.";
         }
-        if (nomeCompleto == null || nomeCompleto.trim().isEmpty()) {
-            return "O nome completo é obrigatório.";
+
+        System.out.println(senha);
+        System.out.println(confirmarSenha);
+        
+        if(confirmarSenha == null || !senha.equals(confirmarSenha)) {
+            return "As senhas não coincidem";
         }
 
-        // 2. Verificar se o usuário já existe (regra de negócio)
         if (usuarioDAO.findByLogin(login) != null) {
             return "Este nome de usuário já está em uso.";
         }

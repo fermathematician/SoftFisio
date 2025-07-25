@@ -37,6 +37,9 @@
                   <Label styleClass="input-label" text="Senha" />
                   <PasswordField fx:id="senhaField" promptText="Mínimo 6 caracteres" styleClass="text-input-line" />
                   
+                  <Label styleClass="input-label" text="Confirmar Senha" />
+                  <PasswordField fx:id="confirmarSenhaField" promptText="Confirme sua senha" styleClass="text-input-line" />
+                  
                   <VBox alignment="CENTER" spacing="10.0">
                      <children>
                         <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegisterButtonAction" styleClass="login-button" text="Cadastrar" />
