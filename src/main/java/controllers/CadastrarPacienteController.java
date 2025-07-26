@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-// ADICIONADO: Import do CheckBox
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -20,6 +19,7 @@ import javafx.stage.Stage;
 
 import services.AuthServicePaciente;
 import services.SessaoUsuario;
+import services.MaskService; // MODIFICAÇÃO: Importa a sua classe de serviço de máscara
 
 public class CadastrarPacienteController {
 
@@ -33,7 +33,6 @@ public class CadastrarPacienteController {
     @FXML private Button saveButton;
     @FXML private Label mensagemLabel;
 
-    // ADICIONADO: Referência para o CheckBox do FXML
     @FXML private CheckBox pacienteCorridaCheckBox;
 
     private final AuthServicePaciente authService;
@@ -46,6 +45,10 @@ public class CadastrarPacienteController {
     public void initialize() {
         saveButton.setDefaultButton(true);
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
+
+        // MODIFICAÇÃO: Adicionadas as chamadas para aplicar a máscara
+        MaskService.applyCpfMask(cpfField);
+        MaskService.applyPhoneMask(phoneField);
     }
 
     @FXML
@@ -62,16 +65,13 @@ public class CadastrarPacienteController {
             String email = emailField.getText();
             LocalDate dataNascimento = dobPicker.getValue();
 
-            // ADICIONADO: Captura o valor do CheckBox (true se marcado, false se não)
             boolean isPacienteCorrida = pacienteCorridaCheckBox.isSelected();
             
-            // ADICIONADO: Passa o valor do CheckBox para o método do serviço
             String resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
 
             if (resultado.isEmpty()) {
                 mensagemLabel.setText("Paciente cadastrado com sucesso!");
                 mensagemLabel.setStyle("-fx-text-fill: green;");
-                // Você pode adicionar um código para limpar os campos aqui, se desejar
             } else {
                 mensagemLabel.setText(resultado);
                 mensagemLabel.setStyle("-fx-text-fill: red;");
