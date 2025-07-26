@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane; // Import adicionado
 import javafx.scene.control.TextField; 
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -23,6 +24,10 @@ import models.Usuario;
 import services.SessaoUsuario;
 
 public class MainViewController implements PatientCardController.OnPatientDeletedListener {
+
+    // MODIFICAÇÃO: Adicionados FXML Fields para o ScrollPane e o Label da mensagem
+    @FXML private ScrollPane scrollPane;
+    @FXML private Label emptyMessageLabel;
 
     @FXML private Label userNameLabel;
     @FXML private Button logoutButton;
@@ -58,7 +63,6 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         SessaoUsuario sessao = SessaoUsuario.getInstance();
         if (sessao.isLogado()) {
             Usuario usuarioLogado = sessao.getUsuarioLogado();
-            // Corrigido: Carregando pacientes comuns (false) na tela principal.
             List<Paciente> pacientesDoUsuario = pacienteDAO.findByUsuarioId(usuarioLogado.getId(), false);
 
             for (Paciente paciente : pacientesDoUsuario) {
@@ -71,12 +75,10 @@ public class MainViewController implements PatientCardController.OnPatientDelete
 
                     FXMLLoader loader = new FXMLLoader(fxmlUrl);
                     VBox cardNode = loader.load();
-
                     cardNode.setUserData(paciente);
 
                     PatientCardController cardController = loader.getController();
                     cardController.setData(paciente);
-                    
                     cardController.setOnPatientDeletedListener(this);
 
                     patientTilePane.getChildren().add(cardNode);
@@ -89,6 +91,9 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         } else {
             System.err.println("Nenhum usuário logado. Nenhum card para carregar.");
         }
+        
+        // MODIFICAÇÃO: Chama o método para atualizar a visibilidade
+        updateViewVisibility();
     }
     
     private void filterPatients(String query) {
@@ -99,10 +104,40 @@ public class MainViewController implements PatientCardController.OnPatientDelete
             
             if (paciente != null) {
                 boolean isVisible = paciente.getNomeCompleto().toLowerCase().contains(lowerCaseQuery);
-                
                 node.setVisible(isVisible);
                 node.setManaged(isVisible);
             }
+        }
+        // MODIFICAÇÃO: Chama o método para atualizar a visibilidade após filtrar
+        updateViewVisibility();
+    }
+    
+    /**
+     * MODIFICAÇÃO: Novo método para gerenciar a visibilidade da lista ou da mensagem.
+     */
+    private void updateViewVisibility() {
+        boolean isListInitiallyEmpty = patientTilePane.getChildren().isEmpty();
+
+        if (isListInitiallyEmpty) {
+            emptyMessageLabel.setText("Não há nenhum paciente cadastrado!");
+            scrollPane.setVisible(false);
+            emptyMessageLabel.setVisible(true);
+            emptyMessageLabel.setManaged(true);
+            return;
+        }
+
+        // Verifica se algum item está visível após a filtragem
+        long visibleCount = patientTilePane.getChildren().stream().filter(Node::isVisible).count();
+
+        if (visibleCount == 0) {
+            emptyMessageLabel.setText("Nenhum paciente encontrado para a sua busca.");
+            scrollPane.setVisible(false);
+            emptyMessageLabel.setVisible(true);
+            emptyMessageLabel.setManaged(true);
+        } else {
+            scrollPane.setVisible(true);
+            emptyMessageLabel.setVisible(false);
+            emptyMessageLabel.setManaged(false);
         }
     }
 
@@ -150,6 +185,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     
     @Override
     public void onPatientDeleted(Paciente paciente) {
+        // O loadPatients() já é chamado, e ele por sua vez chama updateViewVisibility()
         loadPatients();
     }
 }
