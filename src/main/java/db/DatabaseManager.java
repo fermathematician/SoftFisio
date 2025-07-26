@@ -1,5 +1,9 @@
 package db;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,13 +14,54 @@ import java.time.LocalDate;
 
 public class DatabaseManager {
 
-    private static final String DB_URL = "jdbc:sqlite:fisioterapia.db";
+    // Nome da pasta onde o banco de dados será armazenado.
+    // O ponto no início a torna oculta em sistemas Linux/macOS.
+    private static final String APP_DATA_DIRECTORY = ".fisioterapia-app";
+    // Nome do arquivo do banco de dados.
+    private static final String DB_FILE_NAME = "fisioterapia.db";
 
     private DatabaseManager() {}
 
+    /**
+     * Constrói o caminho completo para o arquivo do banco de dados,
+     * garantindo que o diretório de dados da aplicação exista.
+     *
+     * @return O caminho absoluto para o arquivo do banco de dados.
+     */
+    private static String getDatabasePath() {
+        // Pega o diretório 'home' do usuário (funciona em Windows, macOS, Linux).
+        String userHome = System.getProperty("user.home");
+
+        // Cria um objeto Path para o nosso diretório de dados.
+        Path dataDir = Paths.get(userHome, APP_DATA_DIRECTORY);
+
+        // Se o diretório não existir, cria-o.
+        if (Files.notExists(dataDir)) {
+            try {
+                Files.createDirectories(dataDir);
+                System.out.println("Diretório de dados da aplicação criado em: " + dataDir);
+            } catch (IOException e) {
+                System.err.println("Falha ao criar o diretório de dados: " + e.getMessage());
+                // Lança uma exceção em tempo de execução para parar a aplicação se não for possível criar o diretório.
+                throw new RuntimeException("Não foi possível criar o diretório de dados.", e);
+            }
+        }
+
+        // Retorna o caminho completo para o arquivo .db.
+        return dataDir.resolve(DB_FILE_NAME).toString();
+    }
+
+    /**
+     * Obtém uma nova conexão com o banco de dados SQLite.
+     * A URL de conexão é gerada dinamicamente para o local correto.
+     *
+     * @return Uma objeto Connection para o banco de dados.
+     */
     public static Connection getConnection() {
+        // Constrói a String de conexão JDBC usando o caminho dinâmico.
+        String dbUrl = "jdbc:sqlite:" + getDatabasePath();
         try {
-            return DriverManager.getConnection(DB_URL);
+            return DriverManager.getConnection(dbUrl);
         } catch (SQLException e) {
             System.err.println("Falha ao criar conexão com o banco de dados: " + e.getMessage());
             throw new RuntimeException("Não foi possível conectar ao banco de dados.", e);
@@ -25,6 +70,7 @@ public class DatabaseManager {
 
     /**
      * Inicializa o banco de dados, criando as tabelas se elas ainda não existirem.
+     * (O conteúdo deste método permanece o mesmo, pois ele já usa o getConnection() modificado).
      */
     public static void initializeDatabase() {
         // SQL para criar a tabela de usuários
@@ -145,5 +191,4 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
-
 }
