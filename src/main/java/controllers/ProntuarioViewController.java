@@ -34,6 +34,18 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.Priority;
 import javafx.geometry.Pos;
 
+import javafx.scene.layout.TilePane;
+import javafx.stage.FileChooser;
+import java.io.File;
+import models.Anexo;
+import javafx.geometry.Insets;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import javafx.stage.Stage;
+import javafx.stage.Modality;
+
 public class ProntuarioViewController implements OnHistoryChangedListener {
 
     //--- Componentes da tela "Pai" ---
@@ -43,6 +55,8 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML private BorderPane prontuarioRoot;
     @FXML private AvaliacaoViewController avaliacaoTabContentController;
     @FXML private VBox historicoVBox;
+    @FXML private TilePane anexosTilePane;
+    @FXML private Button adicionarAnexoButton;
 
     //--- Injeção do conteúdo e do controller da aba "Sessões" ---
     // O fx:id do <fx:include> é "sessoesTabContent"
@@ -74,6 +88,7 @@ public void initData(Paciente paciente) {
     }
 
     carregarHistoricoCompleto();
+    carregarAnexos();
 }
 
     /**
@@ -272,6 +287,116 @@ private void carregarHistoricoCompleto() {
         }
 
         historicoVBox.getChildren().add(card);
+    }
+}
+
+// SUBSTITUA O MÉTODO INTEIRO POR ESTE
+private void carregarAnexos() {
+    anexosTilePane.getChildren().clear();
+    ProntuarioService service = new ProntuarioService();
+    List<Anexo> anexos = service.getAnexos(pacienteAtual.getId());
+
+    for (Anexo anexo : anexos) {
+        VBox cardAnexo = new VBox(5);
+        cardAnexo.getStyleClass().add("patient-card");
+        cardAnexo.setPadding(new Insets(10));
+        cardAnexo.setPrefWidth(220); // Largura fixa para o card
+        cardAnexo.setAlignment(Pos.CENTER); // Centraliza o conteúdo
+
+        // --- LÓGICA NOVA PARA EXIBIR A IMAGEM ---
+        if (anexo.getTipoMidia().equalsIgnoreCase("FOTO")) {
+            try {
+                // 1. Cria um objeto Image a partir do caminho do arquivo
+                File file = new File(anexo.getCaminhoArquivo());
+                Image image = new Image(file.toURI().toString());
+
+                // 2. Cria um ImageView para exibir a imagem
+                ImageView imageView = new ImageView(image);
+                
+                // 3. Configura o tamanho da miniatura
+                imageView.setFitHeight(150);
+                imageView.setFitWidth(200);
+                imageView.setPreserveRatio(true); // Mantém a proporção da imagem
+
+                                // --- TRECHO NOVO ADICIONADO AQUI ---
+                imageView.setOnMouseClicked(event -> {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/VisualizadorMidia.fxml"));
+                        Parent root = loader.load();
+
+                        VisualizadorMidiaController controller = loader.getController();
+                        controller.initData(anexo.getCaminhoArquivo());
+
+                        Stage stage = new Stage();
+                        stage.setTitle("Visualizador de Anexo");
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.initOwner(anexosTilePane.getScene().getWindow());
+                        stage.setScene(new Scene(root));
+
+                        stage.showAndWait();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                // --- FIM DO TRECHO NOVO ---
+                
+                // Adiciona a imagem ao card
+                cardAnexo.getChildren().add(imageView);
+
+            } catch (Exception e) {
+                // Se houver erro ao carregar a imagem, mostra um texto de erro
+                Label erroLabel = new Label("Erro ao carregar imagem");
+                cardAnexo.getChildren().add(erroLabel);
+                e.printStackTrace();
+            }
+        }
+        // Futuramente, poderíamos adicionar um `else if` para vídeos aqui
+
+        Label nomeArquivo = new Label(new File(anexo.getCaminhoArquivo()).getName());
+        nomeArquivo.setStyle("-fx-font-weight: bold;");
+        nomeArquivo.setWrapText(true);
+
+        Label descricao = new Label(anexo.getDescricao());
+        descricao.setWrapText(true);
+        
+        cardAnexo.getChildren().addAll(new Separator(), nomeArquivo, descricao);
+        anexosTilePane.getChildren().add(cardAnexo);
+    }
+}
+
+@FXML
+private void handleAdicionarAnexo() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Selecionar Anexo");
+    // Filtro para imagens
+    fileChooser.getExtensionFilters().addAll(
+        new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg", "*.gif"),
+        new FileChooser.ExtensionFilter("Todos os Arquivos", "*.*")
+    );
+
+    Stage stage = (Stage) adicionarAnexoButton.getScene().getWindow();
+    File arquivoSelecionado = fileChooser.showOpenDialog(stage);
+
+    if (arquivoSelecionado != null) {
+        // Por simplicidade, vamos usar uma descrição padrão e sem vínculo.
+        // No futuro, podemos abrir um diálogo para o usuário preencher isso.
+        String descricao = "Anexo adicionado em " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String tipoMidia = "FOTO"; // Simples, por enquanto
+
+        ProntuarioService service = new ProntuarioService();
+        String resultado = service.adicionarAnexo(pacienteAtual.getId(), arquivoSelecionado, tipoMidia, descricao, null, null);
+
+        if (resultado.isEmpty()) {
+            carregarAnexos(); // Atualiza a visualização
+        } else {
+            // Exibe um alerta de erro
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro ao Adicionar Anexo");
+            alert.setHeaderText("Não foi possível salvar o anexo.");
+            alert.setContentText(resultado);
+            alert.showAndWait();
+        }
     }
 }
 }

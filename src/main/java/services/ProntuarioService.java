@@ -7,14 +7,25 @@ import models.Sessao;
 import db.AvaliacaoDAO;
 import models.Avaliacao;
 
+import models.Anexo;
+import db.AnexoDAO;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 public class ProntuarioService {
 
     private SessaoDAO sessaoDAO;
     private AvaliacaoDAO avaliacaoDAO;
+    private AnexoDAO anexoDAO;
 
     public ProntuarioService() {
         this.sessaoDAO = new SessaoDAO();
         this.avaliacaoDAO = new AvaliacaoDAO();
+        this.anexoDAO = new AnexoDAO();
     }
 
     /**
@@ -138,5 +149,66 @@ public String atualizarAvaliacao(int idAvaliacao, int idPaciente, LocalDateTime 
 
         boolean sucesso = avaliacaoDAO.update(avaliacaoAtualizada);
         return sucesso ? "" : "Ocorreu um erro ao atualizar a avaliação no banco de dados.";
+    }
+
+    // --- MÉTODOS PARA ANEXOS ---
+
+public List<Anexo> getAnexos(int idPaciente) {
+    return anexoDAO.findByPacienteId(idPaciente);
+}
+
+public String adicionarAnexo(int idPaciente, File arquivoOrigem, String tipoMidia, String descricao, Integer idSessao, Integer idAvaliacao) {
+    if (arquivoOrigem == null || !arquivoOrigem.exists()) {
+        return "Arquivo de origem inválido.";
+    }
+
+    try {
+        // Constrói o caminho para o diretório de mídia do paciente
+        String userHome = System.getProperty("user.home");
+        Path diretorioDestino = Paths.get(userHome, ".fisioterapia-app", "media", String.valueOf(idPaciente));
+
+        // Cria o diretório se ele não existir
+        Files.createDirectories(diretorioDestino);
+
+        // Copia o arquivo para o diretório de destino
+        Path arquivoDestino = diretorioDestino.resolve(arquivoOrigem.getName());
+        Files.copy(arquivoOrigem.toPath(), arquivoDestino, StandardCopyOption.REPLACE_EXISTING);
+
+        // Cria o objeto Anexo para salvar no banco
+        Anexo novoAnexo = new Anexo(
+            0, idPaciente, arquivoDestino.toString(), tipoMidia, descricao,
+            LocalDateTime.now(), idSessao, idAvaliacao
+        );
+
+        // Salva o registro no banco de dados
+        boolean sucesso = anexoDAO.save(novoAnexo);
+        return sucesso ? "" : "Erro ao salvar o registro do anexo no banco de dados.";
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "Erro de I/O ao salvar o arquivo: " + e.getMessage();
+    }
+}
+
+public String deletarAnexo(int idAnexo) {
+    // 1. Buscar o anexo para obter o caminho do arquivo
+    Anexo anexo = anexoDAO.findById(idAnexo);
+    if (anexo == null) {
+        return "Anexo não encontrado no banco de dados.";
+    }
+
+    try {
+        // 2. Deletar o arquivo físico do disco
+        Path caminhoArquivo = Paths.get(anexo.getCaminhoArquivo());
+        Files.deleteIfExists(caminhoArquivo);
+
+        // 3. Deletar o registro do banco de dados
+        boolean sucesso = anexoDAO.delete(idAnexo);
+        return sucesso ? "" : "Erro ao deletar o registro do anexo do banco de dados.";
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "Erro de I/O ao deletar o arquivo: " + e.getMessage();
+    }
     }
 }
