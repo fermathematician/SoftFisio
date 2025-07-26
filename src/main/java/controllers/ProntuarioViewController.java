@@ -34,7 +34,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.Priority;
 import javafx.geometry.Pos;
 
-public class ProntuarioViewController {
+public class ProntuarioViewController implements OnHistoryChangedListener {
 
     //--- Componentes da tela "Pai" ---
     @FXML private Label patientNameLabel;
@@ -55,17 +55,22 @@ public class ProntuarioViewController {
      * Ponto de entrada chamado pelo PatientCardController.
      * Recebe os dados do paciente e os distribui para a tela pai e os filhos.
      */
+@Override
+public void onHistoryChanged() {
+    System.out.println("DEBUG: Histórico atualizado por um evento.");
+    carregarHistoricoCompleto();
+}
+
 public void initData(Paciente paciente) {
     this.pacienteAtual = paciente;
     setupHeader();
 
     if (sessoesTabContentController != null) {
-        sessoesTabContentController.initData(paciente);
+        sessoesTabContentController.initData(paciente, this); // Passa o listener
     }
 
-    // Adicione esta nova parte
     if (avaliacaoTabContentController != null) {
-        avaliacaoTabContentController.initData(paciente);
+        avaliacaoTabContentController.initData(paciente, this); // Passa o listener
     }
 
     carregarHistoricoCompleto();

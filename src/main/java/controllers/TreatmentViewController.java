@@ -37,6 +37,7 @@ public class TreatmentViewController {
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
+    private OnHistoryChangedListener historyListener;
 
     public TreatmentViewController() {
         this.prontuarioService = new ProntuarioService();
@@ -48,8 +49,11 @@ public class TreatmentViewController {
         saveSessionButton.setDefaultButton(true);
     }
 
-    public void initData(Paciente paciente) {
+    
+
+    public void initData(Paciente paciente, OnHistoryChangedListener listener) {
     this.pacienteAtual = paciente;
+    this.historyListener = listener;
     loadSessoes();
 }
 
@@ -157,10 +161,16 @@ public class TreatmentViewController {
             // Se salvou com sucesso, limpa a área de texto e recarrega a lista
             newSessionTextArea.clear();
             loadSessoes();
+
+                if (historyListener != null) {
+        historyListener.onHistoryChanged(); // AVISA O PAI QUE HOUVE MUDANÇA
+                    }
         } else {
             // Se deu erro, poderíamos exibir um alerta para o usuário
             System.err.println(resultado);
         }
+
+        
     }
 
     /**
