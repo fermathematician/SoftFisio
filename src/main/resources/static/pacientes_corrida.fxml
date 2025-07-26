@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -41,11 +42,16 @@
                   <Button fx:id="newPatientButton" mnemonicParsing="false" onAction="#handleNewPatient" styleClass="primary-button" text="+ Novo Paciente" />
                </children>
             </HBox>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
-               <content>
-                  <TilePane fx:id="patientTilePane" hgap="20.0" prefColumns="2" vgap="20.0" />
-               </content>
-            </ScrollPane>
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <Label fx:id="emptyMessageLabel" styleClass="empty-message-label" text="Não há nenhum paciente de corrida cadastrado!" managed="false" visible="false" StackPane.alignment="CENTER" />
+                  <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane">
+                     <content>
+                        <TilePane fx:id="patientTilePane" hgap="20.0" prefColumns="2" vgap="20.0" />
+                     </content>
+                  </ScrollPane>
+               </children>
+            </StackPane>
          </children>
       </VBox>
    </center>
