@@ -19,13 +19,15 @@ public class AvaliacaoViewController {
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
+    private OnHistoryChangedListener historyListener;
 
     public AvaliacaoViewController() {
         this.prontuarioService = new ProntuarioService();
     }
 
-    public void initData(Paciente paciente) {
+    public void initData(Paciente paciente, OnHistoryChangedListener listener) {
         this.pacienteAtual = paciente;
+        this.historyListener = listener;
         // No futuro, este método também pode carregar uma avaliação existente para edição.
     }
 
@@ -47,6 +49,10 @@ public class AvaliacaoViewController {
 
         if (resultado.isEmpty()) {
             setMensagem("Avaliação salva com sucesso!", false);
+
+            if (historyListener != null) {
+                historyListener.onHistoryChanged(); // AVISA O PAI QUE HOUVE MUDANÇA
+                }
             // Opcional: Limpar os campos após salvar
             // limparCampos(); 
         } else {

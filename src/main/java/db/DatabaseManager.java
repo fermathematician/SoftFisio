@@ -118,6 +118,20 @@ public class DatabaseManager {
         "FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente)" +
         ");";
 
+        String sqlAnexos = "CREATE TABLE IF NOT EXISTS anexos (" +
+        "id_anexo INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "id_paciente INTEGER NOT NULL," +
+        "caminho_arquivo TEXT NOT NULL UNIQUE," +
+        "tipo_midia TEXT NOT NULL," +
+        "descricao TEXT," +
+        "data_anexo TEXT NOT NULL," +
+        "id_sessao_ref INTEGER," +
+        "id_avaliacao_ref INTEGER," +
+        "FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente) ON DELETE CASCADE," +
+        "FOREIGN KEY (id_sessao_ref) REFERENCES sessoes(id_sessao) ON DELETE SET NULL," +
+        "FOREIGN KEY (id_avaliacao_ref) REFERENCES avaliacoes(id_avaliacao) ON DELETE SET NULL" +
+        ");";
+
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
 
@@ -130,6 +144,8 @@ public class DatabaseManager {
             System.out.println("Tabela 'sessoes' verificada/criada.");
             stmt.execute(sqlAvaliacoes);
             System.out.println("Tabela 'avaliacoes' verificada/criada.");
+            stmt.execute(sqlAnexos);
+            System.out.println("Tabela 'anexos' verificada/criada.");
 
             // Inserir usuário 'admin' se não existir
             int adminId = -1;

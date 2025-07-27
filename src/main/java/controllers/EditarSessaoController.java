@@ -49,28 +49,29 @@ public class EditarSessaoController {
         editSessionTextArea.setText(sessao.getEvolucaoTexto());
     }
 
-    public void handleBackButton() {
-        try {
-            // Carrega o FXML da tela de prontuário
-            URL fxmlUrl = getClass().getResource("/static/treatment_view.fxml");
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
+@FXML
+public void handleBackButton() {
+    try {
+        // Carrega o FXML da tela de prontuário principal (com abas)
+        URL fxmlUrl = getClass().getResource("/static/prontuario_view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        Parent root = loader.load();
 
-            // Pega a instância do controlador da tela carregada
-            TreatmentViewController controller = loader.getController();
-            
-            // Passa o paciente deste card para o controlador do prontuário
-            controller.initData(this.paciente);
+        // Pega a instância do controlador da tela de prontuário
+        ProntuarioViewController controller = loader.getController();
 
-            // Exibe a nova cena na mesma janela
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.setTitle("SoftFisio - Prontuário do Paciente");
+        // Passa o paciente de volta para o controlador do prontuário
+        controller.initData(this.paciente);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Exibe a cena correta
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.setScene(new Scene(root, 1280, 720));
+        stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
+
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 
     @FXML
     private void handleUpdateSessao() {

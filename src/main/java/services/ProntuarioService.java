@@ -7,14 +7,25 @@ import models.Sessao;
 import db.AvaliacaoDAO;
 import models.Avaliacao;
 
+import models.Anexo;
+import db.AnexoDAO;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 public class ProntuarioService {
 
     private SessaoDAO sessaoDAO;
     private AvaliacaoDAO avaliacaoDAO;
+    private AnexoDAO anexoDAO;
 
     public ProntuarioService() {
         this.sessaoDAO = new SessaoDAO();
         this.avaliacaoDAO = new AvaliacaoDAO();
+        this.anexoDAO = new AnexoDAO();
     }
 
     /**
@@ -138,5 +149,75 @@ public String atualizarAvaliacao(int idAvaliacao, int idPaciente, LocalDateTime 
 
         boolean sucesso = avaliacaoDAO.update(avaliacaoAtualizada);
         return sucesso ? "" : "Ocorreu um erro ao atualizar a avaliação no banco de dados.";
+    }
+
+    // --- MÉTODOS PARA ANEXOS ---
+
+public List<Anexo> getAnexos(int idPaciente) {
+    return anexoDAO.findByPacienteId(idPaciente);
+}
+
+public String adicionarAnexo(int idPaciente, File arquivoOrigem, String descricao, Integer idSessao, Integer idAvaliacao) {
+        if (arquivoOrigem == null || !arquivoOrigem.exists()) {
+            return "Arquivo de origem inválido.";
+        }
+        
+        // --- NOVA LÓGICA PARA IDENTIFICAR O TIPO DE MÍDIA ---
+        String nomeArquivo = arquivoOrigem.getName().toLowerCase();
+        String tipoMidia;
+
+        if (nomeArquivo.endsWith(".mp4") || nomeArquivo.endsWith(".mov") || nomeArquivo.endsWith(".avi") || nomeArquivo.endsWith(".mkv")) {
+            tipoMidia = "VIDEO";
+        } else if (nomeArquivo.endsWith(".png") || nomeArquivo.endsWith(".jpg") || nomeArquivo.endsWith(".jpeg") || nomeArquivo.endsWith(".gif")) {
+            tipoMidia = "FOTO";
+        } else {
+            // Se não for um tipo conhecido, podemos recusar ou salvar como um tipo genérico
+            return "Formato de arquivo não suportado.";
+        }
+        // --- FIM DA NOVA LÓGICA ---
+
+        try {
+            String userHome = System.getProperty("user.home");
+            Path diretorioDestino = Paths.get(userHome, ".fisioterapia-app", "media", String.valueOf(idPaciente));
+            Files.createDirectories(diretorioDestino);
+
+            Path arquivoDestino = diretorioDestino.resolve(arquivoOrigem.getName());
+            Files.copy(arquivoOrigem.toPath(), arquivoDestino, StandardCopyOption.REPLACE_EXISTING);
+            
+            // AGORA USAMOS A VARIÁVEL tipoMidia EM VEZ DE "FOTO"
+            Anexo novoAnexo = new Anexo(
+                0, idPaciente, arquivoDestino.toString(), tipoMidia, descricao,
+                LocalDateTime.now(), idSessao, idAvaliacao
+            );
+
+            boolean sucesso = anexoDAO.save(novoAnexo);
+            return sucesso ? "" : "Erro ao salvar o registro do anexo no banco de dados.";
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Erro de I/O ao salvar o arquivo: " + e.getMessage();
+        }
+    }
+
+public String deletarAnexo(int idAnexo) {
+    // 1. Buscar o anexo para obter o caminho do arquivo
+    Anexo anexo = anexoDAO.findById(idAnexo);
+    if (anexo == null) {
+        return "Anexo não encontrado no banco de dados.";
+    }
+
+    try {
+        // 2. Deletar o arquivo físico do disco
+        Path caminhoArquivo = Paths.get(anexo.getCaminhoArquivo());
+        Files.deleteIfExists(caminhoArquivo);
+
+        // 3. Deletar o registro do banco de dados
+        boolean sucesso = anexoDAO.delete(idAnexo);
+        return sucesso ? "" : "Erro ao deletar o registro do anexo do banco de dados.";
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        return "Erro de I/O ao deletar o arquivo: " + e.getMessage();
+    }
     }
 }

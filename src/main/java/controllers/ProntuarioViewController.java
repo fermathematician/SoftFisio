@@ -34,7 +34,19 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.Priority;
 import javafx.geometry.Pos;
 
-public class ProntuarioViewController {
+import javafx.scene.layout.TilePane;
+import javafx.stage.FileChooser;
+import java.io.File;
+import models.Anexo;
+import javafx.geometry.Insets;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import javafx.stage.Stage;
+import javafx.stage.Modality;
+
+public class ProntuarioViewController implements OnHistoryChangedListener {
 
     //--- Componentes da tela "Pai" ---
     @FXML private Label patientNameLabel;
@@ -43,6 +55,8 @@ public class ProntuarioViewController {
     @FXML private BorderPane prontuarioRoot;
     @FXML private AvaliacaoViewController avaliacaoTabContentController;
     @FXML private VBox historicoVBox;
+    @FXML private TilePane anexosTilePane;
+    @FXML private Button adicionarAnexoButton;
 
     //--- Injeção do conteúdo e do controller da aba "Sessões" ---
     // O fx:id do <fx:include> é "sessoesTabContent"
@@ -55,20 +69,26 @@ public class ProntuarioViewController {
      * Ponto de entrada chamado pelo PatientCardController.
      * Recebe os dados do paciente e os distribui para a tela pai e os filhos.
      */
+@Override
+public void onHistoryChanged() {
+    System.out.println("DEBUG: Histórico atualizado por um evento.");
+    carregarHistoricoCompleto();
+}
+
 public void initData(Paciente paciente) {
     this.pacienteAtual = paciente;
     setupHeader();
 
     if (sessoesTabContentController != null) {
-        sessoesTabContentController.initData(paciente);
+        sessoesTabContentController.initData(paciente, this); // Passa o listener
     }
 
-    // Adicione esta nova parte
     if (avaliacaoTabContentController != null) {
-        avaliacaoTabContentController.initData(paciente);
+        avaliacaoTabContentController.initData(paciente, this); // Passa o listener
     }
 
     carregarHistoricoCompleto();
+    carregarAnexos();
 }
 
     /**
@@ -269,4 +289,129 @@ private void carregarHistoricoCompleto() {
         historicoVBox.getChildren().add(card);
     }
 }
+
+// SUBSTITUA O MÉTODO INTEIRO POR ESTE
+private void carregarAnexos() {
+    anexosTilePane.getChildren().clear();
+    ProntuarioService service = new ProntuarioService();
+    List<Anexo> anexos = service.getAnexos(pacienteAtual.getId());
+
+    for (Anexo anexo : anexos) {
+        VBox cardAnexo = new VBox(5);
+        cardAnexo.getStyleClass().add("patient-card");
+        cardAnexo.setPadding(new Insets(10));
+        cardAnexo.setPrefWidth(220);
+        cardAnexo.setAlignment(Pos.CENTER);
+
+        // --- LÓGICA ATUALIZADA ---
+        if (anexo.getTipoMidia().equalsIgnoreCase("FOTO")) {
+            try {
+                File file = new File(anexo.getCaminhoArquivo());
+                Image image = new Image(file.toURI().toString());
+                ImageView imageView = new ImageView(image);
+                imageView.setFitHeight(150);
+                imageView.setFitWidth(200);
+                imageView.setPreserveRatio(true);
+
+                imageView.setOnMouseClicked(event -> abrirVisualizador(anexo));
+                
+                cardAnexo.getChildren().add(imageView);
+
+            } catch (Exception e) {
+                Label erroLabel = new Label("Erro ao carregar imagem");
+                cardAnexo.getChildren().add(erroLabel);
+                e.printStackTrace();
+            }
+        } else if (anexo.getTipoMidia().equalsIgnoreCase("VIDEO")) {
+            // Se for vídeo, cria um placeholder visual
+            Region videoIcon = new Region();
+            videoIcon.getStyleClass().add("video-icon"); // Estilo que vamos criar no CSS
+            videoIcon.setPrefSize(200, 150);
+            
+            videoIcon.setOnMouseClicked(event -> abrirVisualizador(anexo)); // Também abre o visualizador
+
+            cardAnexo.getChildren().add(videoIcon);
+        }
+        // --- FIM DA LÓGICA ATUALIZADA ---
+
+        Label nomeArquivo = new Label(new File(anexo.getCaminhoArquivo()).getName());
+        nomeArquivo.setStyle("-fx-font-weight: bold;");
+        nomeArquivo.setWrapText(true);
+
+        Label descricao = new Label(anexo.getDescricao());
+        descricao.setWrapText(true);
+        
+        cardAnexo.getChildren().addAll(new Separator(), nomeArquivo, descricao);
+        anexosTilePane.getChildren().add(cardAnexo);
+    }
+}
+
+// MÉTODO "handleAdicionarAnexo" renomeado e um novo método "abrirVisualizador" foi criado
+// para evitar duplicação de código
+private void abrirVisualizador(Anexo anexo) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/VisualizadorMidia.fxml"));
+        Parent root = loader.load();
+        
+        VisualizadorMidiaController controller = loader.getController();
+        controller.initData(anexo.getCaminhoArquivo());
+        
+        Stage stage = new Stage();
+        stage.setTitle("Visualizador de Anexo");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(anexosTilePane.getScene().getWindow());
+        stage.setScene(new Scene(root));
+        
+        stage.setMaximized(true);
+        
+        stage.showAndWait();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+@FXML
+    private void handleAdicionarAnexo() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Selecionar Anexo");
+
+        // --- LÓGICA DE FILTROS ATUALIZADA ---
+        
+        // 1. Cria um novo filtro combinado que será o padrão
+        FileChooser.ExtensionFilter combinedFilter = new FileChooser.ExtensionFilter(
+            "Todas as Mídias Suportadas (*.png, *.jpg, *.mp4, ...)", 
+            "*.png", "*.jpg", "*.jpeg", "*.gif", 
+            "*.mp4", "*.mov", "*.avi"
+        );
+
+        // Cria os filtros específicos
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Imagens (*.png, *.jpg, *.gif)", "*.png", "*.jpg", "*.jpeg", "*.gif");
+        FileChooser.ExtensionFilter videoFilter = new FileChooser.ExtensionFilter("Vídeos (*.mp4, *.mov, *.avi)", "*.mp4", "*.mov", "*.avi");
+        FileChooser.ExtensionFilter allFilter = new FileChooser.ExtensionFilter("Todos os Arquivos (*.*)", "*.*");
+
+        // 2. Adiciona o filtro combinado PRIMEIRO na lista para que ele seja o padrão
+        fileChooser.getExtensionFilters().addAll(combinedFilter, imageFilter, videoFilter, allFilter);
+        // --- FIM DA LÓGICA DE FILTROS ---
+
+        Stage stage = (Stage) adicionarAnexoButton.getScene().getWindow();
+        File arquivoSelecionado = fileChooser.showOpenDialog(stage);
+
+        if (arquivoSelecionado != null) {
+            String descricao = "Anexo adicionado em " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            
+            ProntuarioService service = new ProntuarioService();
+            String resultado = service.adicionarAnexo(pacienteAtual.getId(), arquivoSelecionado, descricao, null, null);
+
+            if (resultado.isEmpty()) {
+                carregarAnexos();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro ao Adicionar Anexo");
+                alert.setHeaderText("Não foi possível salvar o anexo.");
+                alert.setContentText(resultado);
+                alert.showAndWait();
+            }
+        }
+    }
 }

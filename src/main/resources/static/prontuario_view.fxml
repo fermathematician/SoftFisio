@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.TilePane?>
 
 <BorderPane fx:id="prontuarioRoot" prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProntuarioViewController">
    <top>
@@ -55,6 +56,33 @@
               </ScrollPane>
            </content>
          </Tab>
+         <Tab text="Anexos">
+        <content>
+          <BorderPane>
+            <center>
+              <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                <content>
+                  <TilePane fx:id="anexosTilePane" hgap="20" vgap="20">
+                    <padding>
+                      <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
+                    </padding>
+                  </TilePane>
+                </content>
+              </ScrollPane>
+            </center>
+            <bottom>
+              <HBox alignment="CENTER" style="-fx-background-color: #f4f4f4; -fx-border-color: #e0e0e0 transparent transparent transparent;">
+                <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+                <children>
+                  <Button fx:id="adicionarAnexoButton" onAction="#handleAdicionarAnexo" styleClass="primary-button" text="+ Adicionar Anexo" />
+                </children>
+              </HBox>
+            </bottom>
+          </BorderPane>
+        </content>
+      </Tab>
         </tabs>
       </TabPane>
    </center>
