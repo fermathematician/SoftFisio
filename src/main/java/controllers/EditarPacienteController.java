@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-// 1. ADICIONADO: Import do CheckBox
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -20,6 +19,7 @@ import javafx.stage.Stage;
 
 import models.Paciente;
 import services.AuthServicePaciente;
+import services.MaskService; // MODIFICAÇÃO: Importa o serviço de máscara
 
 public class EditarPacienteController {
 
@@ -32,8 +32,6 @@ public class EditarPacienteController {
     @FXML private Button cancelButton;
     @FXML private Button saveButton;
     @FXML private Label mensagemLabel;
-
-    // 2. ADICIONADO: Referência para o CheckBox
     @FXML private CheckBox pacienteCorridaCheckBox;
 
     private final AuthServicePaciente authService;
@@ -47,6 +45,10 @@ public class EditarPacienteController {
     public void initialize() {
         saveButton.setDefaultButton(true);
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
+
+        // MODIFICAÇÃO: Aplica as máscaras aos campos de texto
+        MaskService.applyCpfMask(cpfField);
+        MaskService.applyPhoneMask(phoneField);
     }
 
     public void initData(Paciente paciente) {
@@ -59,8 +61,6 @@ public class EditarPacienteController {
         phoneField.setText(paciente.getTelefone());
         emailField.setText(paciente.getEmail());
         dobPicker.setValue(paciente.getDataNascimento());
-
-        // 3. ADICIONADO: Preenche o CheckBox com o status atual do paciente
         pacienteCorridaCheckBox.setSelected(paciente.isPacienteCorrida());
     }
 
@@ -72,11 +72,8 @@ public class EditarPacienteController {
         String telefone = phoneField.getText();
         String email = emailField.getText();
         LocalDate dataNascimento = dobPicker.getValue();
-        
-        // 4. ADICIONADO: Captura o valor atualizado do CheckBox
         boolean isPacienteCorrida = pacienteCorridaCheckBox.isSelected();
         
-        // 5. ATUALIZADO: Passa o valor do CheckBox (isPacienteCorrida) em vez de 'false'
         String resultado = authService.atualizar(pacienteParaEditar.getId(), nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
 
         if (resultado.isEmpty()) {
@@ -93,12 +90,9 @@ public class EditarPacienteController {
         try {
             Stage stage = (Stage) cancelButton.getScene().getWindow();
             URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-
             Parent mainView = FXMLLoader.load(fxmlUrl);
-            
             stage.setScene(new Scene(mainView, 1280, 720));
             stage.setTitle("SoftFisio - Lista de pacientes");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
