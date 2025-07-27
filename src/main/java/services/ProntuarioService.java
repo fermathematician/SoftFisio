@@ -157,38 +157,47 @@ public List<Anexo> getAnexos(int idPaciente) {
     return anexoDAO.findByPacienteId(idPaciente);
 }
 
-public String adicionarAnexo(int idPaciente, File arquivoOrigem, String tipoMidia, String descricao, Integer idSessao, Integer idAvaliacao) {
-    if (arquivoOrigem == null || !arquivoOrigem.exists()) {
-        return "Arquivo de origem inválido.";
+public String adicionarAnexo(int idPaciente, File arquivoOrigem, String descricao, Integer idSessao, Integer idAvaliacao) {
+        if (arquivoOrigem == null || !arquivoOrigem.exists()) {
+            return "Arquivo de origem inválido.";
+        }
+        
+        // --- NOVA LÓGICA PARA IDENTIFICAR O TIPO DE MÍDIA ---
+        String nomeArquivo = arquivoOrigem.getName().toLowerCase();
+        String tipoMidia;
+
+        if (nomeArquivo.endsWith(".mp4") || nomeArquivo.endsWith(".mov") || nomeArquivo.endsWith(".avi") || nomeArquivo.endsWith(".mkv")) {
+            tipoMidia = "VIDEO";
+        } else if (nomeArquivo.endsWith(".png") || nomeArquivo.endsWith(".jpg") || nomeArquivo.endsWith(".jpeg") || nomeArquivo.endsWith(".gif")) {
+            tipoMidia = "FOTO";
+        } else {
+            // Se não for um tipo conhecido, podemos recusar ou salvar como um tipo genérico
+            return "Formato de arquivo não suportado.";
+        }
+        // --- FIM DA NOVA LÓGICA ---
+
+        try {
+            String userHome = System.getProperty("user.home");
+            Path diretorioDestino = Paths.get(userHome, ".fisioterapia-app", "media", String.valueOf(idPaciente));
+            Files.createDirectories(diretorioDestino);
+
+            Path arquivoDestino = diretorioDestino.resolve(arquivoOrigem.getName());
+            Files.copy(arquivoOrigem.toPath(), arquivoDestino, StandardCopyOption.REPLACE_EXISTING);
+            
+            // AGORA USAMOS A VARIÁVEL tipoMidia EM VEZ DE "FOTO"
+            Anexo novoAnexo = new Anexo(
+                0, idPaciente, arquivoDestino.toString(), tipoMidia, descricao,
+                LocalDateTime.now(), idSessao, idAvaliacao
+            );
+
+            boolean sucesso = anexoDAO.save(novoAnexo);
+            return sucesso ? "" : "Erro ao salvar o registro do anexo no banco de dados.";
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Erro de I/O ao salvar o arquivo: " + e.getMessage();
+        }
     }
-
-    try {
-        // Constrói o caminho para o diretório de mídia do paciente
-        String userHome = System.getProperty("user.home");
-        Path diretorioDestino = Paths.get(userHome, ".fisioterapia-app", "media", String.valueOf(idPaciente));
-
-        // Cria o diretório se ele não existir
-        Files.createDirectories(diretorioDestino);
-
-        // Copia o arquivo para o diretório de destino
-        Path arquivoDestino = diretorioDestino.resolve(arquivoOrigem.getName());
-        Files.copy(arquivoOrigem.toPath(), arquivoDestino, StandardCopyOption.REPLACE_EXISTING);
-
-        // Cria o objeto Anexo para salvar no banco
-        Anexo novoAnexo = new Anexo(
-            0, idPaciente, arquivoDestino.toString(), tipoMidia, descricao,
-            LocalDateTime.now(), idSessao, idAvaliacao
-        );
-
-        // Salva o registro no banco de dados
-        boolean sucesso = anexoDAO.save(novoAnexo);
-        return sucesso ? "" : "Erro ao salvar o registro do anexo no banco de dados.";
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        return "Erro de I/O ao salvar o arquivo: " + e.getMessage();
-    }
-}
 
 public String deletarAnexo(int idAnexo) {
     // 1. Buscar o anexo para obter o caminho do arquivo

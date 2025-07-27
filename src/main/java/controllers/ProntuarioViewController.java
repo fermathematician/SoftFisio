@@ -300,58 +300,39 @@ private void carregarAnexos() {
         VBox cardAnexo = new VBox(5);
         cardAnexo.getStyleClass().add("patient-card");
         cardAnexo.setPadding(new Insets(10));
-        cardAnexo.setPrefWidth(220); // Largura fixa para o card
-        cardAnexo.setAlignment(Pos.CENTER); // Centraliza o conteúdo
+        cardAnexo.setPrefWidth(220);
+        cardAnexo.setAlignment(Pos.CENTER);
 
-        // --- LÓGICA NOVA PARA EXIBIR A IMAGEM ---
+        // --- LÓGICA ATUALIZADA ---
         if (anexo.getTipoMidia().equalsIgnoreCase("FOTO")) {
             try {
-                // 1. Cria um objeto Image a partir do caminho do arquivo
                 File file = new File(anexo.getCaminhoArquivo());
                 Image image = new Image(file.toURI().toString());
-
-                // 2. Cria um ImageView para exibir a imagem
                 ImageView imageView = new ImageView(image);
-                
-                // 3. Configura o tamanho da miniatura
                 imageView.setFitHeight(150);
                 imageView.setFitWidth(200);
-                imageView.setPreserveRatio(true); // Mantém a proporção da imagem
+                imageView.setPreserveRatio(true);
 
-                                // --- TRECHO NOVO ADICIONADO AQUI ---
-                imageView.setOnMouseClicked(event -> {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/VisualizadorMidia.fxml"));
-                        Parent root = loader.load();
-
-                        VisualizadorMidiaController controller = loader.getController();
-                        controller.initData(anexo.getCaminhoArquivo());
-
-                        Stage stage = new Stage();
-                        stage.setTitle("Visualizador de Anexo");
-                        stage.initModality(Modality.APPLICATION_MODAL);
-                        stage.initOwner(anexosTilePane.getScene().getWindow());
-                        stage.setScene(new Scene(root));
-
-                        stage.showAndWait();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-                // --- FIM DO TRECHO NOVO ---
+                imageView.setOnMouseClicked(event -> abrirVisualizador(anexo));
                 
-                // Adiciona a imagem ao card
                 cardAnexo.getChildren().add(imageView);
 
             } catch (Exception e) {
-                // Se houver erro ao carregar a imagem, mostra um texto de erro
                 Label erroLabel = new Label("Erro ao carregar imagem");
                 cardAnexo.getChildren().add(erroLabel);
                 e.printStackTrace();
             }
+        } else if (anexo.getTipoMidia().equalsIgnoreCase("VIDEO")) {
+            // Se for vídeo, cria um placeholder visual
+            Region videoIcon = new Region();
+            videoIcon.getStyleClass().add("video-icon"); // Estilo que vamos criar no CSS
+            videoIcon.setPrefSize(200, 150);
+            
+            videoIcon.setOnMouseClicked(event -> abrirVisualizador(anexo)); // Também abre o visualizador
+
+            cardAnexo.getChildren().add(videoIcon);
         }
-        // Futuramente, poderíamos adicionar um `else if` para vídeos aqui
+        // --- FIM DA LÓGICA ATUALIZADA ---
 
         Label nomeArquivo = new Label(new File(anexo.getCaminhoArquivo()).getName());
         nomeArquivo.setStyle("-fx-font-weight: bold;");
@@ -365,38 +346,72 @@ private void carregarAnexos() {
     }
 }
 
-@FXML
-private void handleAdicionarAnexo() {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Selecionar Anexo");
-    // Filtro para imagens
-    fileChooser.getExtensionFilters().addAll(
-        new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg", "*.gif"),
-        new FileChooser.ExtensionFilter("Todos os Arquivos", "*.*")
-    );
+// MÉTODO "handleAdicionarAnexo" renomeado e um novo método "abrirVisualizador" foi criado
+// para evitar duplicação de código
+private void abrirVisualizador(Anexo anexo) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/VisualizadorMidia.fxml"));
+        Parent root = loader.load();
+        
+        VisualizadorMidiaController controller = loader.getController();
+        controller.initData(anexo.getCaminhoArquivo());
+        
+        Stage stage = new Stage();
+        stage.setTitle("Visualizador de Anexo");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(anexosTilePane.getScene().getWindow());
+        stage.setScene(new Scene(root));
+        
+        stage.setMaximized(true);
+        
+        stage.showAndWait();
 
-    Stage stage = (Stage) adicionarAnexoButton.getScene().getWindow();
-    File arquivoSelecionado = fileChooser.showOpenDialog(stage);
-
-    if (arquivoSelecionado != null) {
-        // Por simplicidade, vamos usar uma descrição padrão e sem vínculo.
-        // No futuro, podemos abrir um diálogo para o usuário preencher isso.
-        String descricao = "Anexo adicionado em " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        String tipoMidia = "FOTO"; // Simples, por enquanto
-
-        ProntuarioService service = new ProntuarioService();
-        String resultado = service.adicionarAnexo(pacienteAtual.getId(), arquivoSelecionado, tipoMidia, descricao, null, null);
-
-        if (resultado.isEmpty()) {
-            carregarAnexos(); // Atualiza a visualização
-        } else {
-            // Exibe um alerta de erro
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro ao Adicionar Anexo");
-            alert.setHeaderText("Não foi possível salvar o anexo.");
-            alert.setContentText(resultado);
-            alert.showAndWait();
-        }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
 }
+
+@FXML
+    private void handleAdicionarAnexo() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Selecionar Anexo");
+
+        // --- LÓGICA DE FILTROS ATUALIZADA ---
+        
+        // 1. Cria um novo filtro combinado que será o padrão
+        FileChooser.ExtensionFilter combinedFilter = new FileChooser.ExtensionFilter(
+            "Todas as Mídias Suportadas (*.png, *.jpg, *.mp4, ...)", 
+            "*.png", "*.jpg", "*.jpeg", "*.gif", 
+            "*.mp4", "*.mov", "*.avi"
+        );
+
+        // Cria os filtros específicos
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Imagens (*.png, *.jpg, *.gif)", "*.png", "*.jpg", "*.jpeg", "*.gif");
+        FileChooser.ExtensionFilter videoFilter = new FileChooser.ExtensionFilter("Vídeos (*.mp4, *.mov, *.avi)", "*.mp4", "*.mov", "*.avi");
+        FileChooser.ExtensionFilter allFilter = new FileChooser.ExtensionFilter("Todos os Arquivos (*.*)", "*.*");
+
+        // 2. Adiciona o filtro combinado PRIMEIRO na lista para que ele seja o padrão
+        fileChooser.getExtensionFilters().addAll(combinedFilter, imageFilter, videoFilter, allFilter);
+        // --- FIM DA LÓGICA DE FILTROS ---
+
+        Stage stage = (Stage) adicionarAnexoButton.getScene().getWindow();
+        File arquivoSelecionado = fileChooser.showOpenDialog(stage);
+
+        if (arquivoSelecionado != null) {
+            String descricao = "Anexo adicionado em " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            
+            ProntuarioService service = new ProntuarioService();
+            String resultado = service.adicionarAnexo(pacienteAtual.getId(), arquivoSelecionado, descricao, null, null);
+
+            if (resultado.isEmpty()) {
+                carregarAnexos();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro ao Adicionar Anexo");
+                alert.setHeaderText("Não foi possível salvar o anexo.");
+                alert.setContentText(resultado);
+                alert.showAndWait();
+            }
+        }
+    }
 }
