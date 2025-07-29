@@ -1,52 +1,55 @@
 package controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.Period;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-import models.Paciente;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import models.HistoricoItem;
-import models.Avaliacao;
-import models.Sessao;
-import services.ProntuarioService;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Separator;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.Priority;
-import javafx.geometry.Pos;
-import javafx.scene.layout.TilePane;
-import javafx.stage.FileChooser;
-import java.io.File;
-import models.Anexo;
-import javafx.geometry.Insets;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.Modality;
+
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Paragraph;
-import models.Usuario;
-import services.SessaoUsuario;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.borders.SolidBorder;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import models.Anexo;
+import models.Avaliacao;
+import models.HistoricoItem;
+import models.Paciente;
+import models.Sessao;
+import models.Usuario;
+import services.ProntuarioService;
+import services.SessaoUsuario;
 
 public class ProntuarioViewController implements OnHistoryChangedListener {
 
@@ -60,6 +63,13 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML private Button adicionarAnexoButton;
     @FXML private Button gerarPdfButton;
     @FXML private TreatmentViewController sessoesTabContentController;
+    
+    @FXML private ScrollPane historyScrollPane;
+    @FXML private Label emptyHistoryLabel;
+
+    // Novos FXML Fields para Anexos
+    @FXML private ScrollPane anexosScrollPane;
+    @FXML private Label emptyAnexosLabel;
 
     private Paciente pacienteAtual;
 
@@ -104,6 +114,149 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         }
     }
 
+    private void carregarHistoricoCompleto() {
+        historicoVBox.getChildren().clear();
+
+        ProntuarioService prontuarioService = new ProntuarioService();
+        List<HistoricoItem> historico = new ArrayList<>();
+        historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
+        historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
+
+        historico.sort(Comparator.comparing(HistoricoItem::getDataHora).reversed());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy 'às' HH:mm");
+
+        for (HistoricoItem item : historico) {
+            VBox card = createHistoryCard(item, formatter);
+            historicoVBox.getChildren().add(card);
+        }
+        
+        updateHistoryVisibility();
+    }
+
+    private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("patient-card");
+
+        Label tipoLabel = new Label(item.getTipo());
+        tipoLabel.getStyleClass().add("card-title");
+        Label dataLabel = new Label(item.getDataHora().format(formatter));
+        dataLabel.getStyleClass().add("card-subtitle");
+        
+        Region hSpacer = new Region();
+        HBox.setHgrow(hSpacer, Priority.ALWAYS);
+
+        Region deleteIcon = new Region();
+        deleteIcon.getStyleClass().add("delete-icon");
+
+        HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        card.getChildren().addAll(header, new Separator());
+
+        if (item instanceof Sessao) {
+            Sessao sessao = (Sessao) item;
+            deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
+            Label conteudo = new Label(sessao.getEvolucaoTexto());
+            conteudo.setWrapText(true);
+            card.getChildren().add(conteudo);
+        } else if (item instanceof Avaliacao) {
+            Avaliacao avaliacao = (Avaliacao) item;
+            deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
+            VBox detalhesAvaliacao = new VBox(8);
+            detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+            detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
+            detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
+            detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+            detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+            card.getChildren().add(detalhesAvaliacao);
+        }
+
+        Region vSpacer = new Region();
+        VBox.setVgrow(vSpacer, Priority.ALWAYS);
+        card.getChildren().add(vSpacer);
+
+        Button editButton = new Button("Editar");
+        editButton.getStyleClass().add("primary-button");
+        
+        if (item instanceof Sessao) {
+            editButton.setOnAction(event -> handleEdit((Sessao)item));
+        } else if (item instanceof Avaliacao) {
+            editButton.setOnAction(event -> handleEditA((Avaliacao)item));
+        }
+
+        HBox bottomBar = new HBox(editButton);
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        card.getChildren().add(bottomBar);
+
+        return card;
+    }
+
+    private void updateHistoryVisibility() {
+        boolean isEmpty = historicoVBox.getChildren().isEmpty();
+        
+        emptyHistoryLabel.setVisible(isEmpty);
+        emptyHistoryLabel.setManaged(isEmpty);
+        historyScrollPane.setVisible(!isEmpty);
+        historyScrollPane.setManaged(!isEmpty);
+    }
+    
+    private void carregarAnexos() {
+        anexosTilePane.getChildren().clear();
+        ProntuarioService service = new ProntuarioService();
+        List<Anexo> anexos = service.getAnexos(pacienteAtual.getId());
+
+        for (Anexo anexo : anexos) {
+            VBox cardAnexo = new VBox(5);
+            cardAnexo.getStyleClass().add("patient-card");
+            cardAnexo.setPadding(new Insets(10));
+            cardAnexo.setPrefWidth(220);
+            cardAnexo.setAlignment(Pos.CENTER);
+
+            if (anexo.getTipoMidia().equalsIgnoreCase("FOTO")) {
+                try {
+                    File file = new File(anexo.getCaminhoArquivo());
+                    Image image = new Image(file.toURI().toString());
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitHeight(150);
+                    imageView.setFitWidth(200);
+                    imageView.setPreserveRatio(true);
+                    imageView.setOnMouseClicked(event -> abrirVisualizador(anexo));
+                    cardAnexo.getChildren().add(imageView);
+                } catch (Exception e) {
+                    Label erroLabel = new Label("Erro ao carregar imagem");
+                    cardAnexo.getChildren().add(erroLabel);
+                    e.printStackTrace();
+                }
+            } else if (anexo.getTipoMidia().equalsIgnoreCase("VIDEO")) {
+                Region videoIcon = new Region();
+                videoIcon.getStyleClass().add("video-icon");
+                videoIcon.setPrefSize(200, 150);
+                videoIcon.setOnMouseClicked(event -> abrirVisualizador(anexo));
+                cardAnexo.getChildren().add(videoIcon);
+            }
+
+            Label nomeArquivo = new Label(new File(anexo.getCaminhoArquivo()).getName());
+            nomeArquivo.setStyle("-fx-font-weight: bold;");
+            nomeArquivo.setWrapText(true);
+            Label descricao = new Label(anexo.getDescricao());
+            descricao.setWrapText(true);
+            cardAnexo.getChildren().addAll(new Separator(), nomeArquivo, descricao);
+            anexosTilePane.getChildren().add(cardAnexo);
+        }
+        
+        updateAnexosVisibility();
+    }
+
+    private void updateAnexosVisibility() {
+        boolean isEmpty = anexosTilePane.getChildren().isEmpty();
+        
+        emptyAnexosLabel.setVisible(isEmpty);
+        emptyAnexosLabel.setManaged(isEmpty);
+        anexosScrollPane.setVisible(!isEmpty);
+        anexosScrollPane.setManaged(!isEmpty);
+    }
+
     private void handleDelete(Sessao sessao) {
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Confirmar Exclusão");
@@ -131,7 +284,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             EditarSessaoController controller = loader.getController();
             controller.initData(sessao, this.pacienteAtual);
 
-            Stage stage = (Stage) historicoVBox.getScene().getWindow();
+            Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
             stage.setScene(new Scene(root, 1280, 720));
             stage.setTitle("SoftFisio - Editar Sessão");
         } catch (IOException e) {
@@ -178,133 +331,11 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             EditarAvaliacaoController controller = loader.getController();
             controller.initData(avaliacao, this.pacienteAtual);
 
-            Stage stage = (Stage) historicoVBox.getScene().getWindow();
+            Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
             stage.setScene(new Scene(root, 1280, 720));
             stage.setTitle("SoftFisio - Editar Avaliação");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void carregarHistoricoCompleto() {
-        historicoVBox.getChildren().clear();
-
-        ProntuarioService prontuarioService = new ProntuarioService();
-        List<HistoricoItem> historico = new ArrayList<>();
-        historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
-        historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
-
-        historico.sort(Comparator.comparing(HistoricoItem::getDataHora).reversed());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy 'às' HH:mm");
-
-        for (HistoricoItem item : historico) {
-            VBox card = new VBox(10);
-            card.getStyleClass().add("patient-card");
-
-            // Cabeçalho do Card
-            Label tipoLabel = new Label(item.getTipo());
-            tipoLabel.getStyleClass().add("card-title");
-            Label dataLabel = new Label(item.getDataHora().format(formatter));
-            dataLabel.getStyleClass().add("card-subtitle");
-            
-            Region hSpacer = new Region();
-            HBox.setHgrow(hSpacer, Priority.ALWAYS);
-
-            Region deleteIcon = new Region();
-            deleteIcon.getStyleClass().add("delete-icon");
-
-            HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
-            header.setAlignment(Pos.CENTER_LEFT);
-
-            card.getChildren().addAll(header, new Separator());
-
-            // Conteúdo do Card
-            if (item instanceof Sessao) {
-                Sessao sessao = (Sessao) item;
-                deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
-
-                Label conteudo = new Label(sessao.getEvolucaoTexto());
-                conteudo.setWrapText(true);
-                card.getChildren().add(conteudo);
-
-            } else if (item instanceof Avaliacao) {
-                Avaliacao avaliacao = (Avaliacao) item;
-                deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
-
-                VBox detalhesAvaliacao = new VBox(8);
-                detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-                detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-                detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
-                detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
-                detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
-                card.getChildren().add(detalhesAvaliacao);
-            }
-
-            // Espaçador Vertical e Botão de Editar
-            Region vSpacer = new Region();
-            VBox.setVgrow(vSpacer, Priority.ALWAYS);
-            card.getChildren().add(vSpacer);
-
-            Button editButton = new Button("Editar");
-            editButton.getStyleClass().add("primary-button");
-            
-            if (item instanceof Sessao) {
-                editButton.setOnAction(event -> handleEdit((Sessao)item));
-            } else if (item instanceof Avaliacao) {
-                editButton.setOnAction(event -> handleEditA((Avaliacao)item));
-            }
-
-            HBox bottomBar = new HBox(editButton);
-            bottomBar.setAlignment(Pos.CENTER_RIGHT);
-            card.getChildren().add(bottomBar);
-
-            historicoVBox.getChildren().add(card);
-        }
-    }
-
-    private void carregarAnexos() {
-        anexosTilePane.getChildren().clear();
-        ProntuarioService service = new ProntuarioService();
-        List<Anexo> anexos = service.getAnexos(pacienteAtual.getId());
-
-        for (Anexo anexo : anexos) {
-            VBox cardAnexo = new VBox(5);
-            cardAnexo.getStyleClass().add("patient-card");
-            cardAnexo.setPadding(new Insets(10));
-            cardAnexo.setPrefWidth(220);
-            cardAnexo.setAlignment(Pos.CENTER);
-
-            if (anexo.getTipoMidia().equalsIgnoreCase("FOTO")) {
-                try {
-                    File file = new File(anexo.getCaminhoArquivo());
-                    Image image = new Image(file.toURI().toString());
-                    ImageView imageView = new ImageView(image);
-                    imageView.setFitHeight(150);
-                    imageView.setFitWidth(200);
-                    imageView.setPreserveRatio(true);
-                    imageView.setOnMouseClicked(event -> abrirVisualizador(anexo));
-                    cardAnexo.getChildren().add(imageView);
-                } catch (Exception e) {
-                    Label erroLabel = new Label("Erro ao carregar imagem");
-                    cardAnexo.getChildren().add(erroLabel);
-                    e.printStackTrace();
-                }
-            } else if (anexo.getTipoMidia().equalsIgnoreCase("VIDEO")) {
-                Region videoIcon = new Region();
-                videoIcon.getStyleClass().add("video-icon");
-                videoIcon.setPrefSize(200, 150);
-                videoIcon.setOnMouseClicked(event -> abrirVisualizador(anexo));
-                cardAnexo.getChildren().add(videoIcon);
-            }
-
-            Label nomeArquivo = new Label(new File(anexo.getCaminhoArquivo()).getName());
-            nomeArquivo.setStyle("-fx-font-weight: bold;");
-            nomeArquivo.setWrapText(true);
-            Label descricao = new Label(anexo.getDescricao());
-            descricao.setWrapText(true);
-            cardAnexo.getChildren().addAll(new Separator(), nomeArquivo, descricao);
-            anexosTilePane.getChildren().add(cardAnexo);
         }
     }
 

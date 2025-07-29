@@ -33,7 +33,8 @@ public class TreatmentViewController {
     @FXML private TextArea newSessionTextArea;
     @FXML private Button saveSessionButton;
     @FXML private VBox sessionsVBox;
-    @FXML private Button editButton;
+    @FXML private Label mensagemSessaoLabel;
+    @FXML private Label emptySessionsLabel; // Novo Label para lista vazia
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
@@ -45,48 +46,52 @@ public class TreatmentViewController {
     
     @FXML
     public void initialize() {
-        // Define o botão de salvar como padrão (ativado com Enter)
         saveSessionButton.setDefaultButton(true);
     }
 
-    
-
     public void initData(Paciente paciente, OnHistoryChangedListener listener) {
-    this.pacienteAtual = paciente;
-    this.historyListener = listener;
-    loadSessoes();
-}
+        this.pacienteAtual = paciente;
+        this.historyListener = listener;
+        
+        newSessionTextArea.textProperty().addListener((obs, oldText, newText) -> {
+            if (mensagemSessaoLabel.isVisible()) {
+                mensagemSessaoLabel.setVisible(false);
+                mensagemSessaoLabel.setManaged(false);
+            }
+        });
 
-    /**
-     * Carrega as sessões do banco de dados e as exibe na tela.
-     */
+        loadSessoes();
+    }
+
     private void loadSessoes() {
-        // 1. Limpa a lista atual para não duplicar conteúdo
         sessionsVBox.getChildren().clear();
-
-        // 2. Busca as sessões do paciente através do serviço
         List<Sessao> sessoes = prontuarioService.getSessoes(pacienteAtual.getId());
-
-        // 3. Para cada sessão na lista, cria um "card" e o adiciona ao VBox
         for (Sessao sessao : sessoes) {
             VBox sessionCard = createSessionCard(sessao);
             sessionsVBox.getChildren().add(sessionCard);
         }
+        // Chama o novo método para verificar a visibilidade
+        updateSessionsVisibility();
     }
 
     /**
-     * Cria um nó de interface (um "card") para representar uma única sessão.
-     * @param sessao O objeto Sessao com os dados.
-     * @return um VBox estilizado contendo as informações da sessão.
+     * Novo método para gerir a visibilidade da lista ou da mensagem de "lista vazia".
      */
+    private void updateSessionsVisibility() {
+        boolean isEmpty = sessionsVBox.getChildren().isEmpty();
 
-    // TO DO - Arrumar o modo que o card tá sendo criado aqui, criar aquivo separado e carregar 
+        // Se a lista estiver vazia, mostra a mensagem e esconde a VBox.
+        // Caso contrário, faz o inverso.
+        emptySessionsLabel.setVisible(isEmpty);
+        emptySessionsLabel.setManaged(isEmpty);
+        sessionsVBox.setVisible(!isEmpty);
+        sessionsVBox.setManaged(!isEmpty);
+    }
+
     private VBox createSessionCard(Sessao sessao) {
-        // Container principal do card
-        VBox card = new VBox(5); // Espaçamento vertical de 5px
+        VBox card = new VBox(5);
         card.getStyleClass().add("patient-card");
 
-        // --- BARRA SUPERIOR: Título e Ícone de Deletar ---
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
 
@@ -95,40 +100,31 @@ public class TreatmentViewController {
         dateLabel.getStyleClass().add("session-date-label");
 
         Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS); // Espaçador para empurrar o ícone para a direita
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Region deleteIcon = new Region();
         deleteIcon.getStyleClass().add("delete-icon");
-        deleteIcon.setOnMouseClicked(event -> {
-            handleDelete(sessao);
-        });
+        deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
 
         topBar.getChildren().addAll(dateLabel, spacer, deleteIcon);
 
-        // --- CONTEÚDO ---
         Separator separator = new Separator();
         separator.setPadding(new Insets(10, 0, 5, 0));
         
         Label evolutionLabel = new Label(sessao.getEvolucaoTexto());
         evolutionLabel.setWrapText(true);
 
-        // --- BARRA INFERIOR: Botão de Editar ---
         HBox bottomBar = new HBox();
-        bottomBar.setAlignment(Pos.CENTER_RIGHT); // Alinha o botão à direita
-        bottomBar.setPadding(new Insets(15, 0, 0, 0)); // Espaço acima do botão
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        bottomBar.setPadding(new Insets(15, 0, 0, 0));
 
-        editButton = new Button("Editar");
-        editButton.getStyleClass().add("primary-button"); // Botão azul com texto branco
-        editButton.setOnAction(event -> {
-            handleEdit(sessao);
-        });
+        Button editButton = new Button("Editar");
+        editButton.getStyleClass().add("primary-button");
+        editButton.setOnAction(event -> handleEdit(sessao));
         bottomBar.getChildren().add(editButton);
         
-        // --- MONTAGEM FINAL DO CARD ---
-        // Adiciona os elementos de conteúdo primeiro
         card.getChildren().addAll(topBar, separator, evolutionLabel);
 
-        // Adiciona as observações se existirem
         if (sessao.getObservacoesSessao() != null && !sessao.getObservacoesSessao().isEmpty()) {
             Label obsLabelTitle = new Label("Observações:");
             obsLabelTitle.getStyleClass().add("session-observation-title");
@@ -137,48 +133,36 @@ public class TreatmentViewController {
             card.getChildren().addAll(obsLabelTitle, obsLabel);
         }
 
-        // NOVO: Espaçador vertical para empurrar o botão para baixo
         Region vSpacer = new Region();
         VBox.setVgrow(vSpacer, Priority.ALWAYS);
-        card.getChildren().add(vSpacer); // Adiciona o espaçador
+        card.getChildren().add(vSpacer);
 
-        // Adiciona a barra inferior com o botão "Editar" no final de tudo
         card.getChildren().add(bottomBar);
 
         return card;
     }
-    /**
-     * Ação do botão "Salvar Sessão".
-     */
+
     @FXML
     private void handleSaveSessao() {
         String textoEvolucao = newSessionTextArea.getText();
         
-        // Usa o serviço para cadastrar a sessão
-        String resultado = prontuarioService.cadastrarSessao(pacienteAtual.getId(), textoEvolucao, ""); // Observações podem ser adicionadas no futuro
+        String resultado = prontuarioService.cadastrarSessao(pacienteAtual.getId(), textoEvolucao, "");
 
         if (resultado.isEmpty()) {
-            // Se salvou com sucesso, limpa a área de texto e recarrega a lista
             newSessionTextArea.clear();
             loadSessoes();
-
-                if (historyListener != null) {
-        historyListener.onHistoryChanged(); // AVISA O PAI QUE HOUVE MUDANÇA
-                    }
+            
+            if (historyListener != null) {
+                historyListener.onHistoryChanged();
+            }
+            setMensagem("Sessão salva com sucesso!", false);
         } else {
-            // Se deu erro, poderíamos exibir um alerta para o usuário
-            System.err.println(resultado);
+            setMensagem(resultado, true);
         }
-
-        
     }
 
-    /**
-     * Ação do botão deletar
-     */
      @FXML
      private void handleDelete(Sessao sessao) {
-        // Mostra um diálogo de confirmação antes de deletar
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Confirmar Exclusão");
         confirmationAlert.setHeaderText("Deseja deletar essa seção?");
@@ -189,46 +173,48 @@ public class TreatmentViewController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             String resultado = prontuarioService.deletarSessao(sessao.getId());
 
-            // Sucesso
             if (resultado.isEmpty()) { 
                 loadSessoes();
+                if (historyListener != null) {
+                    historyListener.onHistoryChanged();
+                }
             } else { 
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setTitle("Erro");
-                errorAlert.setHeaderText("Não foi possível deletar o paciente.");
+                errorAlert.setHeaderText("Não foi possível deletar a sessão.");
                 errorAlert.setContentText(resultado);
                 errorAlert.showAndWait();
             }
         }
      }
     
-     /**
-      * Ação do botão de editar
-      */
       @FXML
       private void handleEdit(Sessao sessao) {
         try {
-            
-            // Carrega o NOVO arquivo FXML de edição
             URL fxmlUrl = getClass().getResource("/static/editar_sessao.fxml");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
 
-            // Pega a instância do NOVO controlador (EditarPacienteController)
             EditarSessaoController controller = loader.getController();
-            
-            // Passa a sessao deste card para o controlador da tela de edição
             controller.initData(sessao, pacienteAtual);
 
-            // Exibe a nova cena na mesma janelapaciente
-            Stage stage = (Stage) editButton.getScene().getWindow();
+            Stage stage = (Stage) saveSessionButton.getScene().getWindow();
             stage.setScene(new Scene(root, 1280, 720));
             stage.setTitle("SoftFisio - Editar Sessão");
 
         } catch (IOException e) {
             e.printStackTrace();
-            // Em uma aplicação real, seria bom mostrar um alerta de erro para o usuário.
         }     
     }
 
+    private void setMensagem(String mensagem, boolean isError) {
+        mensagemSessaoLabel.setText(mensagem);
+        mensagemSessaoLabel.setVisible(true);
+        mensagemSessaoLabel.setManaged(true);
+        if (isError) {
+            mensagemSessaoLabel.setStyle("-fx-text-fill: red;");
+        } else {
+            mensagemSessaoLabel.setStyle("-fx-text-fill: green;");
+        }
+    }
 }
