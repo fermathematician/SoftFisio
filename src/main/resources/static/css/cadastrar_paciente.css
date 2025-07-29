@@ -96,3 +96,11 @@
     -fx-min-height: 20px; 
     -fx-alignment: center;
 }
+
+.jfx-date-picker .input-line {
+    -fx-background-color: transparent; /* Esconde a linha padrão (cinza) */
+}
+
+.jfx-date-picker .input-focused-line {
+    -fx-background-color: transparent; /* Esconde a linha de foco (azul) */
+}

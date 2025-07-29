@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
    <content>
       <VBox alignment="TOP_CENTER" spacing="20.0">
          <children>

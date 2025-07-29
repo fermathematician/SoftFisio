@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
+<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
          <children>
