@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import services.AuthServiceUsuario;
+import services.NavigationService;
 
 public class RegisterController {
 
@@ -104,9 +105,10 @@ public class RegisterController {
     @FXML
     private void handleBackToLoginButtonAction() {
         try {
+            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+
+            Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) registerButton.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/login.fxml");
-            Parent loginView = FXMLLoader.load(fxmlUrl);
             stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
