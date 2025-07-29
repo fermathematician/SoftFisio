@@ -52,6 +52,14 @@ import com.itextpdf.layout.element.Paragraph;
 import java.io.File;
 import javafx.stage.FileChooser;
 
+import models.Usuario;
+import services.SessaoUsuario;
+import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.borders.Border;
+import java.time.format.DateTimeFormatter;
+
 public class ProntuarioViewController implements OnHistoryChangedListener {
 
     //--- Componentes da tela "Pai" ---
@@ -422,51 +430,122 @@ private void abrirVisualizador(Anexo anexo) {
         }
     }
 
+    /**
+     * Cria um parágrafo para o PDF com um título em negrito e o texto do conteúdo.
+     * @param titulo O título do campo (ex: "Nome:").
+     * @param texto O conteúdo do campo.
+     * @return um Parágrafo estilizado para o iText.
+     */
+    private Paragraph criarCampoPdf(String titulo, String texto) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return null; // Não adiciona o campo se o texto estiver vazio
+        }
+        Paragraph p = new Paragraph();
+        Text tituloBold = new Text(titulo).setBold();
+        p.add(tituloBold);
+        p.add(" " + texto); // Adiciona um espaço entre o título e o texto
+        return p;
+    }
+
+
     @FXML
     public void handleGerarPdf() {
+        Usuario usuarioLogado = SessaoUsuario.getInstance().getUsuarioLogado();
+        if (usuarioLogado == null) {
+            new Alert(Alert.AlertType.ERROR, "Nenhum usuário logado. Não é possível gerar o relatório.").showAndWait();
+            return;
+        }
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Salvar Relatório em PDF");
         fileChooser.setInitialFileName("relatorio_" + pacienteAtual.getNomeCompleto().replaceAll("\\s+", "_") + ".pdf");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos PDF (*.pdf)", "*.pdf"));
 
-        // Pega a janela atual para exibir o diálogo de salvar
         Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
         File file = fileChooser.showSaveDialog(stage);
 
         if (file != null) {
             try {
-                // Inicializa o escritor e o documento PDF
                 PdfWriter writer = new PdfWriter(file);
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
+                document.setMargins(30, 30, 30, 30); // Define margens para o documento
 
-                // Adiciona o conteúdo de teste
-                document.add(new Paragraph("Relatório de Teste"));
-                document.add(new Paragraph("Paciente: " + pacienteAtual.getNomeCompleto()));
-                document.add(new Paragraph(" ")); // Linha em branco
-                document.add(new Paragraph("Se você está lendo este texto, o PDF foi gerado com sucesso!"));
+                // --- 1. CABEÇALHO ---
+                Paragraph nomeFisio = new Paragraph(usuarioLogado.getNomeCompleto())
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setBold();
+                document.add(nomeFisio);
+
+                Paragraph tituloRelatorio = new Paragraph("RELATÓRIO FISIOTERAPÊUTICO")
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setBold()
+                        .setFontSize(14)
+                        .setMarginTop(10);
+                document.add(tituloRelatorio);
+
+                // --- 2. IDENTIFICAÇÃO DO PACIENTE ---
+                Paragraph idTitulo = new Paragraph("IDENTIFICAÇÃO")
+                        .setBold()
+                        .setMarginTop(20);
+                document.add(idTitulo);
+                document.add(criarCampoPdf("Nome:", pacienteAtual.getNomeCompleto()));
                 
-                // Fecha o documento (passo crucial para salvar o arquivo)
+                DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                document.add(criarCampoPdf("Data de Nascimento:", pacienteAtual.getDataNascimento().format(formatterData)));
+                document.add(criarCampoPdf("Sexo:", pacienteAtual.getGenero()));
+                document.add(criarCampoPdf("Telefone:", pacienteAtual.getTelefone()));
+
+
+                // --- 3. HISTÓRICO COMPLETO ---
+                Paragraph historicoTitulo = new Paragraph("HISTÓRICO COMPLETO")
+                        .setBold()
+                        .setMarginTop(25)
+                        .setMarginBottom(10);
+                document.add(historicoTitulo);
+
+                // Reutiliza a lógica para buscar e ordenar o histórico
+                ProntuarioService prontuarioService = new ProntuarioService();
+                List<HistoricoItem> historico = new ArrayList<>();
+                historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
+                historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
+                historico.sort(Comparator.comparing(HistoricoItem::getDataHora).reversed());
+
+                DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
+
+                for (HistoricoItem item : historico) {
+                    // Adiciona uma linha separadora antes de cada item do histórico
+                    document.add(new Paragraph(" ").setBorderTop(new SolidBorder(0.5f)).setMarginTop(10).setMarginBottom(10));
+
+                    Paragraph tipoData = new Paragraph()
+                            .add(new Text(item.getTipo().toUpperCase()).setBold())
+                            .add(" - " + item.getDataHora().format(formatterItem));
+                    document.add(tipoData);
+
+                    if (item instanceof Sessao) {
+                        Sessao sessao = (Sessao) item;
+                        document.add(criarCampoPdf("Evolução:", sessao.getEvolucaoTexto()));
+                    } else if (item instanceof Avaliacao) {
+                        Avaliacao avaliacao = (Avaliacao) item;
+                        document.add(criarCampoPdf("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+                        document.add(criarCampoPdf("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
+                        document.add(criarCampoPdf("Exames Físicos:", avaliacao.getExamesFisicos()));
+                        document.add(criarCampoPdf("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+                        document.add(criarCampoPdf("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+                    }
+                }
+                
+                // Fecha o documento para salvar
                 document.close();
 
                 // Mostra um alerta de sucesso
-                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                successAlert.setTitle("Sucesso");
-                successAlert.setHeaderText("PDF Gerado com Sucesso!");
-                successAlert.setContentText("O arquivo foi salvo em: " + file.getAbsolutePath());
-                successAlert.showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "PDF gerado com sucesso em: " + file.getAbsolutePath()).showAndWait();
 
             } catch (IOException e) {
                 e.printStackTrace();
-                // Mostra um alerta de erro
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Erro");
-                errorAlert.setHeaderText("Erro ao Gerar PDF");
-                errorAlert.setContentText("Ocorreu um erro inesperado: " + e.getMessage());
-                errorAlert.showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Ocorreu um erro ao gerar o PDF: " + e.getMessage()).showAndWait();
             }
         } else {
-            // Opcional: informar que a operação foi cancelada
             System.out.println("Geração de PDF cancelada pelo usuário.");
         }
     }
