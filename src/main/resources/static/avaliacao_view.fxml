@@ -50,7 +50,7 @@
 
                   <VBox alignment="CENTER_RIGHT">
                      <children>
-                        <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar Avaliação" prefWidth="200.0" />
+                        <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />
                      </children>
                      <VBox.margin>
                         <Insets top="10.0" />

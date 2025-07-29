@@ -43,8 +43,14 @@ import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import javafx.stage.Stage;
 import javafx.stage.Modality;
+
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import java.io.File;
+import javafx.stage.FileChooser;
 
 public class ProntuarioViewController implements OnHistoryChangedListener {
 
@@ -57,6 +63,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML private VBox historicoVBox;
     @FXML private TilePane anexosTilePane;
     @FXML private Button adicionarAnexoButton;
+    @FXML private Button gerarPdfButton;
 
     //--- Injeção do conteúdo e do controller da aba "Sessões" ---
     // O fx:id do <fx:include> é "sessoesTabContent"
@@ -371,7 +378,7 @@ private void abrirVisualizador(Anexo anexo) {
     }
 }
 
-@FXML
+    @FXML
     private void handleAdicionarAnexo() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Selecionar Anexo");
@@ -412,6 +419,55 @@ private void abrirVisualizador(Anexo anexo) {
                 alert.setContentText(resultado);
                 alert.showAndWait();
             }
+        }
+    }
+
+    @FXML
+    public void handleGerarPdf() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar Relatório em PDF");
+        fileChooser.setInitialFileName("relatorio_" + pacienteAtual.getNomeCompleto().replaceAll("\\s+", "_") + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos PDF (*.pdf)", "*.pdf"));
+
+        // Pega a janela atual para exibir o diálogo de salvar
+        Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            try {
+                // Inicializa o escritor e o documento PDF
+                PdfWriter writer = new PdfWriter(file);
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
+
+                // Adiciona o conteúdo de teste
+                document.add(new Paragraph("Relatório de Teste"));
+                document.add(new Paragraph("Paciente: " + pacienteAtual.getNomeCompleto()));
+                document.add(new Paragraph(" ")); // Linha em branco
+                document.add(new Paragraph("Se você está lendo este texto, o PDF foi gerado com sucesso!"));
+                
+                // Fecha o documento (passo crucial para salvar o arquivo)
+                document.close();
+
+                // Mostra um alerta de sucesso
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Sucesso");
+                successAlert.setHeaderText("PDF Gerado com Sucesso!");
+                successAlert.setContentText("O arquivo foi salvo em: " + file.getAbsolutePath());
+                successAlert.showAndWait();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Mostra um alerta de erro
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Erro");
+                errorAlert.setHeaderText("Erro ao Gerar PDF");
+                errorAlert.setContentText("Ocorreu um erro inesperado: " + e.getMessage());
+                errorAlert.showAndWait();
+            }
+        } else {
+            // Opcional: informar que a operação foi cancelada
+            System.out.println("Geração de PDF cancelada pelo usuário.");
         }
     }
 }
