@@ -16,7 +16,8 @@ import java.net.URL;
 import java.util.Optional; 
 
 import models.Paciente;
-import services.AuthServicePaciente; 
+import services.AuthServicePaciente;
+import services.NavigationService; 
 
 public class PatientCardController {
 
@@ -62,43 +63,25 @@ public class PatientCardController {
         }
     }
 
-// Em controllers/PatientCardController.java
 
 @FXML
 private void handleViewRecord() {
-    System.out.println("DEBUG: Botão 'Ver Ficha' clicado para o paciente: " + this.paciente.getNomeCompleto());
     try {
-        // 1. Tenta encontrar o arquivo FXML
-        URL fxmlUrl = getClass().getResource("/static/prontuario_view.fxml");
-        if (fxmlUrl == null) {
-            System.err.println("ERRO CRÍTICO: Não foi possível encontrar o arquivo /static/prontuario_view.fxml. Verifique o caminho.");
-            return;
-        }
-        System.out.println("DEBUG: Arquivo prontuario_view.fxml encontrado com sucesso.");
+        String fxmlPath = "/static/prontuario_view.fxml";
+        NavigationService.getInstance().pushHistory(fxmlPath);
 
-        // 2. Tenta carregar o FXML e o seu controller
+        URL fxmlUrl = getClass().getResource(fxmlPath);
+
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
-        Parent root = loader.load();
-        System.out.println("DEBUG: FXML carregado. Tentando obter o controller...");
+        Parent prontuarioView = loader.load();
 
-        // 3. Tenta obter o controller
         ProntuarioViewController controller = loader.getController();
-        if (controller == null) {
-            System.err.println("ERRO CRÍTICO: O controller para prontuario_view.fxml não foi injetado. Verifique o fx:controller no arquivo FXML.");
-            return;
-        }
-        System.out.println("DEBUG: Controller obtido com sucesso. Chamando initData...");
-
-        // 4. Tenta passar os dados
+      
         controller.initData(this.paciente);
-        System.out.println("DEBUG: initData chamado com sucesso. Configurando a cena...");
 
-        // 5. Tenta configurar e mostrar a nova cena
         Stage stage = (Stage) viewRecordButton.getScene().getWindow();
-        stage.setScene(new Scene(root, 1280, 720));
+        stage.setScene(new Scene(prontuarioView, 1280, 720));
         stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
-        System.out.println("DEBUG: Cena configurada. A nova tela deveria estar visível.");
-
     } catch (IOException e) {
         System.err.println("### ERRO DE IO AO CARREGAR A TELA DE PRONTUÁRIO ###");
         e.printStackTrace(); // Isto vai imprimir o erro detalhado no console
@@ -138,13 +121,14 @@ private void handleViewRecord() {
 
     @FXML
     private void handleEdit() {
-        System.out.println(">>> MÉTODO handleEdit FOI CHAMADO! <<<"); 
         try {
+            String fxmlPath = "/static/editar_paciente.fxml";
+
+            NavigationService.getInstance().pushHistory(fxmlPath);
             
-            // Carrega o NOVO arquivo FXML de edição
-            URL fxmlUrl = getClass().getResource("/static/editar_paciente.fxml");
+            URL fxmlUrl = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
+            Parent editarPacienteView = loader.load();
 
             // Pega a instância do NOVO controlador (EditarPacienteController)
             EditarPacienteController controller = loader.getController();
@@ -154,7 +138,7 @@ private void handleViewRecord() {
 
             // Exibe a nova cena na mesma janela
             Stage stage = (Stage) editButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
+            stage.setScene(new Scene(editarPacienteView, 1280, 720));
             stage.setTitle("SoftFisio - Editar Paciente");
 
         } catch (IOException e) {

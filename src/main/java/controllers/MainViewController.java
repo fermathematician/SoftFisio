@@ -21,6 +21,7 @@ import java.util.List;
 import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;
+import services.NavigationService;
 import services.SessaoUsuario;
 
 public class MainViewController implements PatientCardController.OnPatientDeletedListener {
@@ -144,12 +145,14 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     @FXML
     private void handlePacienteCorrida() {
         try {
-            URL fxmlUrl = getClass().getResource("/static/pacientes_corrida.fxml");
-            Parent corridaView = FXMLLoader.load(fxmlUrl);
-            
+            String fxmlPath = "/static/pacientes_corrida.fxml";
+
+            NavigationService.getInstance().pushHistory(fxmlPath);
+
+            Parent corridaView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) pacienteCorridaButton.getScene().getWindow();
             stage.setScene(new Scene(corridaView, 1280, 720));
-            stage.setTitle("SoftFisio - Pacientes de Corrida");
+            stage.setTitle("SoftFisio - Pacientes de corrida");
         } catch (IOException e) {
             System.err.println("Erro ao carregar a tela de pacientes de corrida. Verifique se o arquivo 'pacientes_corrida.fxml' existe.");
             e.printStackTrace();
@@ -159,11 +162,13 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     @FXML
     private void handleNewPatient() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/cadastrar_paciente.fxml"));
-            Parent cadastrarPacienteView = loader.load();
+            String fxmlPath = "/static/cadastrar_paciente.fxml";
 
+            NavigationService.getInstance().pushHistory(fxmlPath);
+
+            Parent cadastrarPacienteView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) newPatientButton.getScene().getWindow();
-            stage.setScene(new Scene(cadastrarPacienteView)); 
+            stage.setScene(new Scene(cadastrarPacienteView, 1280, 720));
             stage.setTitle("SoftFisio - Cadastrar Paciente");
         } catch (IOException e) {
             e.printStackTrace();
@@ -173,9 +178,11 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     @FXML
     private void handleLogout() {
         SessaoUsuario.getInstance().logout();
-        try {
+        try {   
+            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+
+            Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) logoutButton.getScene().getWindow();
-            Parent loginView = FXMLLoader.load(getClass().getResource("/static/login.fxml"));
             stage.setScene(new Scene(loginView, 1280, 720));
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {

@@ -13,9 +13,10 @@ import javafx.stage.Stage;
 import models.Usuario;
 
 import java.io.IOException;
-import java.net.URL;
+
 import services.SessaoUsuario;
 import services.AuthServiceUsuario;
+import services.NavigationService;
 
 public class LoginController {
 
@@ -52,7 +53,6 @@ public class LoginController {
         toggleSenhaIcon.getStyleClass().removeAll("icon-eye", "icon-eye-slash");
 
         if (isSenhaVisible) {
-            // MOSTRAR SENHA
             senhaField.setVisible(false);
             senhaField.setManaged(false);
             
@@ -91,37 +91,38 @@ public class LoginController {
             mensagemLabel.setText("Login bem-sucedido! Navegando...");
             mensagemLabel.setStyle("-fx-text-fill: green;");
             
-            navigateToMainView();
+            try {
+                String fxmlPath = "/static/main_view.fxml";
+
+                NavigationService.getInstance().pushHistory(fxmlPath);
+
+                Parent mainView = FXMLLoader.load(getClass().getResource(fxmlPath));
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                stage.setScene(new Scene(mainView, 1280, 720));
+                stage.setTitle("SoftFisio - Lista de pacientes");
+            }catch (IOException e){
+                e.printStackTrace();
+                mensagemLabel.setText("Erro ao carregar a tela principal.");
+                mensagemLabel.setStyle("-fx-text-fill: red;");
+            }
+
         } else {
             mensagemLabel.setText("Login ou senha inválidos. Tente novamente.");
             mensagemLabel.setStyle("-fx-text-fill: red;");
-        }
-    }
-    
-    private void navigateToMainView() {
-        try {
-            Stage stage = (Stage) loginField.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-            Parent mainView = FXMLLoader.load(fxmlUrl);
-            
-            stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Lista de pacientes");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            mensagemLabel.setText("Erro ao carregar a tela principal.");
         }
     }
 
     @FXML
     private void handleGoToRegisterButtonAction() {
         try {
+            String fxmlPath = "/static/register.fxml";
+
+            NavigationService.getInstance().pushHistory(fxmlPath);
+
+            Parent RegisterView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) loginField.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/register.fxml");
-            Parent registerView = FXMLLoader.load(fxmlUrl);
-            
-            stage.setScene(new Scene(registerView, 1280, 720));
-            stage.setTitle("SoftFisio - Novo Cadastro");
+            stage.setScene(new Scene(RegisterView, 1280, 720));
+            stage.setTitle("SoftFisio - Cadastro");
         } catch (IOException e) {
             e.printStackTrace();
             mensagemLabel.setText("Erro ao carregar a tela de cadastro.");

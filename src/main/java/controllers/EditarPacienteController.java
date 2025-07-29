@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
 
 import javafx.collections.FXCollections;
@@ -19,7 +18,8 @@ import javafx.stage.Stage;
 
 import models.Paciente;
 import services.AuthServicePaciente;
-import services.MaskService; // MODIFICAÇÃO: Importa o serviço de máscara
+import services.MaskService;
+import services.NavigationService; 
 
 public class EditarPacienteController {
 
@@ -88,11 +88,17 @@ public class EditarPacienteController {
     @FXML
     private void handleCancel() {
         try {
+            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+
+            Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) cancelButton.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-            Parent mainView = FXMLLoader.load(fxmlUrl);
-            stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Lista de pacientes");
+            stage.setScene(new Scene(patientsView, 1280, 720));
+
+            if(fxmlPath.equals("/static/main_view.fxml")) {
+                stage.setTitle("SoftFisio - Lista de Pacientes");
+            }else {
+                stage.setTitle("SoftFisio - Pacientes de corrida");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

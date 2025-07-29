@@ -71,11 +71,11 @@ public class AvaliacaoViewController {
         }
     }
     
-    private void limparCampos() {
-        queixaPrincipalArea.clear();
-        hdaArea.clear();
-        examesFisicosArea.clear();
-        diagnosticoArea.clear();
-        planoTratamentoArea.clear();
-    }
+    //private void limparCampos() {
+        //queixaPrincipalArea.clear();
+        //hdaArea.clear();
+        //examesFisicosArea.clear();
+        //diagnosticoArea.clear();
+        //planoTratamentoArea.clear();
+    //}
 }
