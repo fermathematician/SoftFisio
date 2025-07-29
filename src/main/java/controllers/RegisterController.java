@@ -12,7 +12,6 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 import services.AuthServiceUsuario;
 import services.NavigationService;
 

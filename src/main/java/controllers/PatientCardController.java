@@ -16,7 +16,8 @@ import java.net.URL;
 import java.util.Optional; 
 
 import models.Paciente;
-import services.AuthServicePaciente; 
+import services.AuthServicePaciente;
+import services.NavigationService; 
 
 public class PatientCardController {
 
@@ -138,13 +139,14 @@ private void handleViewRecord() {
 
     @FXML
     private void handleEdit() {
-        System.out.println(">>> MÉTODO handleEdit FOI CHAMADO! <<<"); 
         try {
+            String fxmlPath = "/static/editar_paciente.fxml";
+
+            NavigationService.getInstance().pushHistory(fxmlPath);
             
-            // Carrega o NOVO arquivo FXML de edição
-            URL fxmlUrl = getClass().getResource("/static/editar_paciente.fxml");
+            URL fxmlUrl = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
+            Parent editarPacienteView = loader.load();
 
             // Pega a instância do NOVO controlador (EditarPacienteController)
             EditarPacienteController controller = loader.getController();
@@ -154,7 +156,7 @@ private void handleViewRecord() {
 
             // Exibe a nova cena na mesma janela
             Stage stage = (Stage) editButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
+            stage.setScene(new Scene(editarPacienteView, 1280, 720));
             stage.setTitle("SoftFisio - Editar Paciente");
 
         } catch (IOException e) {
