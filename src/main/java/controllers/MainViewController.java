@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.net.URL; 
 import java.util.List;
 
-import javax.print.attribute.standard.MediaSize.NA;
-
 import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;

@@ -48,6 +48,7 @@ import models.HistoricoItem;
 import models.Paciente;
 import models.Sessao;
 import models.Usuario;
+import services.NavigationService;
 import services.ProntuarioService;
 import services.SessaoUsuario;
 
@@ -104,11 +105,17 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML
     private void handleBackButton() {
         try {
+            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+
+            Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) backButton.getScene().getWindow();
-            URL fxmlUrl = getClass().getResource("/static/main_view.fxml");
-            Parent mainView = FXMLLoader.load(fxmlUrl);
-            stage.setScene(new Scene(mainView, 1280, 720));
-            stage.setTitle("SoftFisio - Lista de pacientes");
+            stage.setScene(new Scene(patientsView, 1280, 720));
+
+            if(fxmlPath.equals("/static/main_view.fxml")) {
+                stage.setTitle("SoftFisio - Lista de Pacientes");
+            }else {
+                stage.setTitle("SoftFisio - Pacientes de corrida");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

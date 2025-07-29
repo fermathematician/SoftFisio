@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
 
 import javafx.collections.FXCollections;
@@ -91,9 +90,9 @@ public class EditarPacienteController {
         try {
             String fxmlPath = NavigationService.getInstance().getPreviousPage();
 
-            Parent pacientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) cancelButton.getScene().getWindow();
-            stage.setScene(new Scene(pacientsView, 1280, 720));
+            stage.setScene(new Scene(patientsView, 1280, 720));
 
             if(fxmlPath.equals("/static/main_view.fxml")) {
                 stage.setTitle("SoftFisio - Lista de Pacientes");
