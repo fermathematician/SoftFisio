@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,13 +17,18 @@ import services.ProntuarioService;
 
 public class EditarAvaliacaoController {
 
+    // Componentes do Cabeçalho
+    @FXML private Label patientNameLabel;
+    @FXML private Label evaluationInfoLabel;
+    @FXML private Button backButton;
+
+    // Componentes do Formulário
     @FXML private TextArea queixaPrincipalArea;
     @FXML private TextArea hdaArea;
     @FXML private TextArea examesFisicosArea;
     @FXML private TextArea diagnosticoArea;
     @FXML private TextArea planoTratamentoArea;
     @FXML private Button salvarButton;
-    @FXML private Button cancelarButton;
     @FXML private Label mensagemLabel;
 
     private ProntuarioService prontuarioService;
@@ -36,6 +42,12 @@ public class EditarAvaliacaoController {
     public void initData(Avaliacao avaliacao, Paciente paciente) {
         this.avaliacaoAtual = avaliacao;
         this.paciente = paciente;
+        
+        // Preenche o cabeçalho
+        patientNameLabel.setText(paciente.getNomeCompleto());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Avaliação de' dd 'de' MMMM 'de' yyyy");
+        evaluationInfoLabel.setText("Editando " + avaliacao.getDataHora().format(formatter));
+
         populateForm();
     }
 
@@ -49,10 +61,11 @@ public class EditarAvaliacaoController {
 
     @FXML
     private void handleSalvarAlteracoes() {
+        // Assumindo que Avaliacao tem o método getDataHora()
         String resultado = prontuarioService.atualizarAvaliacao(
             avaliacaoAtual.getId(),
             avaliacaoAtual.getIdPaciente(),
-            avaliacaoAtual.getDataAvaliacao(),
+            avaliacaoAtual.getDataHora(), 
             queixaPrincipalArea.getText(),
             hdaArea.getText(),
             examesFisicosArea.getText(),
@@ -68,13 +81,13 @@ public class EditarAvaliacaoController {
     }
 
     @FXML
-    private void handleCancelar() {
+    private void handleBackButton() {
         voltarParaProntuario();
     }
 
     private void voltarParaProntuario() {
         try {
-            Stage stage = (Stage) cancelarButton.getScene().getWindow();
+            Stage stage = (Stage) backButton.getScene().getWindow();
             URL fxmlUrl = getClass().getResource("/static/prontuario_view.fxml");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
