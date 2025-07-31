@@ -413,28 +413,48 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             new Alert(Alert.AlertType.ERROR, "Nenhum usuário logado. Não é possível gerar o relatório.").showAndWait();
             return;
         }
+
+        ProntuarioService prontuarioService = new ProntuarioService();
+        List<HistoricoItem> historico = new ArrayList<>();
+        historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
+        historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
+
+        // Verifica se o histórico está vazio.
+        if (historico.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Atenção");
+            alert.setHeaderText("Não é possível gerar o relatório");
+            alert.setContentText("O paciente não possui nenhum histórico.");
+            alert.showAndWait();
+            return; 
+        }
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Salvar Relatório em PDF");
         fileChooser.setInitialFileName("relatorio_" + pacienteAtual.getNomeCompleto().replaceAll("\\s+", "_") + ".pdf");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos PDF (*.pdf)", "*.pdf"));
         Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
         File file = fileChooser.showSaveDialog(stage);
+
         if (file != null) {
             try {
                 PdfWriter writer = new PdfWriter(file);
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
                 document.setMargins(30, 30, 30, 30);
+
                 Paragraph nomeFisio = new Paragraph(usuarioLogado.getNomeCompleto())
                         .setTextAlignment(TextAlignment.CENTER)
                         .setBold();
                 document.add(nomeFisio);
+
                 Paragraph tituloRelatorio = new Paragraph("RELATÓRIO FISIOTERAPÊUTICO")
                         .setTextAlignment(TextAlignment.CENTER)
                         .setBold()
                         .setFontSize(14)
                         .setMarginTop(10);
                 document.add(tituloRelatorio);
+
                 Paragraph idTitulo = new Paragraph("IDENTIFICAÇÃO")
                         .setBold()
                         .setMarginTop(20);
@@ -444,17 +464,17 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
                 document.add(criarCampoPdf("Data de Nascimento:", pacienteAtual.getDataNascimento().format(formatterData)));
                 document.add(criarCampoPdf("Sexo:", pacienteAtual.getGenero()));
                 document.add(criarCampoPdf("Telefone:", pacienteAtual.getTelefone()));
+
                 Paragraph historicoTitulo = new Paragraph("HISTÓRICO COMPLETO")
                         .setBold()
                         .setMarginTop(25)
                         .setMarginBottom(10);
                 document.add(historicoTitulo);
-                ProntuarioService prontuarioService = new ProntuarioService();
-                List<HistoricoItem> historico = new ArrayList<>();
-                historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
-                historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
+
+                // Reutiliza a lista 'historico' já carregada e a ordena
                 historico.sort(Comparator.comparing(HistoricoItem::getDataHora).reversed());
                 DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
+
                 for (HistoricoItem item : historico) {
                     document.add(new Paragraph(" ").setBorderTop(new SolidBorder(0.5f)).setMarginTop(10).setMarginBottom(10));
                     Paragraph tipoData = new Paragraph()
