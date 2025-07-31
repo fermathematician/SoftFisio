@@ -47,9 +47,15 @@ public class AuthServiceUsuario {
         if (nomeCompleto == null || nomeCompleto.trim().isEmpty()) {
             return "O nome completo é obrigatório.";
         }
+
         if (login == null || login.trim().length() < 4) {
             return "O login deve ter pelo menos 4 caracteres.";
         }
+
+        if (usuarioDAO.findByLogin(login) != null) {
+            return "Este nome de usuário já está em uso.";
+        }
+
         if (senha == null || senha.length() < 6) {
             return "A senha deve ter pelo menos 6 caracteres.";
         }
@@ -58,9 +64,7 @@ public class AuthServiceUsuario {
             return "As senhas não coincidem";
         }
 
-        if (usuarioDAO.findByLogin(login) != null) {
-            return "Este nome de usuário já está em uso.";
-        }
+        
         
         // ATENÇÃO: Hashing de Senha (CRÍTICO PARA SEGURANÇA)
         // Em um projeto real, você NUNCA salvaria a senha em texto plano.
