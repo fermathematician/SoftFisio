@@ -32,6 +32,14 @@ public class AuthServicePaciente {
             return "O cpf precisa ser preenchido!";
         }
 
+        if (dataNascimento == null) {
+            return "A data de nascimento precisa ser selecionada!";
+        }
+
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            return "A data de nascimento não pode ser uma data futura!";
+        }
+
         if (genero == null) {
             return "O gênero precisa ser selecionado!";
         }
@@ -43,13 +51,8 @@ public class AuthServicePaciente {
         if (email.isEmpty()) {
             return "O email precisa ser preenchido!";
         }
-       
-        if (dataNascimento == null) {
-            return "A data de nascimento precisa ser selecionada!";
-        }
+        
 
-        // Cria o objeto Paciente, agora passando a informação se é um paciente de corrida.
-        // Assumindo que o construtor do Paciente foi atualizado para aceitar o booleano.
         Paciente paciente = new Paciente(0, idUsuario, nomeCompleto, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
         
         boolean sucesso = pacienteDAO.save(paciente);
@@ -77,6 +80,15 @@ public class AuthServicePaciente {
         if (cpf.isEmpty()) {
             return "O cpf precisa ser preenchido!";
         }
+
+        if (dataNascimento == null) {
+            return "A data de nascimento precisa ser selecionada!";
+        }
+
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            return "A data de nascimento não pode ser uma data futura!";
+        }
+
         if (genero == null) {
             return "O gênero precisa ser selecionado!";
         }
@@ -85,9 +97,6 @@ public class AuthServicePaciente {
         }
         if (email.isEmpty()) {
             return "O email precisa ser preenchido!";
-        }
-        if (dataNascimento == null) {
-            return "A data de nascimento precisa ser selecionada!";
         }
 
         // 2. Obter o usuário logado
