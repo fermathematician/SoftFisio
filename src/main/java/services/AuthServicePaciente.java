@@ -24,14 +24,33 @@ public class AuthServicePaciente {
      * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
      */
     public String cadastrar(int idUsuario, String nomeCompleto, String cpf, String genero, String telefone, String email, LocalDate dataNascimento, boolean isPacienteCorrida) {
+        // Validações dos campos de entrada
         if (nomeCompleto.isEmpty()) {
             return "O nome precisa ser preenchido!";
         }
         
         if (cpf.isEmpty()) {
-            return "O cpf precisa ser preenchido!";
+            return "O CPF precisa ser preenchido!";
         }
-
+        
+        // NOVA VALIDAÇÃO: Verifica se o CPF tem 11 dígitos, ignorando a formatação.
+        String cpfNumeros = cpf.replaceAll("[^0-9]", "");
+        if (cpfNumeros.length() != 11) {
+            return "O CPF deve conter 11 dígitos.";
+        }
+        
+        if (genero == null) {
+            return "O gênero precisa ser selecionado!";
+        }
+        
+        if (telefone.isEmpty()) {
+            return "O telefone precisa ser preenchido!";
+        }
+        
+        if (email.isEmpty()) {
+            return "O email precisa ser preenchido!";
+        }
+        
         if (dataNascimento == null) {
             return "A data de nascimento precisa ser selecionada!";
         }
@@ -40,24 +59,12 @@ public class AuthServicePaciente {
             return "A data de nascimento não pode ser uma data futura!";
         }
 
-        if (genero == null) {
-            return "O gênero precisa ser selecionado!";
-        }
-
-        if (telefone.isEmpty()) {
-            return "O telefone precisa ser preenchido!";
-        }
-
-        if (email.isEmpty()) {
-            return "O email precisa ser preenchido!";
-        }
-        
-
+        // Cria o objeto Paciente
         Paciente paciente = new Paciente(0, idUsuario, nomeCompleto, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
         
         boolean sucesso = pacienteDAO.save(paciente);
 
-        return sucesso ? "" : "Já existe um paciente com o cpf digitado!";
+        return sucesso ? "" : "Já existe um paciente com o CPF digitado!";
     }
 
     /**
@@ -77,16 +84,15 @@ public class AuthServicePaciente {
         if (nomeCompleto.isEmpty()) {
             return "O nome precisa ser preenchido!";
         }
+
         if (cpf.isEmpty()) {
-            return "O cpf precisa ser preenchido!";
+            return "O CPF precisa ser preenchido!";
         }
 
-        if (dataNascimento == null) {
-            return "A data de nascimento precisa ser selecionada!";
-        }
-
-        if (dataNascimento.isAfter(LocalDate.now())) {
-            return "A data de nascimento não pode ser uma data futura!";
+        // NOVA VALIDAÇÃO: Verifica se o CPF tem 11 dígitos, ignorando a formatação.
+        String cpfNumeros = cpf.replaceAll("[^0-9]", "");
+        if (cpfNumeros.length() != 11) {
+            return "O CPF deve conter 11 dígitos.";
         }
 
         if (genero == null) {
@@ -99,6 +105,14 @@ public class AuthServicePaciente {
             return "O email precisa ser preenchido!";
         }
 
+        if (dataNascimento == null) {
+            return "A data de nascimento precisa ser selecionada!";
+        }
+
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            return "A data de nascimento não pode ser uma data futura!";
+        }
+
         // 2. Obter o usuário logado
         SessaoUsuario sessao = SessaoUsuario.getInstance();
         if (!sessao.isLogado()) {
@@ -106,7 +120,7 @@ public class AuthServicePaciente {
         }
         int idUsuarioLogado = sessao.getUsuarioLogado().getId();
 
-        // 3. Cria o objeto Paciente com os dados atualizados, incluindo o status de corrida.
+        // 3. Cria o objeto Paciente com os dados atualizados
         Paciente pacienteAtualizado = new Paciente(idPaciente, idUsuarioLogado, nomeCompleto, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
         
         // 4. Chama o método 'update' do DAO
