@@ -33,10 +33,17 @@ public class AuthServicePaciente {
             return "O CPF precisa ser preenchido!";
         }
         
-        // NOVA VALIDAÇÃO: Verifica se o CPF tem 11 dígitos, ignorando a formatação.
         String cpfNumeros = cpf.replaceAll("[^0-9]", "");
         if (cpfNumeros.length() != 11) {
             return "O CPF deve conter 11 dígitos.";
+        }
+
+        if (dataNascimento == null) {
+            return "A data de nascimento precisa ser selecionada!";
+        }
+
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            return "A data de nascimento não pode ser uma data futura!";
         }
         
         if (genero == null) {
@@ -50,13 +57,9 @@ public class AuthServicePaciente {
         if (email.isEmpty()) {
             return "O email precisa ser preenchido!";
         }
-        
-        if (dataNascimento == null) {
-            return "A data de nascimento precisa ser selecionada!";
-        }
 
-        if (dataNascimento.isAfter(LocalDate.now())) {
-            return "A data de nascimento não pode ser uma data futura!";
+        if (!email.contains("@")) {
+            return "O formato do e-mail é inválido.";
         }
 
         // Cria o objeto Paciente
@@ -89,10 +92,17 @@ public class AuthServicePaciente {
             return "O CPF precisa ser preenchido!";
         }
 
-        // NOVA VALIDAÇÃO: Verifica se o CPF tem 11 dígitos, ignorando a formatação.
         String cpfNumeros = cpf.replaceAll("[^0-9]", "");
         if (cpfNumeros.length() != 11) {
             return "O CPF deve conter 11 dígitos.";
+        }
+
+        if (dataNascimento == null) {
+            return "A data de nascimento precisa ser selecionada!";
+        }
+
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            return "A data de nascimento não pode ser uma data futura!";
         }
 
         if (genero == null) {
@@ -105,13 +115,9 @@ public class AuthServicePaciente {
             return "O email precisa ser preenchido!";
         }
 
-        if (dataNascimento == null) {
-            return "A data de nascimento precisa ser selecionada!";
-        }
-
-        if (dataNascimento.isAfter(LocalDate.now())) {
-            return "A data de nascimento não pode ser uma data futura!";
-        }
+        if (!email.contains("@")) {
+            return "O formato do e-mail é inválido.";
+        }    
 
         // 2. Obter o usuário logado
         SessaoUsuario sessao = SessaoUsuario.getInstance();
