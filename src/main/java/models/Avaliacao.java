@@ -1,20 +1,21 @@
+// Em models/Avaliacao.java
 package models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Avaliacao implements HistoricoItem {
 
     private final int id;
     private final int idPaciente;
-    private final LocalDateTime dataAvaliacao;
+    private final LocalDate dataAvaliacao; // Alterado para LocalDate
     private final String queixaPrincipal;
     private final String historicoDoencaAtual;
     private final String examesFisicos;
     private final String diagnosticoFisioterapeutico;
     private final String planoTratamento;
 
-    public Avaliacao(int id, int idPaciente, LocalDateTime dataAvaliacao, String queixaPrincipal, 
-                     String historicoDoencaAtual, String examesFisicos, 
+    public Avaliacao(int id, int idPaciente, LocalDate dataAvaliacao, String queixaPrincipal,
+                     String historicoDoencaAtual, String examesFisicos,
                      String diagnosticoFisioterapeutico, String planoTratamento) {
         this.id = id;
         this.idPaciente = idPaciente;
@@ -26,10 +27,10 @@ public class Avaliacao implements HistoricoItem {
         this.planoTratamento = planoTratamento;
     }
 
-    // Getters para todos os campos
+    // Getters
     public int getId() { return id; }
     public int getIdPaciente() { return idPaciente; }
-    public LocalDateTime getDataAvaliacao() { return dataAvaliacao; }
+    public LocalDate getDataAvaliacao() { return dataAvaliacao; } // Alterado para LocalDate
     public String getQueixaPrincipal() { return queixaPrincipal; }
     public String getHistoricoDoencaAtual() { return historicoDoencaAtual; }
     public String getExamesFisicos() { return examesFisicos; }
@@ -37,7 +38,7 @@ public class Avaliacao implements HistoricoItem {
     public String getPlanoTratamento() { return planoTratamento; }
 
     @Override
-    public LocalDateTime getDataHora() {
+    public LocalDate getData() { // Método da interface implementado
         return this.dataAvaliacao;
     }
 

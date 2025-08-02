@@ -28,12 +28,16 @@ import models.Paciente;
 import models.Sessao;
 import services.ProntuarioService;
 
+import javafx.scene.control.DatePicker;
+import java.time.LocalDate;
+
 public class TreatmentViewController {
 
     @FXML private TextArea newSessionTextArea;
     @FXML private Button saveSessionButton;
     @FXML private VBox sessionsVBox;
     @FXML private Label mensagemSessaoLabel;
+    @FXML private DatePicker dataSessaoPicker;
     @FXML private Label emptySessionsLabel; // Novo Label para lista vazia
 
     private ProntuarioService prontuarioService;
@@ -47,6 +51,7 @@ public class TreatmentViewController {
     @FXML
     public void initialize() {
         saveSessionButton.setDefaultButton(true);
+        dataSessaoPicker.setValue(LocalDate.now());
     }
 
     public void initData(Paciente paciente, OnHistoryChangedListener listener) {
@@ -88,70 +93,76 @@ public class TreatmentViewController {
         sessionsVBox.setManaged(!isEmpty);
     }
 
-    private VBox createSessionCard(Sessao sessao) {
-        VBox card = new VBox(5);
-        card.getStyleClass().add("patient-card");
+    // Substitua o método inteiro
+private VBox createSessionCard(Sessao sessao) {
+    VBox card = new VBox(5);
+    card.getStyleClass().add("patient-card");
 
-        HBox topBar = new HBox();
-        topBar.setAlignment(Pos.CENTER_LEFT);
+    HBox topBar = new HBox();
+    topBar.setAlignment(Pos.CENTER_LEFT);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy 'às' HH:mm");
-        Label dateLabel = new Label(sessao.getDataSessao().format(formatter));
-        dateLabel.getStyleClass().add("session-date-label");
+    // CORREÇÃO: Removida a parte da hora ('às' HH:mm) do formato
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy");
+    Label dateLabel = new Label(sessao.getDataSessao().format(formatter));
+    dateLabel.getStyleClass().add("session-date-label");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Region deleteIcon = new Region();
-        deleteIcon.getStyleClass().add("delete-icon");
-        deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
+    Region deleteIcon = new Region();
+    deleteIcon.getStyleClass().add("delete-icon");
+    deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
 
-        topBar.getChildren().addAll(dateLabel, spacer, deleteIcon);
+    topBar.getChildren().addAll(dateLabel, spacer, deleteIcon);
 
-        Separator separator = new Separator();
-        separator.setPadding(new Insets(10, 0, 5, 0));
-        
-        Label evolutionLabel = new Label(sessao.getEvolucaoTexto());
-        evolutionLabel.setWrapText(true);
+    Separator separator = new Separator();
+    separator.setPadding(new Insets(10, 0, 5, 0));
 
-        HBox bottomBar = new HBox();
-        bottomBar.setAlignment(Pos.CENTER_RIGHT);
-        bottomBar.setPadding(new Insets(15, 0, 0, 0));
+    Label evolutionLabel = new Label(sessao.getEvolucaoTexto());
+    evolutionLabel.setWrapText(true);
 
-        Button editButton = new Button("Editar");
-        editButton.getStyleClass().add("primary-button");
-        editButton.setOnAction(event -> handleEdit(sessao));
-        bottomBar.getChildren().add(editButton);
-        
-        card.getChildren().addAll(topBar, separator, evolutionLabel);
+    HBox bottomBar = new HBox();
+    bottomBar.setAlignment(Pos.CENTER_RIGHT);
+    bottomBar.setPadding(new Insets(15, 0, 0, 0));
 
-        if (sessao.getObservacoesSessao() != null && !sessao.getObservacoesSessao().isEmpty()) {
-            Label obsLabelTitle = new Label("Observações:");
-            obsLabelTitle.getStyleClass().add("session-observation-title");
-            Label obsLabel = new Label(sessao.getObservacoesSessao());
-            obsLabel.setWrapText(true);
-            card.getChildren().addAll(obsLabelTitle, obsLabel);
-        }
+    Button editButton = new Button("Editar");
+    editButton.getStyleClass().add("primary-button");
+    editButton.setOnAction(event -> handleEdit(sessao));
+    bottomBar.getChildren().add(editButton);
 
-        Region vSpacer = new Region();
-        VBox.setVgrow(vSpacer, Priority.ALWAYS);
-        card.getChildren().add(vSpacer);
+    card.getChildren().addAll(topBar, separator, evolutionLabel);
 
-        card.getChildren().add(bottomBar);
-
-        return card;
+    if (sessao.getObservacoesSessao() != null && !sessao.getObservacoesSessao().isEmpty()) {
+        Label obsLabelTitle = new Label("Observações:");
+        obsLabelTitle.getStyleClass().add("session-observation-title");
+        Label obsLabel = new Label(sessao.getObservacoesSessao());
+        obsLabel.setWrapText(true);
+        card.getChildren().addAll(obsLabelTitle, obsLabel);
     }
 
-    @FXML
+    Region vSpacer = new Region();
+    VBox.setVgrow(vSpacer, Priority.ALWAYS);
+    card.getChildren().add(vSpacer);
+
+    card.getChildren().add(bottomBar);
+
+    return card;
+}
+
+ @FXML
     private void handleSaveSessao() {
         String textoEvolucao = newSessionTextArea.getText();
-        
-        String resultado = prontuarioService.cadastrarSessao(pacienteAtual.getId(), textoEvolucao, "");
+        LocalDate dataSelecionada = dataSessaoPicker.getValue(); // Pega a data
+
+        // Passa a data para o serviço
+        String resultado = prontuarioService.cadastrarSessao(pacienteAtual.getId(), dataSelecionada, textoEvolucao, "");
 
         if (resultado.isEmpty()) {
             newSessionTextArea.clear();
+            // Reseta a data para o dia de hoje após salvar
+            dataSessaoPicker.setValue(LocalDate.now());
             loadSessoes();
-            
+
             if (historyListener != null) {
                 historyListener.onHistoryChanged();
             }

@@ -6,6 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import models.Paciente;
 import services.ProntuarioService;
+import javafx.scene.control.DatePicker;
+import java.time.LocalDate;
+
 
 public class AvaliacaoViewController {
 
@@ -16,6 +19,7 @@ public class AvaliacaoViewController {
     @FXML private TextArea planoTratamentoArea;
     @FXML private Button salvarButton;
     @FXML private Label mensagemLabel;
+    @FXML private DatePicker dataAvaliacaoPicker;
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
@@ -31,6 +35,7 @@ public class AvaliacaoViewController {
         // No futuro, este método também pode carregar uma avaliação existente para edição.
     }
 
+    
     @FXML
     private void handleSalvarAvaliacao() {
         if (pacienteAtual == null) {
@@ -38,8 +43,12 @@ public class AvaliacaoViewController {
             return;
         }
 
+        LocalDate dataSelecionada = dataAvaliacaoPicker.getValue(); // Pega a data
+
+        // Passa a data selecionada para o serviço
         String resultado = prontuarioService.cadastrarAvaliacao(
             pacienteAtual.getId(),
+            dataSelecionada, // Novo parâmetro
             queixaPrincipalArea.getText(),
             hdaArea.getText(),
             examesFisicosArea.getText(),
@@ -49,15 +58,21 @@ public class AvaliacaoViewController {
 
         if (resultado.isEmpty()) {
             setMensagem("Avaliação salva com sucesso!", false);
+            limparCampos(); // Limpa os campos após salvar
 
             if (historyListener != null) {
-                historyListener.onHistoryChanged(); // AVISA O PAI QUE HOUVE MUDANÇA
-                }
-            // Opcional: Limpar os campos após salvar
-            // limparCampos(); 
+                historyListener.onHistoryChanged();
+            }
         } else {
-            setMensagem(resultado, true); // Exibe o erro vindo do serviço
+            setMensagem(resultado, true);
         }
+    }
+
+    // Adicione este método à classe
+    @FXML
+    public void initialize() {
+        // Define a data de hoje como padrão
+        dataAvaliacaoPicker.setValue(LocalDate.now());
     }
 
     private void setMensagem(String mensagem, boolean isError) {
@@ -71,11 +86,13 @@ public class AvaliacaoViewController {
         }
     }
     
-    //private void limparCampos() {
-        //queixaPrincipalArea.clear();
-        //hdaArea.clear();
-        //examesFisicosArea.clear();
-        //diagnosticoArea.clear();
-        //planoTratamentoArea.clear();
-    //}
+    // Adicione este método à classe
+    private void limparCampos() {
+        dataAvaliacaoPicker.setValue(LocalDate.now());
+        queixaPrincipalArea.clear();
+        hdaArea.clear();
+        examesFisicosArea.clear();
+        diagnosticoArea.clear();
+        planoTratamentoArea.clear();
+    }
 }

@@ -16,12 +16,17 @@ import models.Paciente;
 import models.Sessao;
 import services.ProntuarioService;
 
+import javafx.scene.control.DatePicker;
+import java.time.LocalDate;
+
 public class EditarSessaoController {
     @FXML private Label patientNameLabel;
     @FXML private Button backButton;
     @FXML private Label sessionInfoLabel;
     @FXML private TextArea editSessionTextArea;
     @FXML private Label mensagemLabel;
+    // Adicione esta linha junto aos outros @FXML
+    @FXML private DatePicker dataSessaoPicker;
 
     private final ProntuarioService prontuarioService;
     private Sessao sessao;
@@ -36,6 +41,7 @@ public class EditarSessaoController {
      * @param sessao O objeto da sessão a ser editada.
      * @param paciente O paciente dono da sessão (para exibir o nome).
      */
+   // Substitua o método initData
     public void initData(Sessao sessao, Paciente paciente) {
         this.sessao = sessao;
         this.paciente = paciente;
@@ -45,7 +51,8 @@ public class EditarSessaoController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy");
         sessionInfoLabel.setText("Editando " + sessao.getDataSessao().format(formatter));
 
-        // Ponto principal: preenche a TextArea com o texto existente
+        // Ponto principal: preenche os campos com os dados existentes
+        dataSessaoPicker.setValue(sessao.getDataSessao()); // Preenche a data
         editSessionTextArea.setText(sessao.getEvolucaoTexto());
     }
 
@@ -73,18 +80,30 @@ public void handleBackButton() {
     }
 }
 
+    // Substitua o método handleUpdateSessao
     @FXML
     private void handleUpdateSessao() {
-        // Lógica para pegar o texto editado e salvar no banco de dados
         String textoAtualizado = editSessionTextArea.getText();
-        
-        String resultado = prontuarioService.atualizarSessao(sessao.getId(), sessao.getIdPaciente(), sessao.getDataSessao(), textoAtualizado, sessao.getObservacoesSessao());
+        LocalDate novaData = dataSessaoPicker.getValue(); // Pega a nova data
+
+        String resultado = prontuarioService.atualizarSessao(
+            sessao.getId(),
+            sessao.getIdPaciente(),
+            novaData, // Usa a nova data
+            textoAtualizado,
+            sessao.getObservacoesSessao()
+        );
 
         if (resultado.isEmpty()) {
             mensagemLabel.setText("Sessão editada com sucesso!");
             mensagemLabel.setStyle("-fx-text-fill: green;");
+
+            // Opcional, mas recomendado: atualiza o título com a nova data, se ela mudou
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy");
+            sessionInfoLabel.setText("Editando " + novaData.format(formatter));
+
         } else {
-            mensagemLabel.setText(resultado); // Exibe a mensagem de erro vinda do serviço
+            mensagemLabel.setText(resultado);
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
     }

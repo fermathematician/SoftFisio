@@ -1,6 +1,5 @@
 package services;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import db.SessaoDAO;
 import models.Sessao;
@@ -15,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ProntuarioService {
 
@@ -35,26 +36,27 @@ public class ProntuarioService {
      * @param observacoes As observações adicionais.
      * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
      */
-    public String cadastrarSessao(int idPaciente, String evolucaoTexto, String observacoes) {
-        // 1. Validação da regra de negócio (ex: o texto principal não pode ser vazio)
+    // Em ProntuarioService.java
+
+    public String cadastrarSessao(int idPaciente, LocalDate dataSessao, String evolucaoTexto, String observacoes) {
+        // Validação da data
+        if (dataSessao == null) {
+            return "A data da sessão precisa ser selecionada.";
+        }
+
         if (evolucaoTexto == null || evolucaoTexto.trim().isEmpty()) {
             return "O campo 'Evolução da Sessão' é obrigatório.";
         }
 
-        // 2. Cria o objeto Sessao para ser salvo
-        //    O ID é 0 porque o banco de dados irá gerá-lo automaticamente (AUTOINCREMENT)
-        //    A data é o momento atual.
         Sessao novaSessao = new Sessao(
             0,
             idPaciente,
-            LocalDateTime.now(),
+            dataSessao, // Usa a data fornecida
             evolucaoTexto.trim(),
-            observacoes != null ? observacoes.trim() : "" // Garante que não salve 'null'
+            observacoes != null ? observacoes.trim() : ""
         );
 
-        // 3. Pede ao DAO para salvar o objeto no banco de dados
         boolean sucesso = sessaoDAO.save(novaSessao);
-
         return sucesso ? "" : "Ocorreu um erro inesperado ao salvar a sessão no banco de dados.";
     }
 
@@ -69,8 +71,14 @@ public class ProntuarioService {
         return sessaoDAO.findByPacienteId(idPaciente);
     }
 
-    public String atualizarSessao(int idSessao, int idPaciente, LocalDateTime dataSessao, String evolucaoTexto, String observacoes) {
-        if(evolucaoTexto == null || evolucaoTexto.trim().isEmpty()) {
+// Em ProntuarioService.java
+
+    public String atualizarSessao(int idSessao, int idPaciente, LocalDate dataSessao, String evolucaoTexto, String observacoes) {
+        // Validação da data
+        if (dataSessao == null) {
+            return "A data da sessão precisa ser selecionada.";
+        }
+        if (evolucaoTexto == null || evolucaoTexto.trim().isEmpty()) {
             return "O campo 'Evolucao da sessao é obrigatório";
         }
 
@@ -80,15 +88,23 @@ public class ProntuarioService {
         return sucesso ? "" : "Ocorreu um erro inesperado ao atualizar a sessão no banco de dados";
     }
 
-    public String deletarSessao(int idSessao) {
-        if(idSessao <= 0) {
-            return "O id da sessão é inválido";
-        }
-
-        boolean sucesso = sessaoDAO.delete(idSessao);
-
-        return sucesso ? "" : "Não foi possivel deletar a sessao do banco de dados";
+    // ADICIONE ESTE MÉTODO
+public String deletarSessao(int idSessao) {
+    if (idSessao <= 0) {
+        return "O id da sessão é inválido.";
     }
+    boolean sucesso = sessaoDAO.delete(idSessao);
+    return sucesso ? "" : "Não foi possivel deletar a sessao do banco de dados.";
+}
+
+// ADICIONE ESTE MÉTODO
+public String deletarAvaliacao(int idAvaliacao) {
+    if (idAvaliacao <= 0) {
+        return "ID da avaliação inválido.";
+    }
+    boolean sucesso = avaliacaoDAO.delete(idAvaliacao);
+    return sucesso ? "" : "Ocorreu um erro ao deletar a avaliação.";
+}
 
     // --- NOVOS MÉTODOS PARA AVALIAÇÃO ---
 
@@ -102,21 +118,25 @@ public class ProntuarioService {
  * @param planoTratamento O plano de tratamento proposto.
  * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
  */
-public String cadastrarAvaliacao(int idPaciente, String queixaPrincipal, String historicoDoencaAtual, String examesFisicos, String diagnosticoFisioterapeutico, String planoTratamento) {
-    // Validação de exemplo: a queixa principal não pode ser vazia.
-    // Você pode adicionar outras regras aqui.
-    if (queixaPrincipal == null || queixaPrincipal.trim().isEmpty()) {
-        return "O campo 'Queixa Principal' é obrigatório na avaliação.";
+// Em ProntuarioService.java
+
+    public String cadastrarAvaliacao(int idPaciente, LocalDate dataAvaliacao, String queixaPrincipal, String historicoDoencaAtual, String examesFisicos, String diagnosticoFisioterapeutico, String planoTratamento) {
+        // Validação da data
+        if (dataAvaliacao == null) {
+            return "A data da avaliação precisa ser selecionada.";
+        }
+        if (queixaPrincipal == null || queixaPrincipal.trim().isEmpty()) {
+            return "O campo 'Queixa Principal' é obrigatório na avaliação.";
+        }
+
+        Avaliacao novaAvaliacao = new Avaliacao(
+            0, idPaciente, dataAvaliacao, queixaPrincipal, historicoDoencaAtual,
+            examesFisicos, diagnosticoFisioterapeutico, planoTratamento
+        );
+
+        boolean sucesso = avaliacaoDAO.save(novaAvaliacao);
+        return sucesso ? "" : "Ocorreu um erro ao salvar a avaliação no banco de dados.";
     }
-
-    Avaliacao novaAvaliacao = new Avaliacao(
-        0, idPaciente, LocalDateTime.now(), queixaPrincipal, historicoDoencaAtual,
-        examesFisicos, diagnosticoFisioterapeutico, planoTratamento
-    );
-
-    boolean sucesso = avaliacaoDAO.save(novaAvaliacao);
-    return sucesso ? "" : "Ocorreu um erro ao salvar a avaliação no banco de dados.";
-}
 
 /**
  * Busca a lista de todas as avaliações de um paciente.
@@ -126,18 +146,17 @@ public String cadastrarAvaliacao(int idPaciente, String queixaPrincipal, String 
 public List<Avaliacao> getAvaliacoes(int idPaciente) {
     return avaliacaoDAO.findByPacienteId(idPaciente);
 }
-public String deletarAvaliacao(int idAvaliacao) {
-        if (idAvaliacao <= 0) {
-            return "ID da avaliação inválido.";
-        }
-        boolean sucesso = avaliacaoDAO.delete(idAvaliacao);
-        return sucesso ? "" : "Ocorreu um erro ao deletar a avaliação.";
-    }
 
-public String atualizarAvaliacao(int idAvaliacao, int idPaciente, LocalDateTime dataAvaliacao, String queixaPrincipal, 
-     String historicoDoencaAtual, String examesFisicos, 
-     String diagnosticoFisioterapeutico, String planoTratamento) {
-        
+
+// Em ProntuarioService.java
+
+    public String atualizarAvaliacao(int idAvaliacao, int idPaciente, LocalDate dataAvaliacao, String queixaPrincipal,
+                                    String historicoDoencaAtual, String examesFisicos,
+                                    String diagnosticoFisioterapeutico, String planoTratamento) {
+        // Validação da data
+        if (dataAvaliacao == null) {
+            return "A data da avaliação precisa ser selecionada.";
+        }
         if (queixaPrincipal == null || queixaPrincipal.trim().isEmpty()) {
             return "O campo 'Queixa Principal' é obrigatório na avaliação.";
         }

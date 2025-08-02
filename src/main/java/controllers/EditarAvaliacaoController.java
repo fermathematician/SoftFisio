@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import models.Avaliacao;
 import models.Paciente;
 import services.ProntuarioService;
+import javafx.scene.control.DatePicker;
+import java.time.LocalDate;
 
 public class EditarAvaliacaoController {
 
@@ -30,6 +32,8 @@ public class EditarAvaliacaoController {
     @FXML private TextArea planoTratamentoArea;
     @FXML private Button salvarButton;
     @FXML private Label mensagemLabel;
+    // Adicione esta linha junto aos outros @FXML
+    @FXML private DatePicker dataAvaliacaoPicker;
 
     private ProntuarioService prontuarioService;
     private Avaliacao avaliacaoAtual;
@@ -39,15 +43,18 @@ public class EditarAvaliacaoController {
         this.prontuarioService = new ProntuarioService();
     }
 
+    // Substitua o método initData
     public void initData(Avaliacao avaliacao, Paciente paciente) {
         this.avaliacaoAtual = avaliacao;
         this.paciente = paciente;
-        
+
         // Preenche o cabeçalho
         patientNameLabel.setText(paciente.getNomeCompleto());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Avaliação de' dd 'de' MMMM 'de' yyyy");
-        evaluationInfoLabel.setText("Editando " + avaliacao.getDataHora().format(formatter));
+        evaluationInfoLabel.setText("Editando " + avaliacao.getData().format(formatter)); // Use getData() da interface
 
+        // Preenche os campos do formulário
+        dataAvaliacaoPicker.setValue(avaliacao.getDataAvaliacao()); // Preenche a data
         populateForm();
     }
 
@@ -59,13 +66,15 @@ public class EditarAvaliacaoController {
         planoTratamentoArea.setText(avaliacaoAtual.getPlanoTratamento());
     }
 
+ // Substitua o método handleSalvarAlteracoes
     @FXML
     private void handleSalvarAlteracoes() {
-        // Assumindo que Avaliacao tem o método getDataHora()
+        LocalDate novaData = dataAvaliacaoPicker.getValue(); // Pega a nova data
+
         String resultado = prontuarioService.atualizarAvaliacao(
             avaliacaoAtual.getId(),
             avaliacaoAtual.getIdPaciente(),
-            avaliacaoAtual.getDataHora(), 
+            novaData, // Usa a nova data
             queixaPrincipalArea.getText(),
             hdaArea.getText(),
             examesFisicosArea.getText(),
@@ -75,6 +84,9 @@ public class EditarAvaliacaoController {
 
         if (resultado.isEmpty()) {
             setMensagem("Avaliação atualizada com sucesso!", false);
+            // Atualiza o título com a nova data
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Avaliação de' dd 'de' MMMM 'de' yyyy");
+            evaluationInfoLabel.setText("Editando " + novaData.format(formatter));
         } else {
             setMensagem(resultado, true);
         }

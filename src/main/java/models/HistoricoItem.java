@@ -1,8 +1,9 @@
+// Em models/HistoricoItem.java
 package models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public interface HistoricoItem {
-    LocalDateTime getDataHora();
-    String getTipo(); // Método para sabermos se é "Sessão" ou "Avaliação"
+    LocalDate getData(); // Alterado de getDataHora() para getData() e de LocalDateTime para LocalDate
+    String getTipo();
 }

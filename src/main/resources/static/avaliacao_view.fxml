@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.DatePicker?>
 
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoViewController">
    <content>
@@ -15,6 +16,15 @@
                <children>
                   <Label styleClass="card-title" text="Nova Avaliação Fisioterapêutica" />
 
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Data da Avaliação" />
+                        <DatePicker fx:id="dataAvaliacaoPicker" maxWidth="1.7976931348623157E308" promptText="Selecione a data" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </VBox>
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Queixa Principal" />

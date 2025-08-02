@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.DatePicker?>
 
 <BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EditarAvaliacaoController">
    <top>
@@ -37,6 +38,15 @@
                      <children>
                         <Label styleClass="card-title" text="Editar Avaliação Fisioterapêutica" />
                         <VBox spacing="5.0">
+                           <VBox spacing="5.0">
+                              <children>
+                                 <Label styleClass="input-label" text="Data da Avaliação" />
+                                 <DatePicker fx:id="dataAvaliacaoPicker" maxWidth="1.7976931348623157E308" promptText="Selecione a data" />
+                              </children>
+                              <VBox.margin>
+                                 <Insets bottom="10.0" top="10.0" />
+                              </VBox.margin>
+                           </VBox>
                            <children>
                               <Label styleClass="input-label" text="Queixa Principal" />
                               <TextArea fx:id="queixaPrincipalArea" prefHeight="80.0" wrapText="true" />

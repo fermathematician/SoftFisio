@@ -4,12 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import models.Sessao;
 import db.exceptions.DataIntegrityException;
+import java.time.LocalDate;
 
 public class SessaoDAO {
 
@@ -19,8 +18,6 @@ public class SessaoDAO {
     private static final String UPDATE_SQL = "UPDATE sessoes SET id_paciente = ?, data_sessao = ?, evolucao_texto = ?, observacoes_sessao = ? WHERE id_sessao = ?";
     private static final String DELETE_SQL = "DELETE FROM sessoes WHERE id_sessao = ?";
 
-    // Formato padrão para salvar e ler datas do banco de dados
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     /**
      * Salva uma nova sessão no banco de dados.
@@ -28,14 +25,11 @@ public class SessaoDAO {
      * @return true se a sessão foi salva com sucesso, false caso contrário.
      */
     public boolean save(Sessao sessao) {
-        String sql = SAVE_SQL;
-
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(SAVE_SQL)) {
 
             pstmt.setInt(1, sessao.getIdPaciente());
-            // Converte o LocalDateTime para uma String formatada antes de salvar
-            pstmt.setString(2, sessao.getDataSessao().format(formatter));
+            pstmt.setString(2, sessao.getDataSessao().toString()); // Alterado para usar toString()
             pstmt.setString(3, sessao.getEvolucaoTexto());
             pstmt.setString(4, sessao.getObservacoesSessao());
 
@@ -54,12 +48,10 @@ public class SessaoDAO {
      * @return Uma lista de objetos Sessao.
      */
     public List<Sessao> findByPacienteId(int idPaciente) {
-        // Ordena por data_sessao DESC para que as sessões mais recentes apareçam primeiro
-        String sql = FIND_BY_PACIENTE_ID_SQL;
-        List<Sessao> sessoes = new ArrayList<>();
+    List<Sessao> sessoes = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(FIND_BY_PACIENTE_ID_SQL)) {
 
             pstmt.setInt(1, idPaciente);
             ResultSet rs = pstmt.executeQuery();
@@ -68,8 +60,7 @@ public class SessaoDAO {
                 Sessao sessao = new Sessao(
                     rs.getInt("id_sessao"),
                     rs.getInt("id_paciente"),
-                    // Converte a String do banco de dados de volta para um LocalDateTime
-                    LocalDateTime.parse(rs.getString("data_sessao"), formatter),
+                    LocalDate.parse(rs.getString("data_sessao")), // Alterado para LocalDate.parse
                     rs.getString("evolucao_texto"),
                     rs.getString("observacoes_sessao")
                 );
@@ -80,26 +71,22 @@ public class SessaoDAO {
         }
         return sessoes;
     }
-
     public boolean update(Sessao sessao) {
-        String sql = UPDATE_SQL;
+        try (Connection conn = DatabaseManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(UPDATE_SQL)) {
 
-        try (Connection conn = DatabaseManager.getConnection(); 
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
             pstmt.setInt(1, sessao.getIdPaciente());
-            pstmt.setString(2, sessao.getDataSessao().format(formatter));
+            pstmt.setString(2, sessao.getDataSessao().toString()); // Alterado para usar toString()
             pstmt.setString(3, sessao.getEvolucaoTexto());
             pstmt.setString(4, sessao.getObservacoesSessao());
             pstmt.setInt(5, sessao.getId());
 
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println("Erro ao atualizar a sessao: " + e.getMessage());
+            return false;
         }
-
-        return false;
     }
 
     // Em SessaoDAO.java

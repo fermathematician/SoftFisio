@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import models.Avaliacao;
@@ -20,21 +19,18 @@ public class AvaliacaoDAO {
     private static final String UPDATE_SQL = "UPDATE avaliacoes SET queixa_principal = ?, historico_doenca_atual = ?, exames_fisicos = ?, diagnostico_fisioterapeutico = ?, plano_tratamento = ? WHERE id_avaliacao = ?";
     private static final String FIND_BY_ID_SQL = "SELECT * FROM avaliacoes WHERE id_avaliacao = ?";
     
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
     public boolean save(Avaliacao avaliacao) {
-        String sql = SAVE_SQL;
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(SAVE_SQL)) {
 
             pstmt.setInt(1, avaliacao.getIdPaciente());
-            pstmt.setString(2, avaliacao.getDataAvaliacao().format(formatter));
+            pstmt.setString(2, avaliacao.getDataAvaliacao().toString()); // Alterado
             pstmt.setString(3, avaliacao.getQueixaPrincipal());
             pstmt.setString(4, avaliacao.getHistoricoDoencaAtual());
             pstmt.setString(5, avaliacao.getExamesFisicos());
             pstmt.setString(6, avaliacao.getDiagnosticoFisioterapeutico());
             pstmt.setString(7, avaliacao.getPlanoTratamento());
-            
+
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erro ao salvar avaliação: " + e.getMessage());
@@ -43,11 +39,9 @@ public class AvaliacaoDAO {
     }
 
     public List<Avaliacao> findByPacienteId(int idPaciente) {
-        String sql = FIND_BY_PACIENTE_ID_SQL;
         List<Avaliacao> avaliacoes = new ArrayList<>();
-
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(FIND_BY_PACIENTE_ID_SQL)) {
 
             pstmt.setInt(1, idPaciente);
             ResultSet rs = pstmt.executeQuery();
@@ -56,7 +50,7 @@ public class AvaliacaoDAO {
                 avaliacoes.add(new Avaliacao(
                     rs.getInt("id_avaliacao"),
                     rs.getInt("id_paciente"),
-                    LocalDateTime.parse(rs.getString("data_avaliacao"), formatter),
+                    LocalDate.parse(rs.getString("data_avaliacao")), // Alterado
                     rs.getString("queixa_principal"),
                     rs.getString("historico_doenca_atual"),
                     rs.getString("exames_fisicos"),
@@ -89,10 +83,10 @@ public class AvaliacaoDAO {
     }
 
     public boolean update(Avaliacao avaliacao) {
-        String sql = UPDATE_SQL;
-
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(UPDATE_SQL)) {
+            // A data da avaliação não é alterada na edição, apenas o conteúdo.
+            // Mas se fosse, seria: pstmt.setString(1, avaliacao.getDataAvaliacao().toString());
             pstmt.setString(1, avaliacao.getQueixaPrincipal());
             pstmt.setString(2, avaliacao.getHistoricoDoencaAtual());
             pstmt.setString(3, avaliacao.getExamesFisicos());
@@ -107,17 +101,16 @@ public class AvaliacaoDAO {
     }
 
     public Avaliacao findById(int idAvaliacao) {
-        String sql = FIND_BY_ID_SQL;
         Avaliacao avaliacao = null;
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(FIND_BY_ID_SQL)) {
             pstmt.setInt(1, idAvaliacao);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 avaliacao = new Avaliacao(
                     rs.getInt("id_avaliacao"),
                     rs.getInt("id_paciente"),
-                    LocalDateTime.parse(rs.getString("data_avaliacao"), formatter),
+                    LocalDate.parse(rs.getString("data_avaliacao")), // Alterado
                     rs.getString("queixa_principal"),
                     rs.getString("historico_doenca_atual"),
                     rs.getString("exames_fisicos"),

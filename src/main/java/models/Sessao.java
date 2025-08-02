@@ -1,17 +1,17 @@
+// Em models/Sessao.java
 package models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Sessao implements HistoricoItem {
 
     private final int id;
     private final int idPaciente;
-    private final LocalDateTime dataSessao;
+    private final LocalDate dataSessao; // Alterado para LocalDate
     private final String evolucaoTexto;
     private final String observacoesSessao;
 
-    // Construtor para criar um objeto Sessao com todos os seus dados
-    public Sessao (int id, int idPaciente, LocalDateTime dataSessao, String evolucaoTexto, String observacoesSessao) {
+    public Sessao(int id, int idPaciente, LocalDate dataSessao, String evolucaoTexto, String observacoesSessao) {
         this.id = id;
         this.idPaciente = idPaciente;
         this.dataSessao = dataSessao;
@@ -19,35 +19,20 @@ public class Sessao implements HistoricoItem {
         this.observacoesSessao = observacoesSessao;
     }
 
-    // Métodos "Getters" para permitir que outras partes do código leiam os dados
-    // de forma segura.
-    public int getId() {
-        return id;
-    }
-
-    public int getIdPaciente() {
-        return idPaciente;
-    }
-
-    public LocalDateTime getDataSessao() {
-        return dataSessao;
-    }
-
-    public String getEvolucaoTexto() {
-        return evolucaoTexto;
-    }
-
-    public String getObservacoesSessao() {
-        return observacoesSessao;
-    }
+    // Getters
+    public int getId() { return id; }
+    public int getIdPaciente() { return idPaciente; }
+    public LocalDate getDataSessao() { return dataSessao; } // Alterado para LocalDate
+    public String getEvolucaoTexto() { return evolucaoTexto; }
+    public String getObservacoesSessao() { return observacoesSessao; }
 
     @Override
-    public LocalDateTime getDataHora() {
+    public LocalDate getData() { // Método da interface implementado
         return this.dataSessao;
-}
+    }
 
     @Override
     public String getTipo() {
-        return "Sessão";   
-}
+        return "Sessão";
+    }
 }

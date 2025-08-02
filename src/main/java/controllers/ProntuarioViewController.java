@@ -77,7 +77,14 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @Override
     public void onHistoryChanged() {
         System.out.println("DEBUG: Histórico atualizado por um evento.");
+
+        // 1. Atualiza a lista da aba "Histórico Completo"
         carregarHistoricoCompleto();
+
+        // 2. ADICIONADO: Comanda a aba "Sessões" para também se atualizar
+        if (sessoesTabContentController != null) {
+            sessoesTabContentController.loadSessoes();
+        }
     }
 
     public void initData(Paciente paciente) {
@@ -121,6 +128,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         }
     }
 
+        // Em ProntuarioViewController.java
     private void carregarHistoricoCompleto() {
         historicoVBox.getChildren().clear();
 
@@ -129,9 +137,11 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
         historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
 
-        historico.sort(Comparator.comparing(HistoricoItem::getDataHora).reversed());
+        // Ajustado para usar getData() e ordenação reversa
+        historico.sort(Comparator.comparing(HistoricoItem::getData).reversed());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy 'às' HH:mm");
+        // Formato da data sem a hora
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
 
         for (HistoricoItem item : historico) {
             VBox card = createHistoryCard(item, formatter);
@@ -141,63 +151,65 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         updateHistoryVisibility();
     }
 
-    private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
-        VBox card = new VBox(10);
-        card.getStyleClass().add("patient-card");
+    // Em ProntuarioViewController.java
+private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
+    VBox card = new VBox(10);
+    card.getStyleClass().add("patient-card");
 
-        Label tipoLabel = new Label(item.getTipo());
-        tipoLabel.getStyleClass().add("card-title");
-        Label dataLabel = new Label(item.getDataHora().format(formatter));
-        dataLabel.getStyleClass().add("card-subtitle");
-        
-        Region hSpacer = new Region();
-        HBox.setHgrow(hSpacer, Priority.ALWAYS);
+    Label tipoLabel = new Label(item.getTipo());
+    tipoLabel.getStyleClass().add("card-title");
+    // Ajustado para usar getData()
+    Label dataLabel = new Label(item.getData().format(formatter));
+    dataLabel.getStyleClass().add("card-subtitle");
+    
+    Region hSpacer = new Region();
+    HBox.setHgrow(hSpacer, Priority.ALWAYS);
 
-        Region deleteIcon = new Region();
-        deleteIcon.getStyleClass().add("delete-icon");
+    Region deleteIcon = new Region();
+    deleteIcon.getStyleClass().add("delete-icon");
 
-        HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
-        header.setAlignment(Pos.CENTER_LEFT);
+    HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
+    header.setAlignment(Pos.CENTER_LEFT);
 
-        card.getChildren().addAll(header, new Separator());
+    card.getChildren().addAll(header, new Separator());
 
-        if (item instanceof Sessao) {
-            Sessao sessao = (Sessao) item;
-            deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
-            Label conteudo = new Label(sessao.getEvolucaoTexto());
-            conteudo.setWrapText(true);
-            card.getChildren().add(conteudo);
-        } else if (item instanceof Avaliacao) {
-            Avaliacao avaliacao = (Avaliacao) item;
-            deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
-            VBox detalhesAvaliacao = new VBox(8);
-            detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-            detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-            detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
-            detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
-            detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
-            card.getChildren().add(detalhesAvaliacao);
-        }
-
-        Region vSpacer = new Region();
-        VBox.setVgrow(vSpacer, Priority.ALWAYS);
-        card.getChildren().add(vSpacer);
-
-        Button editButton = new Button("Editar");
-        editButton.getStyleClass().add("primary-button");
-        
-        if (item instanceof Sessao) {
-            editButton.setOnAction(event -> handleEdit((Sessao)item));
-        } else if (item instanceof Avaliacao) {
-            editButton.setOnAction(event -> handleEditA((Avaliacao)item));
-        }
-
-        HBox bottomBar = new HBox(editButton);
-        bottomBar.setAlignment(Pos.CENTER_RIGHT);
-        card.getChildren().add(bottomBar);
-
-        return card;
+    if (item instanceof Sessao) {
+        Sessao sessao = (Sessao) item;
+        deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
+        Label conteudo = new Label(sessao.getEvolucaoTexto());
+        conteudo.setWrapText(true);
+        card.getChildren().add(conteudo);
+    } else if (item instanceof Avaliacao) {
+        Avaliacao avaliacao = (Avaliacao) item;
+        deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
+        VBox detalhesAvaliacao = new VBox(8);
+        detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+        detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
+        detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
+        detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+        detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+        card.getChildren().add(detalhesAvaliacao);
     }
+
+    Region vSpacer = new Region();
+    VBox.setVgrow(vSpacer, Priority.ALWAYS);
+    card.getChildren().add(vSpacer);
+
+    Button editButton = new Button("Editar");
+    editButton.getStyleClass().add("primary-button");
+    
+    if (item instanceof Sessao) {
+        editButton.setOnAction(event -> handleEdit((Sessao)item));
+    } else if (item instanceof Avaliacao) {
+        editButton.setOnAction(event -> handleEditA((Avaliacao)item));
+    }
+
+    HBox bottomBar = new HBox(editButton);
+    bottomBar.setAlignment(Pos.CENTER_RIGHT);
+    card.getChildren().add(bottomBar);
+
+    return card;
+}
 
     private void updateHistoryVisibility() {
         boolean isEmpty = historicoVBox.getChildren().isEmpty();
@@ -264,10 +276,12 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         anexosScrollPane.setManaged(!isEmpty);
     }
 
+    // Em ProntuarioViewController.java
     private void handleDelete(Sessao sessao) {
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Confirmar Exclusão");
-        confirmationAlert.setHeaderText("Deseja deletar a sessão de " + sessao.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?");
+        // Ajustado para usar getData()
+        confirmationAlert.setHeaderText("Deseja deletar a sessão de " + sessao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?");
         confirmationAlert.setContentText("Esta ação é permanente.");
 
         Optional<ButtonType> result = confirmationAlert.showAndWait();
@@ -275,8 +289,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             ProntuarioService prontuarioService = new ProntuarioService();
             String resultado = prontuarioService.deletarSessao(sessao.getId());
             if (resultado.isEmpty()) { 
-                carregarHistoricoCompleto();
-                sessoesTabContentController.loadSessoes();
+                onHistoryChanged(); // Chama o método para recarregar tudo
             } else { 
                 // Lógica para mostrar alerta de erro
             }
@@ -312,18 +325,20 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         return campo;
     }
 
+    // Em ProntuarioViewController.java
     private void handleDeleteA(Avaliacao avaliacao) {
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Confirmar Exclusão");
-        confirmationAlert.setHeaderText("Deseja deletar a avaliação de " + avaliacao.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?");
+        // Ajustado para usar getData()
+        confirmationAlert.setHeaderText("Deseja deletar a avaliação de " + avaliacao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?");
         confirmationAlert.setContentText("Esta ação é permanente.");
-        
+
         Optional<ButtonType> result = confirmationAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             ProntuarioService prontuarioService = new ProntuarioService();
             String resultado = prontuarioService.deletarAvaliacao(avaliacao.getId());
             if (resultado.isEmpty()) { 
-                carregarHistoricoCompleto();
+                onHistoryChanged();
             } else { 
                 System.err.println(resultado);
             }
@@ -473,14 +488,15 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
                 document.add(historicoTitulo);
 
                 // Reutiliza a lista 'historico' já carregada e a ordena
-                historico.sort(Comparator.comparing(HistoricoItem::getDataHora).reversed());
-                DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
+                historico.sort(Comparator.comparing(HistoricoItem::getData).reversed());
+                DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
                 for (HistoricoItem item : historico) {
                     document.add(new Paragraph(" ").setBorderTop(new SolidBorder(0.5f)).setMarginTop(10).setMarginBottom(10));
                     Paragraph tipoData = new Paragraph()
                             .add(new Text(item.getTipo().toUpperCase()).setBold())
-                            .add(" - " + item.getDataHora().format(formatterItem));
+                            // 2. O método foi trocado para getData()
+                            .add(" - " + item.getData().format(formatterItem));
                     document.add(tipoData);
                     if (item instanceof Sessao) {
                         Sessao sessao = (Sessao) item;
