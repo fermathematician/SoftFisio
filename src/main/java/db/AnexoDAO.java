@@ -13,10 +13,16 @@ import models.Anexo;
 
 public class AnexoDAO {
 
+    // QUERIES SQL CENTRALIZADAS
+    private static final String SAVE_SQL = "INSERT INTO anexos(id_paciente, caminho_arquivo, tipo_midia, descricao, data_anexo, id_sessao_ref, id_avaliacao_ref) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    private static final String FIND_BY_PACIENTE_ID_SQL = "SELECT * FROM anexos WHERE id_paciente = ? ORDER BY data_anexo DESC";
+    private static final String DELETE_SQL = "DELETE FROM anexos WHERE id_anexo = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM anexos WHERE id_anexo = ?";
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public boolean save(Anexo anexo) {
-        String sql = "INSERT INTO anexos(id_paciente, caminho_arquivo, tipo_midia, descricao, data_anexo, id_sessao_ref, id_avaliacao_ref) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String sql = SAVE_SQL;
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -48,7 +54,7 @@ public class AnexoDAO {
     }
 
     public List<Anexo> findByPacienteId(int idPaciente) {
-        String sql = "SELECT * FROM anexos WHERE id_paciente = ? ORDER BY data_anexo DESC";
+        String sql = FIND_BY_PACIENTE_ID_SQL;
         List<Anexo> anexos = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -76,7 +82,7 @@ public class AnexoDAO {
     }
 
     public boolean delete(int idAnexo) {
-        String sql = "DELETE FROM anexos WHERE id_anexo = ?";
+        String sql = DELETE_SQL;
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idAnexo);
@@ -88,7 +94,7 @@ public class AnexoDAO {
     }
 
     public Anexo findById(int idAnexo) {
-        String sql = "SELECT * FROM anexos WHERE id_anexo = ?";
+        String sql = FIND_BY_ID_SQL;
         Anexo anexo = null;
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

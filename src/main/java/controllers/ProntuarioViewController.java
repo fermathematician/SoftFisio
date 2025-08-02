@@ -276,6 +276,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             String resultado = prontuarioService.deletarSessao(sessao.getId());
             if (resultado.isEmpty()) { 
                 carregarHistoricoCompleto();
+                sessoesTabContentController.loadSessoes();
             } else { 
                 // Lógica para mostrar alerta de erro
             }

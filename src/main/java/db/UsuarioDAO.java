@@ -9,8 +9,12 @@ import models.Usuario;
 
 public class UsuarioDAO {
 
+    // QUERIES SQL CENTRALIZADAS
+    private static final String FIND_BY_LOGIN_SQL = "SELECT * FROM usuarios WHERE login = ?";
+    private static final String SAVE_SQL = "INSERT INTO usuarios(login, senha, nome_completo) VALUES(?, ?, ?)";
+
     public Usuario findByLogin(String login) {
-        String sql = "SELECT * FROM usuarios WHERE login = ?";
+        String sql = FIND_BY_LOGIN_SQL;
         Usuario usuario = null;
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -36,7 +40,7 @@ public class UsuarioDAO {
     public boolean save(Usuario usuario) {
         // A senha deve ser "hasheada" antes de chegar aqui.
         // O AuthService será responsável por isso.
-        String sql = "INSERT INTO usuarios(login, senha, nome_completo) VALUES(?, ?, ?)";
+        String sql = SAVE_SQL;
 
         try (Connection conn = DatabaseManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {

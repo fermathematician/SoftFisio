@@ -7,10 +7,18 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import db.exceptions.DataIntegrityException;
 
 import models.Paciente;
 
 public class PacienteDAO {
+
+    // QUERIES SQL CENTRALIZADAS
+    private static final String SAVE_SQL = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro, paciente_corrida) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM pacientes WHERE id_paciente = ?";
+    private static final String FIND_BY_USUARIO_ID_SQL = "SELECT * FROM pacientes WHERE id_usuario = ? AND paciente_corrida = ?";
+    private static final String UPDATE_SQL = "UPDATE pacientes SET id_usuario = ?, nome = ?, cpf = ?, genero = ?, telefone = ?, email = ?, data_nascimento = ?, paciente_corrida = ? WHERE id_paciente = ?";
+    private static final String DELETE_SQL = "DELETE FROM pacientes WHERE id_paciente = ?";
 
     /**
      * Salva um novo paciente no banco de dados.
@@ -19,7 +27,7 @@ public class PacienteDAO {
      * @return true se o paciente foi salvo com sucesso, false caso contrário.
      */
     public boolean save(Paciente paciente) {
-        String sql = "INSERT INTO pacientes(id_usuario, nome, cpf, genero, telefone, email, data_nascimento, data_cadastro, paciente_corrida) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = SAVE_SQL;
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -55,7 +63,7 @@ public class PacienteDAO {
      * @return O objeto Paciente encontrado ou null se não for encontrado.
      */
     public Paciente findById(int id) {
-        String sql = "SELECT * FROM pacientes WHERE id_paciente = ?";
+        String sql = FIND_BY_ID_SQL;
         Paciente paciente = null;
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -93,7 +101,7 @@ public class PacienteDAO {
      */
     public List<Paciente> findByUsuarioId(int idUsuario, boolean isPacienteCorrida) { 
         // ALTERADO: Adicionada a condição para a coluna 'paciente_corrida'
-        String sql = "SELECT * FROM pacientes WHERE id_usuario = ? AND paciente_corrida = ?";
+        String sql = FIND_BY_USUARIO_ID_SQL;
         List<Paciente> pacientes = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -132,7 +140,7 @@ public class PacienteDAO {
      * @return true se o paciente foi atualizado com sucesso, false caso contrário.
      */
     public boolean update(Paciente paciente) {
-        String sql = "UPDATE pacientes SET id_usuario = ?, nome = ?, cpf = ?, genero = ?, telefone = ?, email = ?, data_nascimento = ?, paciente_corrida = ? WHERE id_paciente = ?";
+        String sql = UPDATE_SQL;
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -167,18 +175,21 @@ public class PacienteDAO {
      * @param id O ID do paciente a ser deletado.
      * @return true se o paciente foi deletado com sucesso, false caso contrário.
      */
+    
     public boolean delete(int id) {
-        String sql = "DELETE FROM pacientes WHERE id_paciente = ?";
-
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(DELETE_SQL)) {
 
             pstmt.setInt(1, id);
-
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
 
         } catch (SQLException e) {
+            // Verifica se o erro é de violação de chave estrangeira
+            if (e.getMessage().contains("FOREIGN KEY constraint failed")) {
+                throw new DataIntegrityException("Não é possível excluir o paciente, pois ele possui sessões ou avaliações vinculadas.");
+            }
+            // Para outros erros de SQL, apenas loga no console
             System.err.println("Erro ao deletar paciente: " + e.getMessage());
             return false;
         }

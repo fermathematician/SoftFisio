@@ -9,14 +9,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import models.Avaliacao;
+import db.exceptions.DataIntegrityException;
 
 public class AvaliacaoDAO {
+
+    // QUERIES SQL CENTRALIZADAS
+    private static final String SAVE_SQL = "INSERT INTO avaliacoes(id_paciente, data_avaliacao, queixa_principal, historico_doenca_atual, exames_fisicos, diagnostico_fisioterapeutico, plano_tratamento) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    private static final String FIND_BY_PACIENTE_ID_SQL = "SELECT * FROM avaliacoes WHERE id_paciente = ? ORDER BY data_avaliacao DESC";
+    private static final String DELETE_SQL = "DELETE FROM avaliacoes WHERE id_avaliacao = ?";
+    private static final String UPDATE_SQL = "UPDATE avaliacoes SET queixa_principal = ?, historico_doenca_atual = ?, exames_fisicos = ?, diagnostico_fisioterapeutico = ?, plano_tratamento = ? WHERE id_avaliacao = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM avaliacoes WHERE id_avaliacao = ?";
     
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public boolean save(Avaliacao avaliacao) {
-        String sql = "INSERT INTO avaliacoes(id_paciente, data_avaliacao, queixa_principal, historico_doenca_atual, exames_fisicos, diagnostico_fisioterapeutico, plano_tratamento) VALUES(?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = SAVE_SQL;
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -36,7 +43,7 @@ public class AvaliacaoDAO {
     }
 
     public List<Avaliacao> findByPacienteId(int idPaciente) {
-        String sql = "SELECT * FROM avaliacoes WHERE id_paciente = ? ORDER BY data_avaliacao DESC";
+        String sql = FIND_BY_PACIENTE_ID_SQL;
         List<Avaliacao> avaliacoes = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -63,22 +70,27 @@ public class AvaliacaoDAO {
         return avaliacoes;
     }
 
+    // Em AvaliacaoDAO.java
+
+    
     public boolean delete(int idAvaliacao) {
-        String sql = "DELETE FROM avaliacoes WHERE id_avaliacao = ?";
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(DELETE_SQL)) {
             pstmt.setInt(1, idAvaliacao);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
+            // Verifica se o erro é de violação de chave estrangeira (ex: anexo vinculado)
+            if (e.getMessage().contains("FOREIGN KEY constraint failed")) {
+                throw new DataIntegrityException("Não é possível excluir a avaliação, pois ela possui anexos vinculados.");
+            }
             System.err.println("Erro ao deletar avaliação: " + e.getMessage());
             return false;
         }
     }
 
     public boolean update(Avaliacao avaliacao) {
-        String sql = "UPDATE avaliacoes SET queixa_principal = ?, historico_doenca_atual = ?, " +
-                     "exames_fisicos = ?, diagnostico_fisioterapeutico = ?, plano_tratamento = ? " +
-                     "WHERE id_avaliacao = ?";
+        String sql = UPDATE_SQL;
+
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, avaliacao.getQueixaPrincipal());
@@ -95,7 +107,7 @@ public class AvaliacaoDAO {
     }
 
     public Avaliacao findById(int idAvaliacao) {
-        String sql = "SELECT * FROM avaliacoes WHERE id_avaliacao = ?";
+        String sql = FIND_BY_ID_SQL;
         Avaliacao avaliacao = null;
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

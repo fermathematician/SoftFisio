@@ -63,7 +63,7 @@ public class TreatmentViewController {
         loadSessoes();
     }
 
-    private void loadSessoes() {
+    public void loadSessoes() {
         sessionsVBox.getChildren().clear();
         List<Sessao> sessoes = prontuarioService.getSessoes(pacienteAtual.getId());
         for (Sessao sessao : sessoes) {

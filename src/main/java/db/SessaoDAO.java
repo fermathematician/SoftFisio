@@ -9,8 +9,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import models.Sessao;
+import db.exceptions.DataIntegrityException;
 
 public class SessaoDAO {
+
+    // QUERIES SQL CENTRALIZADAS
+    private static final String SAVE_SQL = "INSERT INTO sessoes(id_paciente, data_sessao, evolucao_texto, observacoes_sessao) VALUES(?, ?, ?, ?)";
+    private static final String FIND_BY_PACIENTE_ID_SQL = "SELECT * FROM sessoes WHERE id_paciente = ? ORDER BY data_sessao DESC";
+    private static final String UPDATE_SQL = "UPDATE sessoes SET id_paciente = ?, data_sessao = ?, evolucao_texto = ?, observacoes_sessao = ? WHERE id_sessao = ?";
+    private static final String DELETE_SQL = "DELETE FROM sessoes WHERE id_sessao = ?";
 
     // Formato padrão para salvar e ler datas do banco de dados
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -21,7 +28,7 @@ public class SessaoDAO {
      * @return true se a sessão foi salva com sucesso, false caso contrário.
      */
     public boolean save(Sessao sessao) {
-        String sql = "INSERT INTO sessoes(id_paciente, data_sessao, evolucao_texto, observacoes_sessao) VALUES(?, ?, ?, ?)";
+        String sql = SAVE_SQL;
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -48,7 +55,7 @@ public class SessaoDAO {
      */
     public List<Sessao> findByPacienteId(int idPaciente) {
         // Ordena por data_sessao DESC para que as sessões mais recentes apareçam primeiro
-        String sql = "SELECT * FROM sessoes WHERE id_paciente = ? ORDER BY data_sessao DESC";
+        String sql = FIND_BY_PACIENTE_ID_SQL;
         List<Sessao> sessoes = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -75,7 +82,7 @@ public class SessaoDAO {
     }
 
     public boolean update(Sessao sessao) {
-        String sql = "UPDATE sessoes SET id_paciente = ?, data_sessao = ?, evolucao_texto = ?, observacoes_sessao = ? WHERE id_sessao = ?";
+        String sql = UPDATE_SQL;
 
         try (Connection conn = DatabaseManager.getConnection(); 
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -95,19 +102,24 @@ public class SessaoDAO {
         return false;
     }
 
-    public boolean delete(int id) {
-        String sql = "DELETE FROM sessoes WHERE id_sessao = ?";
+    // Em SessaoDAO.java
 
+    
+    public boolean delete(int idSessao) {
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(DELETE_SQL)) {
 
-            pstmt.setInt(1, id);
-
+            pstmt.setInt(1, idSessao);
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
 
         } catch (SQLException e) {
-            System.err.println("Erro ao deletar paciente: " + e.getMessage());
+            // Verifica se o erro é de violação de chave estrangeira (ex: anexo vinculado)
+            if (e.getMessage().contains("FOREIGN KEY constraint failed")) {
+                throw new DataIntegrityException("Não é possível excluir a sessão, pois ela possui anexos vinculados.");
+            }
+            // Para outros erros de SQL, loga com a mensagem correta
+            System.err.println("Erro ao deletar sessão: " + e.getMessage());
             return false;
         }
     }
