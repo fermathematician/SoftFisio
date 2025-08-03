@@ -17,6 +17,7 @@ import models.Sessao;
 import services.ProntuarioService;
 
 import javafx.scene.control.DatePicker;
+import com.jfoenix.controls.JFXDatePicker;
 import java.time.LocalDate;
 
 public class EditarSessaoController {
@@ -26,7 +27,7 @@ public class EditarSessaoController {
     @FXML private TextArea editSessionTextArea;
     @FXML private Label mensagemLabel;
     // Adicione esta linha junto aos outros @FXML
-    @FXML private DatePicker dataSessaoPicker;
+    @FXML private JFXDatePicker dataSessaoPicker;
 
     private final ProntuarioService prontuarioService;
     private Sessao sessao;

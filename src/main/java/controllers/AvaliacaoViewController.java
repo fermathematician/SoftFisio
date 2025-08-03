@@ -8,6 +8,7 @@ import models.Paciente;
 import services.ProntuarioService;
 import javafx.scene.control.DatePicker;
 import java.time.LocalDate;
+import com.jfoenix.controls.JFXDatePicker;
 
 
 public class AvaliacaoViewController {
@@ -19,7 +20,7 @@ public class AvaliacaoViewController {
     @FXML private TextArea planoTratamentoArea;
     @FXML private Button salvarButton;
     @FXML private Label mensagemLabel;
-    @FXML private DatePicker dataAvaliacaoPicker;
+    @FXML private JFXDatePicker dataAvaliacaoPicker;
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;

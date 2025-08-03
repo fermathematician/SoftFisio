@@ -16,6 +16,7 @@ import models.Paciente;
 import services.ProntuarioService;
 import javafx.scene.control.DatePicker;
 import java.time.LocalDate;
+import com.jfoenix.controls.JFXDatePicker;
 
 public class EditarAvaliacaoController {
 
@@ -33,7 +34,9 @@ public class EditarAvaliacaoController {
     @FXML private Button salvarButton;
     @FXML private Label mensagemLabel;
     // Adicione esta linha junto aos outros @FXML
-    @FXML private DatePicker dataAvaliacaoPicker;
+    @FXML private JFXDatePicker dataAvaliacaoPicker;
+
+
 
     private ProntuarioService prontuarioService;
     private Avaliacao avaliacaoAtual;

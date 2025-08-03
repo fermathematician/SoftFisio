@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import com.jfoenix.controls.JFXDatePicker?>
 
 <BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EditarSessaoController">
    <top>
@@ -38,7 +39,7 @@
                         <VBox spacing="5.0">
                             <children>
                                 <Label styleClass="input-label" text="Data da Sessão" />
-                                <DatePicker fx:id="dataSessaoPicker" maxWidth="1.7976931348623157E308" promptText="Selecione a data" />
+                                <JFXDatePicker fx:id="dataSessaoPicker" defaultColor="#007AFF" maxWidth="1.7976931348623157E308" promptText="Selecione a data" styleClass="text-input" />
                             </children>
                             <VBox.margin>
                                 <Insets bottom="10.0" top="10.0" />

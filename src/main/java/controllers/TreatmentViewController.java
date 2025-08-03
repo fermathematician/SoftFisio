@@ -23,6 +23,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import com.jfoenix.controls.JFXDatePicker;
 
 import models.Paciente;
 import models.Sessao;
@@ -37,7 +38,7 @@ public class TreatmentViewController {
     @FXML private Button saveSessionButton;
     @FXML private VBox sessionsVBox;
     @FXML private Label mensagemSessaoLabel;
-    @FXML private DatePicker dataSessaoPicker;
+    @FXML private JFXDatePicker dataSessaoPicker;
     @FXML private Label emptySessionsLabel; // Novo Label para lista vazia
 
     private ProntuarioService prontuarioService;

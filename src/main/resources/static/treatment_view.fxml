@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import com.jfoenix.controls.JFXDatePicker?>
 
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
    <content>
@@ -19,13 +20,13 @@
                <children>
                   <Label styleClass="card-title" text="Nova Sessão" />
                   <VBox spacing="5.0">
-                  <children>
-                     <Label styleClass="input-label" text="Data da Sessão" />
-                     <DatePicker fx:id="dataSessaoPicker" maxWidth="1.7976931348623157E308" promptText="Selecione a data" />
-                  </children>
-                  <VBox.margin>
-                     <Insets top="10.0" />
-                  </VBox.margin>
+                     <children>
+                        <Label styleClass="input-label" text="Data da Sessão" />
+                        <JFXDatePicker fx:id="dataSessaoPicker" defaultColor="#007AFF" maxWidth="1.7976931348623157E308" promptText="Selecione a data" styleClass="text-input" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
                   </VBox>
                   <TextArea fx:id="newSessionTextArea" prefHeight="150.0" promptText="Descreva a evolução do paciente e as intervenções realizadas nesta sessão..." wrapText="true" />
                   <Label fx:id="mensagemSessaoLabel" alignment="CENTER" maxWidth="Infinity" managed="false" styleClass="error-label" visible="false" />
