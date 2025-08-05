@@ -153,8 +153,6 @@ SoftFisio/
 
 └── setup.sh                    # Script de configuração do ambiente
 
-```
-
 ---
 
 
