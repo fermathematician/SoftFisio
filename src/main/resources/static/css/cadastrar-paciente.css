@@ -62,7 +62,7 @@
 
 /* Botão de Salvar (ação primária) */
 .save-button {
-    -fx-background-color: #007AFF; /* Azul padrão para consistência */
+    -fx-background-color: #007AFF;
     -fx-text-fill: white;
     -fx-background-radius: 8px;
     -fx-font-size: 14px;
@@ -77,8 +77,8 @@
 
 /* Botão de Voltar (ação secundária) */
 .secondary-button {
-    -fx-background-color: #e9ecef; /* Cinza claro */
-    -fx-text-fill: #495057; /* Texto escuro */
+    -fx-background-color: #e9ecef;
+    -fx-text-fill: #495057;
     -fx-background-radius: 8px;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -103,4 +103,45 @@
 
 .jfx-date-picker .input-focused-line {
     -fx-background-color: transparent; /* Esconde a linha de foco (azul) */
+}
+
+
+/* Estilo geral do CheckBox para alinhar fonte e cor do texto */
+.check-box {
+    -fx-text-fill: #555555; /* Mesma cor do .input-label */
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+/* A "caixinha" do CheckBox */
+.check-box .box {
+    -fx-background-color: #f9f9f9; /* Mesma cor de fundo dos text-inputs */
+    -fx-border-color: #dcdcdc; /* Mesma cor da borda dos text-inputs */
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-pref-width: 18px;
+    -fx-pref-height: 18px;
+}
+
+/* A "caixinha" quando o mouse está sobre ela */
+.check-box:hover .box {
+    -fx-border-color: #ababab; /* Borda um pouco mais escura */
+}
+
+/* A "caixinha" quando está focada (mas não selecionada) */
+.check-box:focused .box {
+    -fx-border-color: #007AFF; /* Mesma cor de foco dos text-inputs */
+}
+
+/* A "caixinha" quando está selecionada */
+.check-box:selected .box {
+    -fx-background-color: #007AFF; /* Cor primária azul */
+    -fx-border-color: #007AFF;
+}
+
+/* A marca de "check" dentro da caixinha */
+.check-box .mark {
+    -fx-background-color: white; /* Cor da marca de check */
+    -fx-padding: 4px; /* Tamanho da marca */
 }

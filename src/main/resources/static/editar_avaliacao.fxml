@@ -12,7 +12,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import com.jfoenix.controls.JFXDatePicker?>
 
-<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EditarAvaliacaoController">
+<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EditarAvaliacaoController">
    <top>
       <VBox spacing="5.0" styleClass="header">
          <children>

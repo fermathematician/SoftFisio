@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -25,9 +24,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
@@ -48,6 +45,7 @@ import models.HistoricoItem;
 import models.Paciente;
 import models.Sessao;
 import models.Usuario;
+import services.AlertFactory; // <<--- IMPORT ADICIONADO
 import services.NavigationService;
 import services.ProntuarioService;
 import services.SessaoUsuario;
@@ -77,11 +75,8 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @Override
     public void onHistoryChanged() {
         System.out.println("DEBUG: Histórico atualizado por um evento.");
-
-        // 1. Atualiza a lista da aba "Histórico Completo"
         carregarHistoricoCompleto();
 
-        // 2. ADICIONADO: Comanda a aba "Sessões" para também se atualizar
         if (sessoesTabContentController != null) {
             sessoesTabContentController.loadSessoes();
         }
@@ -113,7 +108,6 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     private void handleBackButton() {
         try {
             String fxmlPath = NavigationService.getInstance().getPreviousPage();
-
             Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(new Scene(patientsView, 1280, 720));
@@ -128,19 +122,14 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         }
     }
 
-        // Em ProntuarioViewController.java
     private void carregarHistoricoCompleto() {
         historicoVBox.getChildren().clear();
-
         ProntuarioService prontuarioService = new ProntuarioService();
         List<HistoricoItem> historico = new ArrayList<>();
         historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
         historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
-
-        // Ajustado para usar getData() e ordenação reversa
         historico.sort(Comparator.comparing(HistoricoItem::getData).reversed());
 
-        // Formato da data sem a hora
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
 
         for (HistoricoItem item : historico) {
@@ -151,69 +140,66 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         updateHistoryVisibility();
     }
 
-    // Em ProntuarioViewController.java
-private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
-    VBox card = new VBox(10);
-    card.getStyleClass().add("patient-card");
+    private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("patient-card");
 
-    Label tipoLabel = new Label(item.getTipo());
-    tipoLabel.getStyleClass().add("card-title");
-    // Ajustado para usar getData()
-    Label dataLabel = new Label(item.getData().format(formatter));
-    dataLabel.getStyleClass().add("card-subtitle");
-    
-    Region hSpacer = new Region();
-    HBox.setHgrow(hSpacer, Priority.ALWAYS);
+        Label tipoLabel = new Label(item.getTipo());
+        tipoLabel.getStyleClass().add("card-title");
+        Label dataLabel = new Label(item.getData().format(formatter));
+        dataLabel.getStyleClass().add("card-subtitle");
+        
+        Region hSpacer = new Region();
+        HBox.setHgrow(hSpacer, Priority.ALWAYS);
 
-    Region deleteIcon = new Region();
-    deleteIcon.getStyleClass().add("delete-icon");
+        Region deleteIcon = new Region();
+        deleteIcon.getStyleClass().add("delete-icon");
 
-    HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
-    header.setAlignment(Pos.CENTER_LEFT);
+        HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
+        header.setAlignment(Pos.CENTER_LEFT);
 
-    card.getChildren().addAll(header, new Separator());
+        card.getChildren().addAll(header, new Separator());
 
-    if (item instanceof Sessao) {
-        Sessao sessao = (Sessao) item;
-        deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
-        Label conteudo = new Label(sessao.getEvolucaoTexto());
-        conteudo.setWrapText(true);
-        card.getChildren().add(conteudo);
-    } else if (item instanceof Avaliacao) {
-        Avaliacao avaliacao = (Avaliacao) item;
-        deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
-        VBox detalhesAvaliacao = new VBox(8);
-        detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-        detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-        detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
-        detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
-        detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
-        card.getChildren().add(detalhesAvaliacao);
+        if (item instanceof Sessao) {
+            Sessao sessao = (Sessao) item;
+            deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
+            Label conteudo = new Label(sessao.getEvolucaoTexto());
+            conteudo.setWrapText(true);
+            card.getChildren().add(conteudo);
+        } else if (item instanceof Avaliacao) {
+            Avaliacao avaliacao = (Avaliacao) item;
+            deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
+            VBox detalhesAvaliacao = new VBox(8);
+            detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+            detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
+            detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
+            detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+            detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+            card.getChildren().add(detalhesAvaliacao);
+        }
+
+        Region vSpacer = new Region();
+        VBox.setVgrow(vSpacer, Priority.ALWAYS);
+        card.getChildren().add(vSpacer);
+
+        Button editButton = new Button("Editar");
+        editButton.getStyleClass().add("primary-button");
+        
+        if (item instanceof Sessao) {
+            editButton.setOnAction(event -> handleEdit((Sessao)item));
+        } else if (item instanceof Avaliacao) {
+            editButton.setOnAction(event -> handleEditA((Avaliacao)item));
+        }
+
+        HBox bottomBar = new HBox(editButton);
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        card.getChildren().add(bottomBar);
+
+        return card;
     }
-
-    Region vSpacer = new Region();
-    VBox.setVgrow(vSpacer, Priority.ALWAYS);
-    card.getChildren().add(vSpacer);
-
-    Button editButton = new Button("Editar");
-    editButton.getStyleClass().add("primary-button");
-    
-    if (item instanceof Sessao) {
-        editButton.setOnAction(event -> handleEdit((Sessao)item));
-    } else if (item instanceof Avaliacao) {
-        editButton.setOnAction(event -> handleEditA((Avaliacao)item));
-    }
-
-    HBox bottomBar = new HBox(editButton);
-    bottomBar.setAlignment(Pos.CENTER_RIGHT);
-    card.getChildren().add(bottomBar);
-
-    return card;
-}
 
     private void updateHistoryVisibility() {
         boolean isEmpty = historicoVBox.getChildren().isEmpty();
-        
         emptyHistoryLabel.setVisible(isEmpty);
         emptyHistoryLabel.setManaged(isEmpty);
         historyScrollPane.setVisible(!isEmpty);
@@ -269,31 +255,28 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
 
     private void updateAnexosVisibility() {
         boolean isEmpty = anexosTilePane.getChildren().isEmpty();
-        
         emptyAnexosLabel.setVisible(isEmpty);
         emptyAnexosLabel.setManaged(isEmpty);
         anexosScrollPane.setVisible(!isEmpty);
         anexosScrollPane.setManaged(!isEmpty);
     }
 
-    // Em ProntuarioViewController.java
     private void handleDelete(Sessao sessao) {
-        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Confirmar Exclusão");
-        // Ajustado para usar getData()
-        confirmationAlert.setHeaderText("Deseja deletar a sessão de " + sessao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?");
-        confirmationAlert.setContentText("Esta ação é permanente.");
-
-        Optional<ButtonType> result = confirmationAlert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            ProntuarioService prontuarioService = new ProntuarioService();
-            String resultado = prontuarioService.deletarSessao(sessao.getId());
-            if (resultado.isEmpty()) { 
-                onHistoryChanged(); // Chama o método para recarregar tudo
-            } else { 
-                // Lógica para mostrar alerta de erro
+        // <<--- CÓDIGO ALTERADO ---<<<
+        AlertFactory.showConfirmation(
+            "Confirmar Exclusão",
+            "Deseja deletar a sessão de " + sessao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?",
+            "Esta ação é permanente.",
+            () -> { // Ação a ser executada se o usuário clicar em "OK"
+                ProntuarioService prontuarioService = new ProntuarioService();
+                String resultado = prontuarioService.deletarSessao(sessao.getId());
+                if (resultado.isEmpty()) { 
+                    onHistoryChanged();
+                } else { 
+                    AlertFactory.showError("Erro ao Deletar", "Não foi possível deletar a sessão: " + resultado);
+                }
             }
-        }
+        );
     }
 
     private void handleEdit(Sessao sessao) {
@@ -301,10 +284,8 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
             URL fxmlUrl = getClass().getResource("/static/editar_sessao.fxml");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
-
             EditarSessaoController controller = loader.getController();
             controller.initData(sessao, this.pacienteAtual);
-
             Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
             stage.setScene(new Scene(root, 1280, 720));
             stage.setTitle("SoftFisio - Editar Sessão");
@@ -317,32 +298,28 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
         VBox campo = new VBox(2);
         Label tituloLabel = new Label(titulo);
         tituloLabel.setStyle("-fx-font-weight: bold;");
-
         Label textoLabel = new Label(texto);
         textoLabel.setWrapText(true);
-
         campo.getChildren().addAll(tituloLabel, textoLabel);
         return campo;
     }
 
-    // Em ProntuarioViewController.java
     private void handleDeleteA(Avaliacao avaliacao) {
-        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Confirmar Exclusão");
-        // Ajustado para usar getData()
-        confirmationAlert.setHeaderText("Deseja deletar a avaliação de " + avaliacao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?");
-        confirmationAlert.setContentText("Esta ação é permanente.");
-
-        Optional<ButtonType> result = confirmationAlert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            ProntuarioService prontuarioService = new ProntuarioService();
-            String resultado = prontuarioService.deletarAvaliacao(avaliacao.getId());
-            if (resultado.isEmpty()) { 
-                onHistoryChanged();
-            } else { 
-                System.err.println(resultado);
+        // <<--- CÓDIGO ALTERADO ---<<<
+        AlertFactory.showConfirmation(
+            "Confirmar Exclusão",
+            "Deseja deletar a avaliação de " + avaliacao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?",
+            "Esta ação é permanente.",
+            () -> {
+                ProntuarioService prontuarioService = new ProntuarioService();
+                String resultado = prontuarioService.deletarAvaliacao(avaliacao.getId());
+                if (resultado.isEmpty()) {
+                    onHistoryChanged();
+                } else {
+                    AlertFactory.showError("Erro ao Deletar", "Não foi possível deletar a avaliação: " + resultado);
+                }
             }
-        }
+        );
     }
 
     private void handleEditA(Avaliacao avaliacao) {
@@ -350,10 +327,8 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
             URL fxmlUrl = getClass().getResource("/static/editar_avaliacao.fxml");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
-
             EditarAvaliacaoController controller = loader.getController();
             controller.initData(avaliacao, this.pacienteAtual);
-
             Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
             stage.setScene(new Scene(root, 1280, 720));
             stage.setTitle("SoftFisio - Editar Avaliação");
@@ -402,11 +377,8 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
             if (resultado.isEmpty()) {
                 carregarAnexos();
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Erro ao Adicionar Anexo");
-                alert.setHeaderText("Não foi possível salvar o anexo.");
-                alert.setContentText(resultado);
-                alert.showAndWait();
+                // <<--- CÓDIGO ALTERADO ---<<<
+                AlertFactory.showError("Erro ao Adicionar Anexo", "Não foi possível salvar o anexo: " + resultado);
             }
         }
     }
@@ -426,7 +398,8 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
     public void handleGerarPdf() {
         Usuario usuarioLogado = SessaoUsuario.getInstance().getUsuarioLogado();
         if (usuarioLogado == null) {
-            new Alert(Alert.AlertType.ERROR, "Nenhum usuário logado. Não é possível gerar o relatório.").showAndWait();
+            // <<--- CÓDIGO ALTERADO ---<<<
+            AlertFactory.showError("Erro de Autenticação", "Nenhum usuário logado. Não é possível gerar o relatório.");
             return;
         }
 
@@ -435,13 +408,9 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
         historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
         historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
 
-        // Verifica se o histórico está vazio.
         if (historico.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Atenção");
-            alert.setHeaderText("Não é possível gerar o relatório");
-            alert.setContentText("O paciente não possui nenhum histórico.");
-            alert.showAndWait();
+            // <<--- CÓDIGO ALTERADO ---<<<
+            AlertFactory.showError("Atenção", "Não é possível gerar o relatório pois o paciente não possui nenhum histórico.");
             return; 
         }
 
@@ -487,7 +456,6 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
                         .setMarginBottom(10);
                 document.add(historicoTitulo);
 
-                // Reutiliza a lista 'historico' já carregada e a ordena
                 historico.sort(Comparator.comparing(HistoricoItem::getData).reversed());
                 DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -495,7 +463,6 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
                     document.add(new Paragraph(" ").setBorderTop(new SolidBorder(0.5f)).setMarginTop(10).setMarginBottom(10));
                     Paragraph tipoData = new Paragraph()
                             .add(new Text(item.getTipo().toUpperCase()).setBold())
-                            // 2. O método foi trocado para getData()
                             .add(" - " + item.getData().format(formatterItem));
                     document.add(tipoData);
                     if (item instanceof Sessao) {
@@ -511,10 +478,12 @@ private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) 
                     }
                 }
                 document.close();
-                new Alert(Alert.AlertType.INFORMATION, "PDF gerado com sucesso em: " + file.getAbsolutePath()).showAndWait();
+                // <<--- CÓDIGO ALTERADO ---<<<
+                AlertFactory.showSuccess("PDF Gerado", "O arquivo foi salvo com sucesso em:\n" + file.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "Ocorreu um erro ao gerar o PDF: " + e.getMessage()).showAndWait();
+                // <<--- CÓDIGO ALTERADO ---<<<
+                AlertFactory.showError("Erro ao Gerar PDF", "Ocorreu um erro: " + e.getMessage());
             }
         } else {
             System.out.println("Geração de PDF cancelada pelo usuário.");

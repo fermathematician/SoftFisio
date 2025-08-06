@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import models.Avaliacao;
-import db.exceptions.DataIntegrityException;
+import exceptions.DataIntegrityException;
 
 public class AvaliacaoDAO {
 

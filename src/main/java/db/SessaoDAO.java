@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import models.Sessao;
-import db.exceptions.DataIntegrityException;
+import exceptions.DataIntegrityException;
 import java.time.LocalDate;
 
 public class SessaoDAO {
