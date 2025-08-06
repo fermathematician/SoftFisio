@@ -12,7 +12,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import com.jfoenix.controls.JFXDatePicker?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment_view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
    <content>
       <VBox alignment="TOP_CENTER" spacing="20.0">
          <children>

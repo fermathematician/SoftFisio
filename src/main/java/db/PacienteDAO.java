@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import db.exceptions.DataIntegrityException;
+import exceptions.DataIntegrityException;
 
 import models.Paciente;
 

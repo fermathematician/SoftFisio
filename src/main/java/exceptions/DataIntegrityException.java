@@ -1,6 +1,4 @@
-// Local: src/db/exceptions/DataIntegrityException.java
-
-package db.exceptions;
+package exceptions;
 
 /**
  * Exceção personalizada para ser lançada quando uma operação de banco de dados

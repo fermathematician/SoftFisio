@@ -7,15 +7,13 @@ import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert; 
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType; 
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional; 
 
 import models.Paciente;
+import services.AlertFactory; // Importa a nova classe
 import services.AuthServicePaciente;
 import services.NavigationService; 
 
@@ -64,59 +62,56 @@ public class PatientCardController {
     }
 
 
-@FXML
-private void handleViewRecord() {
-    try {
-        String fxmlPath = "/static/prontuario_view.fxml";
-        NavigationService.getInstance().pushHistory(fxmlPath);
+    @FXML
+    private void handleViewRecord() {
+        try {
+            String fxmlPath = "/static/prontuario_view.fxml";
+            NavigationService.getInstance().pushHistory(fxmlPath);
 
-        URL fxmlUrl = getClass().getResource(fxmlPath);
+            URL fxmlUrl = getClass().getResource(fxmlPath);
 
-        FXMLLoader loader = new FXMLLoader(fxmlUrl);
-        Parent prontuarioView = loader.load();
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent prontuarioView = loader.load();
 
-        ProntuarioViewController controller = loader.getController();
-      
-        controller.initData(this.paciente);
+            ProntuarioViewController controller = loader.getController();
+        
+            controller.initData(this.paciente);
 
-        Stage stage = (Stage) viewRecordButton.getScene().getWindow();
-        stage.setScene(new Scene(prontuarioView, 1280, 720));
-        stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
-    } catch (IOException e) {
-        System.err.println("### ERRO DE IO AO CARREGAR A TELA DE PRONTUÁRIO ###");
-        e.printStackTrace(); // Isto vai imprimir o erro detalhado no console
-    } catch (Exception e) {
-        System.err.println("### UM ERRO INESPERADO OCORREU ###");
-        e.printStackTrace();
+            Stage stage = (Stage) viewRecordButton.getScene().getWindow();
+            stage.setScene(new Scene(prontuarioView, 1280, 720));
+            stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
+        } catch (IOException e) {
+            System.err.println("### ERRO DE IO AO CARREGAR A TELA DE PRONTUÁRIO ###");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("### UM ERRO INESPERADO OCORREU ###");
+            e.printStackTrace();
+        }
     }
-}
 
     @FXML
     private void handleDelete() {
-        // Mostra um diálogo de confirmação antes de deletar
-        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Confirmar Exclusão");
-        confirmationAlert.setHeaderText("Deletar " + this.paciente.getNomeCompleto() + "?");
-        confirmationAlert.setContentText("Esta ação é permanente e não pode ser desfeita.");
-        
-        Optional<ButtonType> result = confirmationAlert.showAndWait();
-        
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            String resultado = authServicePaciente.deletar(this.paciente.getId());
+        // Usa a nova AlertFactory para mostrar um diálogo de confirmação estilizado.
+        AlertFactory.showConfirmation(
+            "Confirmar Exclusão",
+            "Deletar " + this.paciente.getNomeCompleto() + "?",
+            "Esta ação é permanente e não pode ser desfeita.",
+            () -> { // Esta é a ação que será executada se o usuário clicar "OK"
+                String resultado = authServicePaciente.deletar(this.paciente.getId());
 
-            // Verifica o resultado do serviço
-            if (resultado.isEmpty()) { // Sucesso
-                if (deletionListener != null) {
-                    deletionListener.onPatientDeleted(this.paciente);
+                if (resultado.isEmpty()) { // Sucesso
+                    if (deletionListener != null) {
+                        deletionListener.onPatientDeleted(this.paciente);
+                    }
+                } else { 
+                    // Usa a AlertFactory para mostrar um diálogo de erro estilizado.
+                    AlertFactory.showError(
+                        "Erro ao Deletar",
+                        "Não foi possível deletar o paciente: " + resultado
+                    );
                 }
-            } else { 
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Erro");
-                errorAlert.setHeaderText("Não foi possível deletar o paciente.");
-                errorAlert.setContentText(resultado);
-                errorAlert.showAndWait();
             }
-        }
+        );
     }
 
     @FXML
@@ -129,21 +124,18 @@ private void handleViewRecord() {
             URL fxmlUrl = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent editarPacienteView = loader.load();
-
-            // Pega a instância do NOVO controlador (EditarPacienteController)
-            EditarPacienteController controller = loader.getController();
             
-            // Passa o paciente deste card para o controlador da tela de edição
+            EditarPacienteController controller = loader.getController();
             controller.initData(this.paciente);
 
-            // Exibe a nova cena na mesma janela
             Stage stage = (Stage) editButton.getScene().getWindow();
             stage.setScene(new Scene(editarPacienteView, 1280, 720));
             stage.setTitle("SoftFisio - Editar Paciente");
 
         } catch (IOException e) {
             e.printStackTrace();
-            // Em uma aplicação real, seria bom mostrar um alerta de erro para o usuário.
+            // Aqui também seria um ótimo lugar para usar a AlertFactory!
+            // Ex: AlertFactory.showError("Erro de Navegação", "Não foi possível abrir a tela de edição.");
         }
     }
 }
