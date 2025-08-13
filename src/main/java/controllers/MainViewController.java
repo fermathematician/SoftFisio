@@ -23,6 +23,7 @@ import models.Paciente;
 import models.Usuario;
 import services.NavigationService;
 import services.SessaoUsuario;
+import javafx.stage.Modality;
 
 public class MainViewController implements PatientCardController.OnPatientDeletedListener {
 
@@ -162,18 +163,34 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     @FXML
     private void handleNewPatient() {
         try {
-            String fxmlPath = "/static/cadastrar_paciente.fxml";
+            String fxmlPath = "/static/formulario_paciente.fxml";
+            // Se você já renomeou os arquivos, use a linha abaixo:
+            // String fxmlPath = "/static/formulario_paciente.fxml";
+            
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            
+            FormularioPacienteController controller = loader.getController();
+            // Se você já renomeou, o nome da classe será FormularioPacienteController
+            // FormularioPacienteController controller = loader.getController();
+            
+            controller.initData();
 
-            NavigationService.getInstance().pushHistory(fxmlPath);
-
-            Parent cadastrarPacienteView = FXMLLoader.load(getClass().getResource(fxmlPath));
-            Stage stage = (Stage) newPatientButton.getScene().getWindow();
-            stage.setScene(new Scene(cadastrarPacienteView, 1280, 720));
+            // --- LÓGICA DE NOVA JANELA ---
+            Stage stage = new Stage();
             stage.setTitle("SoftFisio - Cadastrar Paciente");
+            stage.setScene(new Scene(root, 1280, 720));
+
+            stage.initOwner(newPatientButton.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
+            
+            // Remove a necessidade do NavigationService aqui
+            stage.showAndWait();
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+}
 
     @FXML
     private void handleLogout() {

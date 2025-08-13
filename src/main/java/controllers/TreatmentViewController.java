@@ -26,16 +26,13 @@ import models.Paciente;
 import models.Sessao;
 import services.AlertFactory;
 import services.ProntuarioService;
-
+import javafx.stage.Modality;
 import java.time.LocalDate;
 
 public class TreatmentViewController {
 
-    @FXML private TextArea newSessionTextArea;
-    @FXML private Button saveSessionButton;
     @FXML private VBox sessionsVBox;
-    @FXML private Label mensagemSessaoLabel;
-    @FXML private JFXDatePicker dataSessaoPicker;
+    @FXML private Button novaSessaoButton;
     @FXML private Label emptySessionsLabel;
 
     private ProntuarioService prontuarioService;
@@ -45,26 +42,13 @@ public class TreatmentViewController {
     public TreatmentViewController() {
         this.prontuarioService = new ProntuarioService();
     }
-    
-    @FXML
-    public void initialize() {
-        saveSessionButton.setDefaultButton(true);
-        dataSessaoPicker.setValue(LocalDate.now());
-    }
 
-    public void initData(Paciente paciente, OnHistoryChangedListener listener) {
-        this.pacienteAtual = paciente;
-        this.historyListener = listener;
-        
-        newSessionTextArea.textProperty().addListener((obs, oldText, newText) -> {
-            if (mensagemSessaoLabel.isVisible()) {
-                mensagemSessaoLabel.setVisible(false);
-                mensagemSessaoLabel.setManaged(false);
-            }
-        });
 
-        loadSessoes();
-    }
+public void initData(Paciente paciente, OnHistoryChangedListener listener) {
+    this.pacienteAtual = paciente;
+    this.historyListener = listener;
+    loadSessoes();
+}
 
     public void loadSessoes() {
         sessionsVBox.getChildren().clear();
@@ -138,25 +122,6 @@ public class TreatmentViewController {
         return card;
     }
 
-    @FXML
-    private void handleSaveSessao() {
-        String textoEvolucao = newSessionTextArea.getText();
-        LocalDate dataSelecionada = dataSessaoPicker.getValue();
-        String resultado = prontuarioService.cadastrarSessao(pacienteAtual.getId(), dataSelecionada, textoEvolucao, "");
-
-        if (resultado.isEmpty()) {
-            newSessionTextArea.clear();
-            dataSessaoPicker.setValue(LocalDate.now());
-            loadSessoes();
-
-            if (historyListener != null) {
-                historyListener.onHistoryChanged();
-            }
-            setMensagem("Sessão salva com sucesso!", false);
-        } else {
-            setMensagem(resultado, true);
-        }
-    }
 
     @FXML
     private void handleDelete(Sessao sessao) {
@@ -182,30 +147,50 @@ public class TreatmentViewController {
     @FXML
     private void handleEdit(Sessao sessao) {
         try {
-            URL fxmlUrl = getClass().getResource("/static/editar_sessao.fxml");
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            // Carrega o novo formulário unificado
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
             Parent root = loader.load();
 
-            EditarSessaoController controller = loader.getController();
-            controller.initData(sessao, pacienteAtual);
+            // Pega o controller do novo formulário
+            FormularioSessaoController controller = loader.getController();
+            // Inicia o formulário em MODO EDIÇÃO
+            controller.initData(sessao, pacienteAtual, historyListener);
 
-            Stage stage = (Stage) saveSessionButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
+            // Cria e exibe a janela como um modal (bloqueia a janela de trás)
+            Stage stage = new Stage();
             stage.setTitle("SoftFisio - Editar Sessão");
+            stage.setScene(new Scene(root, 1280, 720));
+            stage.initOwner(sessionsVBox.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.showAndWait(); // Pausa a execução aqui até a janela ser fechada
 
         } catch (IOException e) {
             e.printStackTrace();
-        }     
+        }
     }
 
-    private void setMensagem(String mensagem, boolean isError) {
-        mensagemSessaoLabel.setText(mensagem);
-        mensagemSessaoLabel.setVisible(true);
-        mensagemSessaoLabel.setManaged(true);
-        if (isError) {
-            mensagemSessaoLabel.setStyle("-fx-text-fill: red;");
-        } else {
-            mensagemSessaoLabel.setStyle("-fx-text-fill: green;");
+    @FXML
+    private void handleNovaSessao() {
+        try {
+            // Carrega o mesmo formulário unificado
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
+            Parent root = loader.load();
+
+            // Pega o controller do formulário
+            FormularioSessaoController controller = loader.getController();
+            // Inicia o formulário em MODO CRIAÇÃO
+            controller.initData(pacienteAtual, historyListener);
+
+            // Cria e exibe a janela como um modal
+            Stage stage = new Stage();
+            stage.setTitle("SoftFisio - Nova Sessão");
+            stage.setScene(new Scene(root, 1280, 720));
+            stage.initOwner(sessionsVBox.getScene().getWindow());
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -280,19 +280,27 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     }
 
     private void handleEdit(Sessao sessao) {
-        try {
-            URL fxmlUrl = getClass().getResource("/static/editar_sessao.fxml");
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
-            EditarSessaoController controller = loader.getController();
-            controller.initData(sessao, this.pacienteAtual);
-            Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.setTitle("SoftFisio - Editar Sessão");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    try {
+        // Carrega o novo formulário unificado
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
+        Parent root = loader.load();
+
+        FormularioSessaoController controller = loader.getController();
+        // Passa 'this' como o listener, pois ProntuarioViewController já implementa OnHistoryChangedListener
+        controller.initData(sessao, this.pacienteAtual, this);
+
+        // Cria e exibe a janela como um modal
+        Stage stage = new Stage();
+        stage.setTitle("SoftFisio - Editar Sessão");
+        stage.setScene(new Scene(root, 1280, 720));
+        stage.initOwner(prontuarioRoot.getScene().getWindow());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.showAndWait();
+
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 
     private VBox createCampo(String titulo, String texto) {
         VBox campo = new VBox(2);

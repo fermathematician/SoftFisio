@@ -11,58 +11,33 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import com.jfoenix.controls.JFXDatePicker?>
+<?import javafx.scene.layout.Region?>
 
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TreatmentViewController">
    <content>
       <VBox alignment="TOP_CENTER" spacing="20.0">
-         <children>
-            <VBox maxWidth="800.0" spacing="10.0" styleClass="patient-card">
-               <children>
-                  <Label styleClass="card-title" text="Nova Sessão" />
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Data da Sessão" />
-                        <JFXDatePicker fx:id="dataSessaoPicker" defaultColor="#007AFF" maxWidth="1.7976931348623157E308" promptText="Selecione a data" styleClass="text-input" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="10.0" />
-                     </VBox.margin>
-                  </VBox>
-                  <TextArea fx:id="newSessionTextArea" prefHeight="150.0" promptText="Descreva a evolução do paciente e as intervenções realizadas nesta sessão..." wrapText="true" />
-                  <Label fx:id="mensagemSessaoLabel" alignment="CENTER" maxWidth="Infinity" managed="false" styleClass="error-label" visible="false" />
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <Button fx:id="saveSessionButton" onAction="#handleSaveSessao" mnemonicParsing="false" styleClass="primary-button" text="Salvar Sessão" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-               </children>
-            </VBox>
-            <Separator prefWidth="200.0">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
-               </VBox.margin>
-            </Separator>
-            <VBox maxWidth="1000.0" spacing="10.0">
-               <children>
-                  <Label styleClass="section-title" text="Sessões Anteriores" />
-                  <StackPane>
-                     <children>
-                        <Label fx:id="emptySessionsLabel" styleClass="empty-message-label" text="Não há sessões cadastradas para este paciente." managed="false" visible="false" StackPane.alignment="CENTER" />
-                        <VBox fx:id="sessionsVBox" spacing="20.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="30.0" />
-                     </VBox.margin>
+            <children>
+               <HBox alignment="CENTER_LEFT">
+                  <children>
+                     <Label styleClass="section-title" text="Sessões Anteriores" />
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Button fx:id="novaSessaoButton" onAction="#handleNovaSessao" mnemonicParsing="false" styleClass="primary-button" text="+ Nova Sessão" />
+                  </children>
+               </HBox>
+               
+                     <StackPane>
+                        <children>
+                           <Label fx:id="emptySessionsLabel" styleClass="empty-message-label" text="Não há sessões cadastradas para este paciente." managed="false" visible="false" StackPane.alignment="CENTER" />
+                           <VBox fx:id="sessionsVBox" spacing="20.0" />
+                        </children>
+                        <VBox.margin>
+                           <Insets top="30.0" />
+                        </VBox.margin>
                   </StackPane>
                </children>
-            </VBox>
-         </children>
-         <padding>
-            <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
-         </padding>
+               <padding>
+                  <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
+               </padding>
       </VBox>
    </content>
 </ScrollPane>
