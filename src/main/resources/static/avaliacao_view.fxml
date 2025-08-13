@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXDatePicker?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
-<?import com.jfoenix.controls.JFXDatePicker?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoViewController">
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoController">
    <content>
       <VBox alignment="TOP_CENTER" spacing="20.0">
          <children>
             <VBox maxWidth="800.0" spacing="15.0" styleClass="patient-card">
                <children>
                   <Label styleClass="card-title" text="Nova Avaliação Fisioterapêutica" />
-
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Data da Avaliação" />
@@ -43,7 +42,7 @@
                         <TextArea fx:id="examesFisicosArea" prefHeight="120.0" wrapText="true" />
                      </children>
                   </VBox>
-                   <VBox spacing="5.0">
+                  <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
                         <TextArea fx:id="diagnosticoArea" prefHeight="120.0" wrapText="true" />
@@ -55,9 +54,7 @@
                         <TextArea fx:id="planoTratamentoArea" prefHeight="120.0" wrapText="true" />
                      </children>
                   </VBox>
-
                   <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />
-
                   <VBox alignment="CENTER_RIGHT">
                      <children>
                         <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />

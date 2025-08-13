@@ -144,53 +144,49 @@ public void initData(Paciente paciente, OnHistoryChangedListener listener) {
         );
     }
     
-    @FXML
-    private void handleEdit(Sessao sessao) {
-        try {
-            // Carrega o novo formulário unificado
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
-            Parent root = loader.load();
-
-            // Pega o controller do novo formulário
-            FormularioSessaoController controller = loader.getController();
-            // Inicia o formulário em MODO EDIÇÃO
-            controller.initData(sessao, pacienteAtual, historyListener);
-
-            // Cria e exibe a janela como um modal (bloqueia a janela de trás)
-            Stage stage = new Stage();
-            stage.setTitle("SoftFisio - Editar Sessão");
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.initOwner(sessionsVBox.getScene().getWindow());
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.showAndWait(); // Pausa a execução aqui até a janela ser fechada
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @FXML
-    private void handleNovaSessao() {
-        try {
-            // Carrega o mesmo formulário unificado
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
-            Parent root = loader.load();
+private void handleEdit(Sessao sessao) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
+        Parent root = loader.load();
 
-            // Pega o controller do formulário
-            FormularioSessaoController controller = loader.getController();
-            // Inicia o formulário em MODO CRIAÇÃO
-            controller.initData(pacienteAtual, historyListener);
+        SessaoController controller = loader.getController();
+        controller.initData(sessao, pacienteAtual, historyListener);
 
-            // Cria e exibe a janela como um modal
-            Stage stage = new Stage();
-            stage.setTitle("SoftFisio - Nova Sessão");
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.initOwner(sessionsVBox.getScene().getWindow());
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.showAndWait();
+        // --- LÓGICA DE NOVA JANELA ---
+        Stage stage = new Stage();
+        stage.setTitle("SoftFisio - Editar Sessão");
+        stage.setScene(new Scene(root, 1280, 720));
+        stage.initOwner(sessionsVBox.getScene().getWindow());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.showAndWait();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
+
+@FXML
+private void handleNovaSessao() {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
+        Parent root = loader.load();
+
+        SessaoController controller = loader.getController();
+        controller.initData(pacienteAtual, historyListener);
+
+        // --- LÓGICA DE NOVA JANELA ---
+        Stage stage = new Stage();
+        stage.setTitle("SoftFisio - Nova Sessão");
+        stage.setScene(new Scene(root, 1280, 720));
+        stage.initOwner(sessionsVBox.getScene().getWindow());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.showAndWait();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
 }

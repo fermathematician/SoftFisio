@@ -20,7 +20,7 @@ import javafx.scene.control.DatePicker;
 import com.jfoenix.controls.JFXDatePicker;
 import java.time.LocalDate;
 
-public class FormularioSessaoController {
+public class SessaoController {
     @FXML private Label patientNameLabel;
     @FXML private Button backButton;
     @FXML private Label sessionInfoLabel;
@@ -77,9 +77,9 @@ public void initialize() {
 
 @FXML
 public void handleBackButton() {
+    // Pega a janela atual (a do formulário) e simplesmente a fecha.
     Stage stage = (Stage) backButton.getScene().getWindow();
     stage.close();
-
 }
 
     // Substitua o método handleUpdateSessao

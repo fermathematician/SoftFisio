@@ -49,6 +49,8 @@ import services.AlertFactory; // <<--- IMPORT ADICIONADO
 import services.NavigationService;
 import services.ProntuarioService;
 import services.SessaoUsuario;
+import javafx.stage.Modality;
+import javafx.scene.control.TabPane;
 
 public class ProntuarioViewController implements OnHistoryChangedListener {
 
@@ -56,19 +58,18 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML private Label patientInfoLabel;
     @FXML private Button backButton;
     @FXML private BorderPane prontuarioRoot;
-    @FXML private AvaliacaoViewController avaliacaoTabContentController;
+    @FXML private AvaliacaoController avaliacaoTabContentController;
     @FXML private VBox historicoVBox;
     @FXML private TilePane anexosTilePane;
     @FXML private Button adicionarAnexoButton;
     @FXML private Button gerarPdfButton;
     @FXML private TreatmentViewController sessoesTabContentController;
-    
     @FXML private ScrollPane historyScrollPane;
     @FXML private Label emptyHistoryLabel;
-
     // Novos FXML Fields para Anexos
     @FXML private ScrollPane anexosScrollPane;
     @FXML private Label emptyAnexosLabel;
+    @FXML private TabPane mainTabPane;
 
     private Paciente pacienteAtual;
 
@@ -91,7 +92,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         }
 
         if (avaliacaoTabContentController != null) {
-            avaliacaoTabContentController.initData(paciente, this);
+            avaliacaoTabContentController.configureParaCriacao(paciente, this);
         }
 
         carregarHistoricoCompleto();
@@ -281,15 +282,13 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
 
     private void handleEdit(Sessao sessao) {
     try {
-        // Carrega o novo formulário unificado
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
         Parent root = loader.load();
 
-        FormularioSessaoController controller = loader.getController();
-        // Passa 'this' como o listener, pois ProntuarioViewController já implementa OnHistoryChangedListener
+        SessaoController controller = loader.getController();
         controller.initData(sessao, this.pacienteAtual, this);
 
-        // Cria e exibe a janela como um modal
+        // --- LÓGICA DE NOVA JANELA ---
         Stage stage = new Stage();
         stage.setTitle("SoftFisio - Editar Sessão");
         stage.setScene(new Scene(root, 1280, 720));
@@ -331,19 +330,14 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     }
 
     private void handleEditA(Avaliacao avaliacao) {
-        try {
-            URL fxmlUrl = getClass().getResource("/static/editar_avaliacao.fxml");
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
-            EditarAvaliacaoController controller = loader.getController();
-            controller.initData(avaliacao, this.pacienteAtual);
-            Stage stage = (Stage) prontuarioRoot.getScene().getWindow();
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.setTitle("SoftFisio - Editar Avaliação");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    // 1. Muda o foco para a aba de Avaliação (que é a segunda aba, de índice 1)
+    mainTabPane.getSelectionModel().select(1);
+
+    // 2. Manda o controlador daquela aba se configurar para o modo de edição
+    if (avaliacaoTabContentController != null) {
+        avaliacaoTabContentController.configureParaEdicao(avaliacao, this.pacienteAtual, this);
     }
+}
 
     private void abrirVisualizador(Anexo anexo) {
         try {
