@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.HTMLEditor?>
 
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoController">
    <content>
@@ -27,31 +28,31 @@
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Queixa Principal" />
-                        <TextArea fx:id="queixaPrincipalArea" prefHeight="80.0" wrapText="true" />
+                        <HTMLEditor fx:id="queixaPrincipalEditor" prefHeight="200.0" />
                      </children>
                   </VBox>
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Histórico da Doença Atual (HDA)" />
-                        <TextArea fx:id="hdaArea" prefHeight="120.0" wrapText="true" />
+                        <HTMLEditor fx:id="hdaEditor" prefHeight="200.0" />
                      </children>
                   </VBox>
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Exames Físicos" />
-                        <TextArea fx:id="examesFisicosArea" prefHeight="120.0" wrapText="true" />
+                        <HTMLEditor fx:id="examesFisicosEditor" prefHeight="200.0" />
                      </children>
                   </VBox>
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
-                        <TextArea fx:id="diagnosticoArea" prefHeight="120.0" wrapText="true" />
+                        <HTMLEditor fx:id="diagnosticoEditor" prefHeight="200.0" />
                      </children>
                   </VBox>
                   <VBox spacing="5.0">
                      <children>
                         <Label styleClass="input-label" text="Plano de Tratamento" />
-                        <TextArea fx:id="planoTratamentoArea" prefHeight="120.0" wrapText="true" />
+                        <HTMLEditor fx:id="planoTratamentoEditor" prefHeight="200.0" />
                      </children>
                   </VBox>
                   <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />

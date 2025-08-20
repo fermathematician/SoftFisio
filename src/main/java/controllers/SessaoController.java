@@ -19,12 +19,13 @@ import services.ProntuarioService;
 import javafx.scene.control.DatePicker;
 import com.jfoenix.controls.JFXDatePicker;
 import java.time.LocalDate;
+import javafx.scene.web.HTMLEditor;
 
 public class SessaoController {
     @FXML private Label patientNameLabel;
     @FXML private Button backButton;
     @FXML private Label sessionInfoLabel;
-    @FXML private TextArea editSessionTextArea;
+    @FXML private HTMLEditor evolutionEditor;
     @FXML private Label mensagemLabel;
     // Adicione esta linha junto aos outros @FXML
     @FXML private JFXDatePicker dataSessaoPicker;
@@ -52,7 +53,7 @@ public class SessaoController {
 
         // Ponto principal: preenche os campos com os dados existentes
         dataSessaoPicker.setValue(sessao.getDataSessao()); // Preenche a data
-        editSessionTextArea.setText(sessao.getEvolucaoTexto());
+        evolutionEditor.setHtmlText(sessao.getEvolucaoTexto());
     }
 
 public void initData(Paciente paciente, OnHistoryChangedListener listener) {
@@ -64,7 +65,7 @@ public void initData(Paciente paciente, OnHistoryChangedListener listener) {
     sessionInfoLabel.setText("Cadastrar Nova Sessão");
 
     dataSessaoPicker.setValue(LocalDate.now());
-    editSessionTextArea.clear();
+    evolutionEditor.setHtmlText("");
     // Você precisará adicionar um fx:id="saveButton" ao seu botão de salvar no FXML para a linha abaixo funcionar
     // saveButton.setText("Salvar Sessão"); 
 }
@@ -85,7 +86,7 @@ public void handleBackButton() {
     // Substitua o método handleUpdateSessao
     @FXML
     private void handleUpdateSessao() {
-        String textoAtualizado = editSessionTextArea.getText();
+        String textoAtualizado = evolutionEditor.getHtmlText();
         LocalDate novaData = dataSessaoPicker.getValue();
         String resultado;
 

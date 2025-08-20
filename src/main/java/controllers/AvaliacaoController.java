@@ -16,15 +16,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import models.Avaliacao;
+import javafx.scene.web.HTMLEditor;
 
 
 public class AvaliacaoController {
     @FXML private Label mensagemLabel;
-    @FXML private TextArea queixaPrincipalArea;
-    @FXML private TextArea hdaArea;
-    @FXML private TextArea examesFisicosArea;
-    @FXML private TextArea diagnosticoArea;
-    @FXML private TextArea planoTratamentoArea;
+    @FXML private HTMLEditor queixaPrincipalEditor;
+    @FXML private HTMLEditor hdaEditor;
+    @FXML private HTMLEditor examesFisicosEditor;
+    @FXML private HTMLEditor diagnosticoEditor;
+    @FXML private HTMLEditor planoTratamentoEditor;
     @FXML private Button salvarButton;
     @FXML private JFXDatePicker dataAvaliacaoPicker;
     private ProntuarioService prontuarioService;
@@ -57,11 +58,11 @@ public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistor
 
     // Preenche o formulário com os dados da avaliação
     dataAvaliacaoPicker.setValue(avaliacao.getDataAvaliacao());
-    queixaPrincipalArea.setText(avaliacao.getQueixaPrincipal());
-    hdaArea.setText(avaliacao.getHistoricoDoencaAtual());
-    examesFisicosArea.setText(avaliacao.getExamesFisicos());
-    diagnosticoArea.setText(avaliacao.getDiagnosticoFisioterapeutico());
-    planoTratamentoArea.setText(avaliacao.getPlanoTratamento());
+    queixaPrincipalEditor.setHtmlText(avaliacao.getQueixaPrincipal());
+    hdaEditor.setHtmlText(avaliacao.getHistoricoDoencaAtual());
+    examesFisicosEditor.setHtmlText(avaliacao.getExamesFisicos());
+    diagnosticoEditor.setHtmlText(avaliacao.getDiagnosticoFisioterapeutico());
+    planoTratamentoEditor.setHtmlText(avaliacao.getPlanoTratamento());
 }
 
     private void setMensagem(String mensagem, boolean isError) {
@@ -83,11 +84,11 @@ private void handleSalvarAvaliacao() {
     }
 
     LocalDate data = dataAvaliacaoPicker.getValue();
-    String queixa = queixaPrincipalArea.getText();
-    String hda = hdaArea.getText();
-    String exames = examesFisicosArea.getText();
-    String diagnostico = diagnosticoArea.getText();
-    String plano = planoTratamentoArea.getText();
+    String queixa = queixaPrincipalEditor.getHtmlText();
+    String hda = hdaEditor.getHtmlText();
+    String exames = examesFisicosEditor.getHtmlText();
+    String diagnostico = diagnosticoEditor.getHtmlText();
+    String plano = planoTratamentoEditor.getHtmlText();
     String resultado;
 
     // Lógica de decisão: Criar ou Atualizar?
@@ -113,11 +114,11 @@ private void handleSalvarAvaliacao() {
 
 private void limparCampos() {
     dataAvaliacaoPicker.setValue(LocalDate.now());
-    queixaPrincipalArea.clear();
-    hdaArea.clear();
-    examesFisicosArea.clear();
-    diagnosticoArea.clear();
-    planoTratamentoArea.clear();
+    queixaPrincipalEditor.setHtmlText("");
+    hdaEditor.setHtmlText("");
+    examesFisicosEditor.setHtmlText("");
+    diagnosticoEditor.setHtmlText("");
+    planoTratamentoEditor.setHtmlText("");
 }
 
     
