@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -14,20 +13,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import com.jfoenix.controls.JFXDatePicker;
 
 import models.Paciente;
 import models.Sessao;
 import services.AlertFactory;
 import services.ProntuarioService;
 import javafx.stage.Modality;
-import java.time.LocalDate;
 
 public class TreatmentViewController {
 

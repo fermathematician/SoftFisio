@@ -2,7 +2,6 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +48,6 @@ import services.AlertFactory; // <<--- IMPORT ADICIONADO
 import services.NavigationService;
 import services.ProntuarioService;
 import services.SessaoUsuario;
-import javafx.stage.Modality;
 import javafx.scene.control.TabPane;
 
 public class ProntuarioViewController implements OnHistoryChangedListener {

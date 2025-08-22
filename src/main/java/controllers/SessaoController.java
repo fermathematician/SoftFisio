@@ -1,22 +1,16 @@
 package controllers;
 
-import java.io.IOException;
-import java.net.URL;
 import java.time.format.DateTimeFormatter;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import models.Paciente;
 import models.Sessao;
 import services.ProntuarioService;
 
-import javafx.scene.control.DatePicker;
 import com.jfoenix.controls.JFXDatePicker;
 import java.time.LocalDate;
 import javafx.scene.web.HTMLEditor;
@@ -56,32 +50,32 @@ public class SessaoController {
         evolutionEditor.setHtmlText(sessao.getEvolucaoTexto());
     }
 
-public void initData(Paciente paciente, OnHistoryChangedListener listener) {
-    this.sessao = null;
-    this.paciente = paciente;
-    this.historyListener = listener;
+    public void initData(Paciente paciente, OnHistoryChangedListener listener) {
+        this.sessao = null;
+        this.paciente = paciente;
+        this.historyListener = listener;
 
-    patientNameLabel.setText(paciente.getNomeCompleto());
-    sessionInfoLabel.setText("Cadastrar Nova Sessão");
+        patientNameLabel.setText(paciente.getNomeCompleto());
+        sessionInfoLabel.setText("Cadastrar Nova Sessão");
 
-    dataSessaoPicker.setValue(LocalDate.now());
-    evolutionEditor.setHtmlText("");
-    // Você precisará adicionar um fx:id="saveButton" ao seu botão de salvar no FXML para a linha abaixo funcionar
-    // saveButton.setText("Salvar Sessão"); 
-}
+        dataSessaoPicker.setValue(LocalDate.now());
+        evolutionEditor.setHtmlText("");
+        // Você precisará adicionar um fx:id="saveButton" ao seu botão de salvar no FXML para a linha abaixo funcionar
+        // saveButton.setText("Salvar Sessão"); 
+    }
 
-@FXML
-public void initialize() {
-    this.prontuarioService = new ProntuarioService();
-    this.sessao = null; 
-}
+    @FXML
+    public void initialize() {
+        this.prontuarioService = new ProntuarioService();
+        this.sessao = null; 
+    }
 
-@FXML
-public void handleBackButton() {
-    // Pega a janela atual (a do formulário) e simplesmente a fecha.
-    Stage stage = (Stage) backButton.getScene().getWindow();
-    stage.close();
-}
+    @FXML
+    public void handleBackButton() {
+        // Pega a janela atual (a do formulário) e simplesmente a fecha.
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+    }
 
     // Substitua o método handleUpdateSessao
     @FXML

@@ -74,49 +74,62 @@ public class FormularioPacienteController {
         saveButton.setText("Salvar Paciente");
     }
 
-@FXML
-private void handleSave() {
-    // Coleta os dados do formulário (como já fazia)
-    String nome = nameField.getText();
-    String cpf = cpfField.getText();
-    String genero = genderComboBox.getValue();
-    String telefone = phoneField.getText();
-    String email = emailField.getText();
-    LocalDate dataNascimento = dobPicker.getValue();
-    boolean isPacienteCorrida = pacienteCorridaCheckBox.isSelected();
-
-    String resultado;
-
-    // Lógica de decisão: Criar ou Atualizar?
-    if (pacienteParaEditar == null) {
-        // MODO CRIAÇÃO
-        SessaoUsuario sessao = SessaoUsuario.getInstance();
-        if (!sessao.isLogado()) {
-            mensagemLabel.setText("Erro: Usuário não está logado.");
-            mensagemLabel.setStyle("-fx-text-fill: red;");
-            return;
-        }
-        int idUsuarioLogado = sessao.getUsuarioLogado().getId();
-        resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
-
-    } else {
-        // MODO EDIÇÃO
-        resultado = authService.atualizar(pacienteParaEditar.getId(), nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
-    }
-
-    // Exibe o resultado
-    if (resultado.isEmpty()) {
-        mensagemLabel.setText("Dados salvos com sucesso!");
-        mensagemLabel.setStyle("-fx-text-fill: green;");
-    } else {
-        mensagemLabel.setText(resultado);
-        mensagemLabel.setStyle("-fx-text-fill: red;");
-    }
-}
     @FXML
-private void handleCancel() {
-    // Pega a janela atual (a do formulário) e simplesmente a fecha.
-    Stage stage = (Stage) cancelButton.getScene().getWindow();
-    stage.close();
-}
+    private void handleSave() {
+        // Coleta os dados do formulário (como já fazia)
+        String nome = nameField.getText();
+        String cpf = cpfField.getText();
+        String genero = genderComboBox.getValue();
+        String telefone = phoneField.getText();
+        String email = emailField.getText();
+        LocalDate dataNascimento = dobPicker.getValue();
+        boolean isPacienteCorrida = pacienteCorridaCheckBox.isSelected();
+
+        String resultado;
+
+        // Lógica de decisão: Criar ou Atualizar?
+        if (pacienteParaEditar == null) {
+            // MODO CRIAÇÃO
+            SessaoUsuario sessao = SessaoUsuario.getInstance();
+            if (!sessao.isLogado()) {
+                mensagemLabel.setText("Erro: Usuário não está logado.");
+                mensagemLabel.setStyle("-fx-text-fill: red;");
+                return;
+            }
+            int idUsuarioLogado = sessao.getUsuarioLogado().getId();
+            resultado = authService.cadastrar(idUsuarioLogado, nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
+
+        } else {
+            // MODO EDIÇÃO
+            resultado = authService.atualizar(pacienteParaEditar.getId(), nome, cpf, genero, telefone, email, dataNascimento, isPacienteCorrida);
+        }
+
+        // Exibe o resultado
+        if (resultado.isEmpty()) {
+            mensagemLabel.setText("Dados salvos com sucesso!");
+            mensagemLabel.setStyle("-fx-text-fill: green;");
+        } else {
+            mensagemLabel.setText(resultado);
+            mensagemLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+    
+    @FXML
+    private void handleCancel() {
+        try {
+            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+
+            Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Stage stage = (Stage) cancelButton.getScene().getWindow();
+            stage.setScene(new Scene(patientsView, 1280, 720));
+
+            if(fxmlPath.equals("/static/main_view.fxml")) {
+                stage.setTitle("SoftFisio - Lista de Pacientes");
+            }else {
+                stage.setTitle("SoftFisio - Pacientes de corrida");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
