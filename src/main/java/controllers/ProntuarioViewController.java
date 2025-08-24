@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -279,25 +280,27 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     }
 
     private void handleEdit(Sessao sessao) {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
-        Parent root = loader.load();
+     try {
+            String fxmlPath = "/static/formulario_sessao.fxml";
 
-        SessaoController controller = loader.getController();
-        controller.initData(sessao, this.pacienteAtual, this);
+            NavigationService.getInstance().pushHistory(fxmlPath);
 
-        // --- LÓGICA DE NOVA JANELA ---
-        Stage stage = new Stage();
-        stage.setTitle("SoftFisio - Editar Sessão");
-        stage.setScene(new Scene(root, 1280, 720));
-        stage.initOwner(prontuarioRoot.getScene().getWindow());
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.showAndWait();
+            URL fxmlUrl = getClass().getResource(fxmlPath);
 
-    } catch (IOException e) {
-        e.printStackTrace();
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent newPatient = loader.load();
+
+            SessaoController controller = loader.getController();
+            controller.initData(sessao, this.pacienteAtual, this);
+
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.setScene(new Scene(newPatient, 1280, 720));
+            stage.setTitle("SoftFisio - Editar Sessão");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
     private VBox createCampo(String titulo, String texto) {
         VBox campo = new VBox(2);

@@ -3,15 +3,21 @@ package controllers;
 import java.time.format.DateTimeFormatter;
 
 import javafx.fxml.FXML;
-
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import models.Paciente;
 import models.Sessao;
+import services.NavigationService;
 import services.ProntuarioService;
 
 import com.jfoenix.controls.JFXDatePicker;
+
+import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
 import javafx.scene.web.HTMLEditor;
 
@@ -72,9 +78,24 @@ public class SessaoController {
 
     @FXML
     public void handleBackButton() {
-        // Pega a janela atual (a do formulário) e simplesmente a fecha.
-        Stage stage = (Stage) backButton.getScene().getWindow();
-        stage.close();
+        try {
+            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+
+            URL fxmlUrl = getClass().getResource(fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent prontuarioView = loader.load();
+
+            ProntuarioViewController controller = loader.getController();
+        
+            controller.initData(this.paciente);
+
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.setScene(new Scene(prontuarioView, 1280, 720));
+            stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Substitua o método handleUpdateSessao
@@ -85,7 +106,7 @@ public class SessaoController {
         String resultado;
 
         // Lógica principal de decisão
-        if (sessao == null) { // ou sessaoParaEditar, dependendo do nome que usar
+        if (sessao == null) { 
             // MODO CRIAÇÃO
             resultado = prontuarioService.cadastrarSessao(
                 paciente.getId(),
