@@ -1,4 +1,4 @@
-package services;
+package ui;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -8,16 +8,16 @@ import java.util.Deque;
  * Esta classe atua puramente como um gerenciador de histórico de strings (caminhos FXML).
  * Ela não é responsável por carregar ou exibir cenas.
  */
-public class NavigationService {
+public class NavigationManager {
 
     // Singleton Pattern
-    private static final NavigationService instance = new NavigationService();
+    private static final NavigationManager instance = new NavigationManager();
 
     private final Deque<String> history = new ArrayDeque<>();
 
-    private NavigationService() {}
+    private NavigationManager() {}
 
-    public static NavigationService getInstance() {
+    public static NavigationManager getInstance() {
         return instance;
     }
 

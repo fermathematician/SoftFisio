@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane; // Import adicionado
+import javafx.scene.control.ScrollPane; 
 import javafx.scene.control.TextField; 
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -21,9 +21,8 @@ import java.util.List;
 import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;
-import services.NavigationService;
+import ui.NavigationManager;
 import services.SessaoUsuario;
-import javafx.stage.Modality;
 
 public class PacientesCorridaController implements PatientCardController.OnPatientDeletedListener {
 
@@ -147,7 +146,7 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
     @FXML
     private void handleVerComuns() {
         try {
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent mainView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) verComunsButton.getScene().getWindow();
@@ -163,28 +162,20 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
     private void handleNewPatient() {
         try {
             String fxmlPath = "/static/formulario_paciente.fxml";
-            // Se você já renomeou os arquivos, use a linha abaixo:
-            // String fxmlPath = "/static/formulario_paciente.fxml";
-            
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
-            
-            FormularioPacienteController controller = loader.getController();
-            // Se você já renomeou, o nome da classe será FormularioPacienteController
-            // FormularioPacienteController controller = loader.getController();
-            
-            controller.initData();
+           
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
-            // --- LÓGICA DE NOVA JANELA ---
-            Stage stage = new Stage();
+            URL fxmlUrl = getClass().getResource(fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent newPatient = loader.load();
+
+            FormularioPacienteController cadastrarPacienteController = loader.getController();
+            cadastrarPacienteController.initData();
+
+            Stage stage = (Stage) newPatientButton.getScene().getWindow();
+            stage.setScene(new Scene(newPatient, 1280, 720));
             stage.setTitle("SoftFisio - Cadastrar Paciente");
-            stage.setScene(new Scene(root, 1280, 720));
-
-            stage.initOwner(newPatientButton.getScene().getWindow());
-            stage.initModality(Modality.WINDOW_MODAL);
-            
-            // Remove a necessidade do NavigationService aqui
-            stage.showAndWait();
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -195,8 +186,8 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
     private void handleLogout() {
         SessaoUsuario.getInstance().logout();
         try {   
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
-            fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
+            fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) logoutButton.getScene().getWindow();

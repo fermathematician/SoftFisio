@@ -3,18 +3,10 @@ package controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import models.Paciente;
 import services.ProntuarioService;
-import javafx.scene.control.DatePicker;
 import java.time.LocalDate;
 import com.jfoenix.controls.JFXDatePicker;
-import javafx.stage.Modality;
-import java.io.IOException;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import models.Avaliacao;
 import javafx.scene.web.HTMLEditor;
 

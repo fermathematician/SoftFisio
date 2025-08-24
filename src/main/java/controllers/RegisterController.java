@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import services.AuthServiceUsuario;
-import services.NavigationService;
+import ui.NavigationManager;
 
 public class RegisterController {
 
@@ -104,7 +104,7 @@ public class RegisterController {
     @FXML
     private void handleBackToLoginButtonAction() {
         try {
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) registerButton.getScene().getWindow();

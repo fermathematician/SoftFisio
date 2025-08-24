@@ -14,20 +14,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import com.jfoenix.controls.JFXDatePicker;
 
 import models.Paciente;
 import models.Sessao;
-import services.AlertFactory;
+import ui.AlertFactory;
+import ui.NavigationManager;
 import services.ProntuarioService;
-import javafx.stage.Modality;
-import java.time.LocalDate;
 
 public class TreatmentViewController {
 
@@ -44,11 +41,11 @@ public class TreatmentViewController {
     }
 
 
-public void initData(Paciente paciente, OnHistoryChangedListener listener) {
-    this.pacienteAtual = paciente;
-    this.historyListener = listener;
-    loadSessoes();
-}
+    public void initData(Paciente paciente, OnHistoryChangedListener listener) {
+        this.pacienteAtual = paciente;
+        this.historyListener = listener;
+        loadSessoes();
+    }
 
     public void loadSessoes() {
         sessionsVBox.getChildren().clear();
@@ -146,47 +143,50 @@ public void initData(Paciente paciente, OnHistoryChangedListener listener) {
     
 
     @FXML
-private void handleEdit(Sessao sessao) {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
-        Parent root = loader.load();
+    private void handleEdit(Sessao sessao) {
+        try {
+            String fxmlPath = "/static/formulario_sessao.fxml";
 
-        SessaoController controller = loader.getController();
-        controller.initData(sessao, pacienteAtual, historyListener);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
-        // --- LÓGICA DE NOVA JANELA ---
-        Stage stage = new Stage();
-        stage.setTitle("SoftFisio - Editar Sessão");
-        stage.setScene(new Scene(root, 1280, 720));
-        stage.initOwner(sessionsVBox.getScene().getWindow());
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.showAndWait();
+            URL fxmlUrl = getClass().getResource(fxmlPath);
 
-    } catch (IOException e) {
-        e.printStackTrace();
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent newPatient = loader.load();
+
+            SessaoController controller = loader.getController();
+            controller.initData(sessao, pacienteAtual, historyListener);
+
+            Stage stage = (Stage) novaSessaoButton.getScene().getWindow();
+            stage.setScene(new Scene(newPatient, 1280, 720));
+            stage.setTitle("SoftFisio - Editar Sessão");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
-@FXML
-private void handleNovaSessao() {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/formulario_sessao.fxml"));
-        Parent root = loader.load();
+    @FXML
+    private void handleNovaSessao() {
+        try {
+            String fxmlPath = "/static/formulario_sessao.fxml";
+            
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
-        SessaoController controller = loader.getController();
-        controller.initData(pacienteAtual, historyListener);
+            URL fxmlUrl = getClass().getResource(fxmlPath);
 
-        // --- LÓGICA DE NOVA JANELA ---
-        Stage stage = new Stage();
-        stage.setTitle("SoftFisio - Nova Sessão");
-        stage.setScene(new Scene(root, 1280, 720));
-        stage.initOwner(sessionsVBox.getScene().getWindow());
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.showAndWait();
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent newSession = loader.load();
 
-    } catch (IOException e) {
-        e.printStackTrace();
+            SessaoController cadastrarSessaoController = loader.getController();
+            cadastrarSessaoController.initData(pacienteAtual, historyListener);
+
+            Stage stage = (Stage) novaSessaoButton.getScene().getWindow();
+            stage.setScene(new Scene(newSession, 1280, 720));
+            stage.setTitle("SoftFisio - Nova Sessão");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
 }

@@ -13,10 +13,9 @@ import java.io.IOException;
 import java.net.URL;
 
 import models.Paciente;
-import services.AlertFactory; // Importa a nova classe
+import ui.AlertFactory; // Importa a nova classe
 import services.AuthServicePaciente;
-import services.NavigationService;
-import javafx.stage.Modality;
+import ui.NavigationManager;
 
 public class PatientCardController {
 
@@ -67,7 +66,7 @@ public class PatientCardController {
     private void handleViewRecord() {
         try {
             String fxmlPath = "/static/prontuario_view.fxml";
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 
@@ -119,29 +118,20 @@ public class PatientCardController {
 private void handleEdit() {
     try {
         String fxmlPath = "/static/formulario_paciente.fxml";
-        // Se você já renomeou os arquivos, use a linha abaixo:
-        // String fxmlPath = "/static/formulario_paciente.fxml";
         
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-        Parent root = loader.load();
-        
-        FormularioPacienteController controller = loader.getController();
-        // Se você já renomeou, o nome da classe será FormularioPacienteController
-        // FormularioPacienteController controller = loader.getController();
-        
-        controller.initData(this.paciente);
+        NavigationManager.getInstance().pushHistory(fxmlPath);
 
-        // --- LÓGICA DE NOVA JANELA ---
-        Stage stage = new Stage();
+        URL fxmlUrl = getClass().getResource(fxmlPath);
+
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        Parent editPatient = loader.load();
+
+        FormularioPacienteController cadastrarPacienteController = loader.getController();
+        cadastrarPacienteController.initData(this.paciente);
+
+        Stage stage = (Stage) editButton.getScene().getWindow();
+        stage.setScene(new Scene(editPatient, 1280, 720));
         stage.setTitle("SoftFisio - Editar Paciente");
-        stage.setScene(new Scene(root, 1280, 720));
-        
-        // Configura a nova janela para ser um "modal" (bloqueia a janela de trás)
-        stage.initOwner(editButton.getScene().getWindow());
-        stage.initModality(Modality.WINDOW_MODAL);
-        
-        // Remove a necessidade do NavigationService aqui, pois a janela apenas fecha
-        stage.showAndWait();
 
     } catch (IOException e) {
         e.printStackTrace();

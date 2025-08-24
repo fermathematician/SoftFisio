@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane; // Import adicionado
+import javafx.scene.control.ScrollPane; 
 import javafx.scene.control.TextField; 
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -21,13 +21,11 @@ import java.util.List;
 import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;
-import services.NavigationService;
+import ui.NavigationManager;
 import services.SessaoUsuario;
-import javafx.stage.Modality;
 
 public class MainViewController implements PatientCardController.OnPatientDeletedListener {
 
-    // MODIFICAÇÃO: Adicionados FXML Fields para o ScrollPane e o Label da mensagem
     @FXML private ScrollPane scrollPane;
     @FXML private Label emptyMessageLabel;
 
@@ -148,7 +146,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         try {
             String fxmlPath = "/static/pacientes_corrida.fxml";
 
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             Parent corridaView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) pacienteCorridaButton.getScene().getWindow();
@@ -157,46 +155,38 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         } catch (IOException e) {
             System.err.println("Erro ao carregar a tela de pacientes de corrida. Verifique se o arquivo 'pacientes_corrida.fxml' existe.");
             e.printStackTrace();
-        }
+        }    
     }
 
     @FXML
     private void handleNewPatient() {
         try {
             String fxmlPath = "/static/formulario_paciente.fxml";
-            // Se você já renomeou os arquivos, use a linha abaixo:
-            // String fxmlPath = "/static/formulario_paciente.fxml";
-            
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
-            
-            FormularioPacienteController controller = loader.getController();
-            // Se você já renomeou, o nome da classe será FormularioPacienteController
-            // FormularioPacienteController controller = loader.getController();
-            
-            controller.initData();
+           
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
-            // --- LÓGICA DE NOVA JANELA ---
-            Stage stage = new Stage();
+            URL fxmlUrl = getClass().getResource(fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent newPatient = loader.load();
+
+            FormularioPacienteController cadastrarPacienteController = loader.getController();
+            cadastrarPacienteController.initData();
+
+            Stage stage = (Stage) newPatientButton.getScene().getWindow();
+            stage.setScene(new Scene(newPatient, 1280, 720));
             stage.setTitle("SoftFisio - Cadastrar Paciente");
-            stage.setScene(new Scene(root, 1280, 720));
-
-            stage.initOwner(newPatientButton.getScene().getWindow());
-            stage.initModality(Modality.WINDOW_MODAL);
-            
-            // Remove a necessidade do NavigationService aqui
-            stage.showAndWait();
             
         } catch (IOException e) {
             e.printStackTrace();
         }
-}
+    }
 
     @FXML
     private void handleLogout() {
         SessaoUsuario.getInstance().logout();
         try {   
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) logoutButton.getScene().getWindow();
@@ -209,7 +199,6 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     
     @Override
     public void onPatientDeleted(Paciente paciente) {
-        // O loadPatients() já é chamado, e ele por sua vez chama updateViewVisibility()
         loadPatients();
     }
 }

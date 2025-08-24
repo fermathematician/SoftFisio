@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import services.SessaoUsuario;
 import services.AuthServiceUsuario;
-import services.NavigationService;
+import ui.NavigationManager;
 
 public class LoginController {
 
@@ -94,7 +94,7 @@ public class LoginController {
             try {
                 String fxmlPath = "/static/main_view.fxml";
 
-                NavigationService.getInstance().pushHistory(fxmlPath);
+                NavigationManager.getInstance().pushHistory(fxmlPath);
 
                 Parent mainView = FXMLLoader.load(getClass().getResource(fxmlPath));
                 Stage stage = (Stage) loginButton.getScene().getWindow();
@@ -117,7 +117,7 @@ public class LoginController {
         try {
             String fxmlPath = "/static/register.fxml";
 
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             Parent RegisterView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) loginField.getScene().getWindow();
