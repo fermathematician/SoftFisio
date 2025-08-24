@@ -21,7 +21,7 @@ import java.util.List;
 import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;
-import services.NavigationService;
+import ui.NavigationManager;
 import services.SessaoUsuario;
 
 public class MainViewController implements PatientCardController.OnPatientDeletedListener {
@@ -146,7 +146,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         try {
             String fxmlPath = "/static/pacientes_corrida.fxml";
 
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             Parent corridaView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) pacienteCorridaButton.getScene().getWindow();
@@ -163,7 +163,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
         try {
             String fxmlPath = "/static/formulario_paciente.fxml";
            
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 
@@ -186,7 +186,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
     private void handleLogout() {
         SessaoUsuario.getInstance().logout();
         try {   
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) logoutButton.getScene().getWindow();

@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.net.URL;
 
 import models.Paciente;
-import services.AlertFactory; // Importa a nova classe
+import ui.AlertFactory; // Importa a nova classe
 import services.AuthServicePaciente;
-import services.NavigationService;
+import ui.NavigationManager;
 
 public class PatientCardController {
 
@@ -66,7 +66,7 @@ public class PatientCardController {
     private void handleViewRecord() {
         try {
             String fxmlPath = "/static/prontuario_view.fxml";
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 
@@ -119,7 +119,7 @@ private void handleEdit() {
     try {
         String fxmlPath = "/static/formulario_paciente.fxml";
         
-        NavigationService.getInstance().pushHistory(fxmlPath);
+        NavigationManager.getInstance().pushHistory(fxmlPath);
 
         URL fxmlUrl = getClass().getResource(fxmlPath);
 

@@ -45,8 +45,8 @@ import models.HistoricoItem;
 import models.Paciente;
 import models.Sessao;
 import models.Usuario;
-import services.AlertFactory; // <<--- IMPORT ADICIONADO
-import services.NavigationService;
+import ui.AlertFactory; 
+import ui.NavigationManager;
 import services.ProntuarioService;
 import services.SessaoUsuario;
 import javafx.scene.control.TabPane;
@@ -107,7 +107,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML
     private void handleBackButton() {
         try {
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
             Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(new Scene(patientsView, 1280, 720));
@@ -283,7 +283,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
      try {
             String fxmlPath = "/static/formulario_sessao.fxml";
 
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 

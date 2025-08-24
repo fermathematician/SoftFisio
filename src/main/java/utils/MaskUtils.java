@@ -1,11 +1,11 @@
-package services;
+package utils;
 
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 
 import java.util.function.UnaryOperator;
 
-public class MaskService {
+public class MaskUtils {
 
     /**
      * Aplica uma máscara de CPF (xxx.xxx.xxx-xx) a um TextField.

@@ -18,8 +18,8 @@ import javafx.stage.Stage;
 
 import models.Paciente;
 import services.AuthServicePaciente;
-import services.MaskService;
-import services.NavigationService;
+import utils.MaskUtils;
+import ui.NavigationManager;
 import services.SessaoUsuario;
 
 public class FormularioPacienteController {
@@ -44,9 +44,8 @@ public class FormularioPacienteController {
         saveButton.setDefaultButton(true);
         genderComboBox.setItems(FXCollections.observableArrayList("Feminino", "Masculino", "Outro"));
 
-        // MODIFICAÇÃO: Aplica as máscaras aos campos de texto
-        MaskService.applyCpfMask(cpfField);
-        MaskService.applyPhoneMask(phoneField);
+        MaskUtils.applyCpfMask(cpfField);
+        MaskUtils.applyPhoneMask(phoneField);
     }
 
     public void initData(Paciente paciente) {
@@ -117,7 +116,7 @@ public class FormularioPacienteController {
     @FXML
     private void handleCancel() {
         try {
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) cancelButton.getScene().getWindow();

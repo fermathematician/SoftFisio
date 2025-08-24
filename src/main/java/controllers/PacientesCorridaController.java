@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane; // Import adicionado
+import javafx.scene.control.ScrollPane; 
 import javafx.scene.control.TextField; 
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -21,7 +21,7 @@ import java.util.List;
 import db.PacienteDAO;
 import models.Paciente;
 import models.Usuario;
-import services.NavigationService;
+import ui.NavigationManager;
 import services.SessaoUsuario;
 
 public class PacientesCorridaController implements PatientCardController.OnPatientDeletedListener {
@@ -146,7 +146,7 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
     @FXML
     private void handleVerComuns() {
         try {
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent mainView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) verComunsButton.getScene().getWindow();
@@ -163,7 +163,7 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
         try {
             String fxmlPath = "/static/formulario_paciente.fxml";
            
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 
@@ -186,8 +186,8 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
     private void handleLogout() {
         SessaoUsuario.getInstance().logout();
         try {   
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
-            fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
+            fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) logoutButton.getScene().getWindow();

@@ -11,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import models.Paciente;
 import models.Sessao;
-import services.NavigationService;
+import ui.NavigationManager;
 import services.ProntuarioService;
 
 import com.jfoenix.controls.JFXDatePicker;
@@ -79,7 +79,7 @@ public class SessaoController {
     @FXML
     public void handleBackButton() {
         try {
-            String fxmlPath = NavigationService.getInstance().getPreviousPage();
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 

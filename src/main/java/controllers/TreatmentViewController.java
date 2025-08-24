@@ -22,8 +22,8 @@ import javafx.stage.Stage;
 
 import models.Paciente;
 import models.Sessao;
-import services.AlertFactory;
-import services.NavigationService;
+import ui.AlertFactory;
+import ui.NavigationManager;
 import services.ProntuarioService;
 
 public class TreatmentViewController {
@@ -147,7 +147,7 @@ public class TreatmentViewController {
         try {
             String fxmlPath = "/static/formulario_sessao.fxml";
 
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 
@@ -171,7 +171,7 @@ public class TreatmentViewController {
         try {
             String fxmlPath = "/static/formulario_sessao.fxml";
             
-            NavigationService.getInstance().pushHistory(fxmlPath);
+            NavigationManager.getInstance().pushHistory(fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
 

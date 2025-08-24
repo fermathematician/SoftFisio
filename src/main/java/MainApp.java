@@ -4,7 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import services.NavigationService; 
+import ui.NavigationManager; 
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,7 +18,7 @@ public class MainApp extends Application {
 
         String initialFxmlPath = "/static/login.fxml";
 
-        NavigationService.getInstance().startHistoryWith(initialFxmlPath);
+        NavigationManager.getInstance().startHistoryWith(initialFxmlPath);
 
         try {
             URL fxmlUrl = getClass().getResource(initialFxmlPath);
