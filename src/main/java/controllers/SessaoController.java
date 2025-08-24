@@ -27,8 +27,8 @@ public class SessaoController {
     @FXML private Label sessionInfoLabel;
     @FXML private HTMLEditor evolutionEditor;
     @FXML private Label mensagemLabel;
-    // Adicione esta linha junto aos outros @FXML
     @FXML private JFXDatePicker dataSessaoPicker;
+    @FXML private Label sessionTitle;
 
     private Sessao sessao;
     private Paciente paciente;
@@ -50,6 +50,8 @@ public class SessaoController {
         patientNameLabel.setText(paciente.getNomeCompleto());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy");
         sessionInfoLabel.setText("Editando " + sessao.getDataSessao().format(formatter));
+
+        sessionTitle.setText("Editar Sessão");
 
         // Ponto principal: preenche os campos com os dados existentes
         dataSessaoPicker.setValue(sessao.getDataSessao()); // Preenche a data

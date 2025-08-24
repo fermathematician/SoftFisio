@@ -35,7 +35,7 @@
             <children>
                 <VBox maxWidth="800.0" spacing="10.0" styleClass="patient-card">
                     <children>
-                        <Label styleClass="card-title" text="Editar Sessão" />
+                        <Label  fx:id="sessionTitle"  styleClass="card-title" text="Criar Sessão" />
 
                         <VBox spacing="5.0">
                             <children>
