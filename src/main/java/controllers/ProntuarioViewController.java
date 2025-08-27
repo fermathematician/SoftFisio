@@ -20,16 +20,14 @@ import com.itextpdf.layout.properties.TextAlignment;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -207,51 +205,78 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     }
     
     private void carregarAnexos() {
+        // 1. Limpa a tela
         anexosTilePane.getChildren().clear();
+
+        // 2. Instancia o serviço e busca os dados (seu padrão)
         ProntuarioService service = new ProntuarioService();
         List<Anexo> anexos = service.getAnexos(pacienteAtual.getId());
 
+        // 3. Itera sobre a lista, carrega o FXML do card e o configura
         for (Anexo anexo : anexos) {
-            VBox cardAnexo = new VBox(5);
-            cardAnexo.getStyleClass().add("patient-card");
-            cardAnexo.setPadding(new Insets(10));
-            cardAnexo.setPrefWidth(220);
-            cardAnexo.setAlignment(Pos.CENTER);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/anexo_card.fxml")); // Verifique o caminho
+                Node anexoCardNode = loader.load();
 
-            if (anexo.getTipoMidia().equalsIgnoreCase("FOTO")) {
-                try {
-                    File file = new File(anexo.getCaminhoArquivo());
-                    Image image = new Image(file.toURI().toString());
-                    ImageView imageView = new ImageView(image);
-                    imageView.setFitHeight(150);
-                    imageView.setFitWidth(200);
-                    imageView.setPreserveRatio(true);
-                    imageView.setOnMouseClicked(event -> abrirVisualizador(anexo));
-                    cardAnexo.getChildren().add(imageView);
-                } catch (Exception e) {
-                    Label erroLabel = new Label("Erro ao carregar imagem");
-                    cardAnexo.getChildren().add(erroLabel);
-                    e.printStackTrace();
-                }
-            } else if (anexo.getTipoMidia().equalsIgnoreCase("VIDEO")) {
-                Region videoIcon = new Region();
-                videoIcon.getStyleClass().add("video-icon");
-                videoIcon.setPrefSize(200, 150);
-                videoIcon.setOnMouseClicked(event -> abrirVisualizador(anexo));
-                cardAnexo.getChildren().add(videoIcon);
+                AnexoCardController cardController = loader.getController();
+
+                // Popula o card com os dados. O controller agora sabe como se exibir.
+                cardController.setData(anexo);
+
+                // Configura o que fazer ao clicar em DELETAR
+                cardController.setDeleteHandler(anexoParaDeletar -> {
+                    handleDeletarAnexo(anexoParaDeletar, anexoCardNode);
+                });
+
+                // Configura o que fazer ao clicar em VISUALIZAR (no card em si)
+                cardController.setViewHandler(anexoParaVisualizar -> {
+                    abrirVisualizador(anexoParaVisualizar);
+                });
+
+                // Adiciona o card pronto à tela
+                anexosTilePane.getChildren().add(anexoCardNode);
+
+            } catch (IOException e) {
+                System.err.println("Erro ao carregar o FXML do card de anexo: " + e.getMessage());
+                e.printStackTrace();
             }
-
-            Label nomeArquivo = new Label(new File(anexo.getCaminhoArquivo()).getName());
-            nomeArquivo.setStyle("-fx-font-weight: bold;");
-            nomeArquivo.setWrapText(true);
-            Label descricao = new Label(anexo.getDescricao());
-            descricao.setWrapText(true);
-            cardAnexo.getChildren().addAll(new Separator(), nomeArquivo, descricao);
-            anexosTilePane.getChildren().add(cardAnexo);
         }
-        
+
+        // 4. Atualiza a visibilidade da UI
         updateAnexosVisibility();
     }
+
+    
+    private void handleDeletarAnexo(Anexo anexo, Node cardNode) {
+        String nomeArquivo = new File(anexo.getCaminhoArquivo()).getName();
+
+        AlertFactory.showConfirmation(
+            "Confirmar Exclusão",
+            "Deseja realmente deletar o anexo '" + nomeArquivo + "'?",
+            "Esta ação é permanente e não pode ser desfeita.",
+            () -> { // Ação a ser executada no "OK"
+                
+                // 1. Crie uma instância do serviço aqui
+                ProntuarioService service = new ProntuarioService();
+
+                // 2. Chame o método e guarde o resultado (que é uma String)
+                String resultado = service.deletarAnexo(anexo.getId());
+
+                // 3. Verifique se a string de resultado está vazia (indicando sucesso)
+                if (resultado.isEmpty()) {
+                    // Se a exclusão no banco for bem-sucedida, remove o card da tela
+                    anexosTilePane.getChildren().remove(cardNode);
+                    // Atualiza a visibilidade, caso este fosse o último anexo
+                    updateAnexosVisibility();
+                } else {
+                    // Se a string não estiver vazia, ela contém a mensagem de erro
+                    AlertFactory.showError("Erro", "Ocorreu um erro ao tentar deletar o anexo: " + resultado);
+                }
+            }
+        );
+    }
+
+
 
     private void updateAnexosVisibility() {
         boolean isEmpty = anexosTilePane.getChildren().isEmpty();

@@ -12,7 +12,6 @@ import exceptions.DataIntegrityException;
 
 public class AvaliacaoDAO {
 
-    // QUERIES SQL CENTRALIZADAS
     private static final String SAVE_SQL = "INSERT INTO avaliacoes(id_paciente, data_avaliacao, queixa_principal, historico_doenca_atual, exames_fisicos, diagnostico_fisioterapeutico, plano_tratamento) VALUES(?, ?, ?, ?, ?, ?, ?)";
     private static final String FIND_BY_PACIENTE_ID_SQL = "SELECT * FROM avaliacoes WHERE id_paciente = ? ORDER BY data_avaliacao DESC";
     private static final String DELETE_SQL = "DELETE FROM avaliacoes WHERE id_avaliacao = ?";
