@@ -50,6 +50,7 @@ import ui.NavigationManager;
 import services.ProntuarioService;
 import services.SessaoUsuario;
 import javafx.scene.control.TabPane;
+import javafx.scene.web.WebView;
 
 public class ProntuarioViewController implements OnHistoryChangedListener {
 
@@ -161,22 +162,29 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         card.getChildren().addAll(header, new Separator());
 
         if (item instanceof Sessao) {
-            Sessao sessao = (Sessao) item;
-            deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
-            Label conteudo = new Label(sessao.getEvolucaoTexto());
-            conteudo.setWrapText(true);
-            card.getChildren().add(conteudo);
-        } else if (item instanceof Avaliacao) {
-            Avaliacao avaliacao = (Avaliacao) item;
-            deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
-            VBox detalhesAvaliacao = new VBox(8);
-            detalhesAvaliacao.getChildren().add(createCampo("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-            detalhesAvaliacao.getChildren().add(createCampo("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-            detalhesAvaliacao.getChildren().add(createCampo("Exames Físicos:", avaliacao.getExamesFisicos()));
-            detalhesAvaliacao.getChildren().add(createCampo("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
-            detalhesAvaliacao.getChildren().add(createCampo("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
-            card.getChildren().add(detalhesAvaliacao);
-        }
+    Sessao sessao = (Sessao) item;
+    deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
+
+    // Cria um WebView para a evolução da sessão
+    WebView webView = new WebView();
+    webView.getEngine().loadContent(sessao.getEvolucaoTexto());
+    webView.setPrefHeight(150); // Altura preferencial para o conteúdo
+    card.getChildren().add(webView);
+
+} else if (item instanceof Avaliacao) {
+    Avaliacao avaliacao = (Avaliacao) item;
+    deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
+
+    // Cria um VBox para organizar os campos da avaliação
+    VBox detalhesAvaliacao = new VBox(8);
+detalhesAvaliacao.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+detalhesAvaliacao.getChildren().add(createCampoWebView("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
+detalhesAvaliacao.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
+detalhesAvaliacao.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+detalhesAvaliacao.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+
+card.getChildren().add(detalhesAvaliacao);
+}
 
         Region vSpacer = new Region();
         VBox.setVgrow(vSpacer, Priority.ALWAYS);
@@ -492,4 +500,22 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             System.out.println("Geração de PDF cancelada pelo usuário.");
         }
     }
+
+   private VBox createCampoWebView(String titulo, String htmlContent) {
+    VBox campo = new VBox(2);
+    Label tituloLabel = new Label(titulo);
+    tituloLabel.setStyle("-fx-font-weight: bold;");
+
+    WebView webView = new WebView();
+
+    // Se o conteúdo for nulo ou vazio, carrega uma página em branco.
+    // Senão, carrega o conteúdo.
+    String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) ? "" : htmlContent;
+    webView.getEngine().loadContent(contentToShow);
+
+    webView.setPrefHeight(75); // Altura padrão para cada campo
+
+    campo.getChildren().addAll(tituloLabel, webView);
+    return campo; // <-- SEMPRE retorna um VBox válido
+}
 }

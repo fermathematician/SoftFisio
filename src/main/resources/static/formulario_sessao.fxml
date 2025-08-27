@@ -47,7 +47,7 @@
                             </VBox.margin>
                         </VBox>
 
-                        <HTMLEditor fx:id="evolutionEditor" prefHeight="350.0" />
+                        <StackPane fx:id="evolutionPlaceholder" prefHeight="350.0" />
                         
                         <HBox alignment="CENTER_RIGHT">
                             <children>
