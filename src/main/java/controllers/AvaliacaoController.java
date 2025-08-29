@@ -6,6 +6,8 @@ import javafx.scene.control.Label;
 import models.Paciente;
 import services.ProntuarioService;
 import java.time.LocalDate;
+import javafx.scene.layout.StackPane;
+
 import com.jfoenix.controls.JFXDatePicker;
 import models.Avaliacao;
 import javafx.scene.web.HTMLEditor;
@@ -13,37 +15,54 @@ import javafx.scene.web.HTMLEditor;
 
 public class AvaliacaoController {
     @FXML private Label mensagemLabel;
-    @FXML private HTMLEditor queixaPrincipalEditor;
-    @FXML private HTMLEditor hdaEditor;
-    @FXML private HTMLEditor examesFisicosEditor;
-    @FXML private HTMLEditor diagnosticoEditor;
-    @FXML private HTMLEditor planoTratamentoEditor;
+    @FXML private StackPane examesFisicosPlaceholder;
+    @FXML private StackPane diagnosticoPlaceholder;
+    @FXML private StackPane planoTratamentoPlaceholder;
+    @FXML private StackPane queixaPrincipalPlaceholder;
+    @FXML private StackPane hdaPlaceholder;
     @FXML private Button salvarButton;
     @FXML private JFXDatePicker dataAvaliacaoPicker;
+    private HTMLEditor queixaPrincipalEditor;
+    private HTMLEditor hdaEditor;
+    private HTMLEditor examesFisicosEditor;
+    private HTMLEditor diagnosticoEditor;  
+    private HTMLEditor planoTratamentoEditor;
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
     private OnHistoryChangedListener historyListener;
     private Avaliacao avaliacaoParaEditar;
 
+
+
     public AvaliacaoController() {
         this.prontuarioService = new ProntuarioService();
     }
 
-    // Este método substitui o initData
-    public void configureParaCriacao(Paciente paciente, OnHistoryChangedListener listener) {
-        this.pacienteAtual = paciente;
-        this.historyListener = listener;
-        this.avaliacaoParaEditar = null; // Garante que estamos no modo de criação
+  public void configureParaCriacao(Paciente paciente, OnHistoryChangedListener listener) {
+      inicializarEditores(); 
+      this.pacienteAtual = paciente;
+      this.historyListener = listener;
+      this.avaliacaoParaEditar = null; // Garante que estamos no modo de criação
 
-        // Configura a UI
-        salvarButton.setText("Salvar Avaliação");
-        limparCampos(); // Limpa e reseta o formulário
-    }
+      // Configura a UI
+      salvarButton.setText("Salvar Avaliação");
+      limparCampos(); // Limpa e reseta o formulário
+  }
+
+public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
+    this.pacienteAtual = paciente;
+    this.historyListener = listener;
+    this.avaliacaoParaEditar = avaliacao; // Define o objeto a ser editado
+    inicializarEditores(); 
+
+    // Configura a UI
+    salvarButton.setText("Salvar Alterações");
 
     public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
         this.pacienteAtual = paciente;
         this.historyListener = listener;
         this.avaliacaoParaEditar = avaliacao; // Define o objeto a ser editado
+        inicializarEditores(); 
 
         // Configura a UI
         salvarButton.setText("Salvar Alterações");
@@ -112,4 +131,25 @@ public class AvaliacaoController {
         diagnosticoEditor.setHtmlText("");
         planoTratamentoEditor.setHtmlText("");
     }
+  
+  private void inicializarEditores() {
+
+      // Usa o "carregamento lento": só cria os editores se eles ainda não existirem.
+      if (queixaPrincipalEditor == null) {
+          queixaPrincipalEditor = new HTMLEditor();
+          queixaPrincipalPlaceholder.getChildren().add(queixaPrincipalEditor);
+
+          hdaEditor = new HTMLEditor();
+          hdaPlaceholder.getChildren().add(hdaEditor);
+
+          examesFisicosEditor = new HTMLEditor();
+          examesFisicosPlaceholder.getChildren().add(examesFisicosEditor);
+
+          diagnosticoEditor = new HTMLEditor();
+          diagnosticoPlaceholder.getChildren().add(diagnosticoEditor);
+
+          planoTratamentoEditor = new HTMLEditor();
+          planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
+      }
+  }
 }

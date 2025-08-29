@@ -25,6 +25,7 @@ import models.Sessao;
 import ui.AlertFactory;
 import ui.NavigationManager;
 import services.ProntuarioService;
+import javafx.scene.web.WebView;
 
 public class TreatmentViewController {
 
@@ -88,8 +89,12 @@ public class TreatmentViewController {
         Separator separator = new Separator();
         separator.setPadding(new Insets(10, 0, 5, 0));
 
-        Label evolutionLabel = new Label(sessao.getEvolucaoTexto());
-        evolutionLabel.setWrapText(true);
+        // Cria um WebView para renderizar o HTML
+        WebView webView = new WebView();
+// Carrega o conteúdo HTML salvo no banco
+        webView.getEngine().loadContent(sessao.getEvolucaoTexto());
+// Ajusta a altura máxima para não ocupar muito espaço
+        webView.setMaxHeight(150);
 
         HBox bottomBar = new HBox();
         bottomBar.setAlignment(Pos.CENTER_RIGHT);
@@ -100,7 +105,7 @@ public class TreatmentViewController {
         editButton.setOnAction(event -> handleEdit(sessao));
         bottomBar.getChildren().add(editButton);
 
-        card.getChildren().addAll(topBar, separator, evolutionLabel);
+        card.getChildren().addAll(topBar, separator, webView);
 
         if (sessao.getObservacoesSessao() != null && !sessao.getObservacoesSessao().isEmpty()) {
             Label obsLabelTitle = new Label("Observações:");
