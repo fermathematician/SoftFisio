@@ -15,7 +15,10 @@ public class AvaliacaoDAO {
     private static final String SAVE_SQL = "INSERT INTO avaliacoes(id_paciente, data_avaliacao, queixa_principal, historico_doenca_atual, exames_fisicos, diagnostico_fisioterapeutico, plano_tratamento) VALUES(?, ?, ?, ?, ?, ?, ?)";
     private static final String FIND_BY_PACIENTE_ID_SQL = "SELECT * FROM avaliacoes WHERE id_paciente = ? ORDER BY data_avaliacao DESC";
     private static final String DELETE_SQL = "DELETE FROM avaliacoes WHERE id_avaliacao = ?";
-    private static final String UPDATE_SQL = "UPDATE avaliacoes SET queixa_principal = ?, historico_doenca_atual = ?, exames_fisicos = ?, diagnostico_fisioterapeutico = ?, plano_tratamento = ? WHERE id_avaliacao = ?";
+    
+    // CORRIGIDO: Adicionado "data_avaliacao = ?" para um total de 7 interrogações '?'
+    private static final String UPDATE_SQL = "UPDATE avaliacoes SET data_avaliacao = ?, queixa_principal = ?, historico_doenca_atual = ?, exames_fisicos = ?, diagnostico_fisioterapeutico = ?, plano_tratamento = ? WHERE id_avaliacao = ?";
+    
     private static final String FIND_BY_ID_SQL = "SELECT * FROM avaliacoes WHERE id_avaliacao = ?";
     
     public boolean save(Avaliacao avaliacao) {
@@ -23,7 +26,8 @@ public class AvaliacaoDAO {
             PreparedStatement pstmt = conn.prepareStatement(SAVE_SQL)) {
 
             pstmt.setInt(1, avaliacao.getIdPaciente());
-            pstmt.setString(2, avaliacao.getDataAvaliacao().toString()); // Alterado
+            // Para colunas TEXT, usar toString() é aceitável.
+            pstmt.setString(2, avaliacao.getDataAvaliacao().toString()); 
             pstmt.setString(3, avaliacao.getQueixaPrincipal());
             pstmt.setString(4, avaliacao.getHistoricoDoencaAtual());
             pstmt.setString(5, avaliacao.getExamesFisicos());
@@ -49,7 +53,7 @@ public class AvaliacaoDAO {
                 avaliacoes.add(new Avaliacao(
                     rs.getInt("id_avaliacao"),
                     rs.getInt("id_paciente"),
-                    LocalDate.parse(rs.getString("data_avaliacao")), // Alterado
+                    LocalDate.parse(rs.getString("data_avaliacao")),
                     rs.getString("queixa_principal"),
                     rs.getString("historico_doenca_atual"),
                     rs.getString("exames_fisicos"),
@@ -63,16 +67,12 @@ public class AvaliacaoDAO {
         return avaliacoes;
     }
 
-    // Em AvaliacaoDAO.java
-
-    
     public boolean delete(int idAvaliacao) {
         try (Connection conn = DatabaseManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(DELETE_SQL)) {
             pstmt.setInt(1, idAvaliacao);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            // Verifica se o erro é de violação de chave estrangeira (ex: anexo vinculado)
             if (e.getMessage().contains("FOREIGN KEY constraint failed")) {
                 throw new DataIntegrityException("Não é possível excluir a avaliação, pois ela possui anexos vinculados.");
             }
@@ -81,17 +81,24 @@ public class AvaliacaoDAO {
         }
     }
 
+    // CORRIGIDO: Método update completo e funcional
     public boolean update(Avaliacao avaliacao) {
         try (Connection conn = DatabaseManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(UPDATE_SQL)) {
-            // A data da avaliação não é alterada na edição, apenas o conteúdo.
-            // Mas se fosse, seria: pstmt.setString(1, avaliacao.getDataAvaliacao().toString());
-            pstmt.setString(1, avaliacao.getQueixaPrincipal());
-            pstmt.setString(2, avaliacao.getHistoricoDoencaAtual());
-            pstmt.setString(3, avaliacao.getExamesFisicos());
-            pstmt.setString(4, avaliacao.getDiagnosticoFisioterapeutico());
-            pstmt.setString(5, avaliacao.getPlanoTratamento());
-            pstmt.setInt(6, avaliacao.getId());
+            
+            // Parâmetro 1: data_avaliacao
+            pstmt.setString(1, avaliacao.getDataAvaliacao().toString());
+
+            // Parâmetros 2 a 6: campos de texto
+            pstmt.setString(2, avaliacao.getQueixaPrincipal());
+            pstmt.setString(3, avaliacao.getHistoricoDoencaAtual());
+            pstmt.setString(4, avaliacao.getExamesFisicos());
+            pstmt.setString(5, avaliacao.getDiagnosticoFisioterapeutico());
+            pstmt.setString(6, avaliacao.getPlanoTratamento());
+            
+            // Parâmetro 7: id_avaliacao para a cláusula WHERE
+            pstmt.setInt(7, avaliacao.getId());
+            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar avaliação: " + e.getMessage());
@@ -109,7 +116,7 @@ public class AvaliacaoDAO {
                 avaliacao = new Avaliacao(
                     rs.getInt("id_avaliacao"),
                     rs.getInt("id_paciente"),
-                    LocalDate.parse(rs.getString("data_avaliacao")), // Alterado
+                    LocalDate.parse(rs.getString("data_avaliacao")),
                     rs.getString("queixa_principal"),
                     rs.getString("historico_doenca_atual"),
                     rs.getString("exames_fisicos"),

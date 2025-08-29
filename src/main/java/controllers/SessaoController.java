@@ -13,7 +13,7 @@ import models.Paciente;
 import models.Sessao;
 import ui.NavigationManager;
 import services.ProntuarioService;
-
+import javafx.scene.layout.StackPane;
 import com.jfoenix.controls.JFXDatePicker;
 
 import java.io.IOException;
@@ -25,15 +25,18 @@ public class SessaoController {
     @FXML private Label patientNameLabel;
     @FXML private Button backButton;
     @FXML private Label sessionInfoLabel;
-    @FXML private HTMLEditor evolutionEditor;
+    @FXML private StackPane evolutionPlaceholder;
     @FXML private Label mensagemLabel;
     @FXML private JFXDatePicker dataSessaoPicker;
     @FXML private Label sessionTitle;
+    
 
     private Sessao sessao;
     private Paciente paciente;
     private OnHistoryChangedListener historyListener;
     private ProntuarioService prontuarioService;
+    private HTMLEditor evolutionEditor;
+
 
     /**
      * Método para receber os dados da tela anterior.
@@ -45,6 +48,7 @@ public class SessaoController {
         this.sessao = sessao;
         this.paciente = paciente;
         this.historyListener = listener; // Linha adicionada
+        inicializarEditor(); 
 
         // Preenche o cabeçalho
         patientNameLabel.setText(paciente.getNomeCompleto());
@@ -62,6 +66,7 @@ public class SessaoController {
         this.sessao = null;
         this.paciente = paciente;
         this.historyListener = listener;
+        inicializarEditor(); 
 
         patientNameLabel.setText(paciente.getNomeCompleto());
         sessionInfoLabel.setText("Cadastrar Nova Sessão");
@@ -137,4 +142,11 @@ public class SessaoController {
             mensagemLabel.setStyle("-fx-text-fill: red;");
         }
     }
+
+    private void inicializarEditor() {
+    if (evolutionEditor == null) {
+        evolutionEditor = new HTMLEditor();
+        evolutionPlaceholder.getChildren().add(evolutionEditor);
+    }
+}
 }
