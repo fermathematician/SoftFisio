@@ -49,15 +49,6 @@ public class AvaliacaoController {
       limparCampos(); // Limpa e reseta o formulário
   }
 
-public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
-    this.pacienteAtual = paciente;
-    this.historyListener = listener;
-    this.avaliacaoParaEditar = avaliacao; // Define o objeto a ser editado
-    inicializarEditores(); 
-
-    // Configura a UI
-    salvarButton.setText("Salvar Alterações");
-
     public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
         this.pacienteAtual = paciente;
         this.historyListener = listener;
