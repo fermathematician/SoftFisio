@@ -38,17 +38,16 @@ public class AvaliacaoController {
         this.prontuarioService = new ProntuarioService();
     }
 
-    // Este método substitui o initData
-public void configureParaCriacao(Paciente paciente, OnHistoryChangedListener listener) {
-    inicializarEditores(); 
-    this.pacienteAtual = paciente;
-    this.historyListener = listener;
-    this.avaliacaoParaEditar = null; // Garante que estamos no modo de criação
+  public void configureParaCriacao(Paciente paciente, OnHistoryChangedListener listener) {
+      inicializarEditores(); 
+      this.pacienteAtual = paciente;
+      this.historyListener = listener;
+      this.avaliacaoParaEditar = null; // Garante que estamos no modo de criação
 
-    // Configura a UI
-    salvarButton.setText("Salvar Avaliação");
-    limparCampos(); // Limpa e reseta o formulário
-}
+      // Configura a UI
+      salvarButton.setText("Salvar Avaliação");
+      limparCampos(); // Limpa e reseta o formulário
+  }
 
 public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
     this.pacienteAtual = paciente;
@@ -59,14 +58,23 @@ public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistor
     // Configura a UI
     salvarButton.setText("Salvar Alterações");
 
-    // Preenche o formulário com os dados da avaliação
-    dataAvaliacaoPicker.setValue(avaliacao.getDataAvaliacao());
-    queixaPrincipalEditor.setHtmlText(avaliacao.getQueixaPrincipal());
-    hdaEditor.setHtmlText(avaliacao.getHistoricoDoencaAtual());
-    examesFisicosEditor.setHtmlText(avaliacao.getExamesFisicos());
-    diagnosticoEditor.setHtmlText(avaliacao.getDiagnosticoFisioterapeutico());
-    planoTratamentoEditor.setHtmlText(avaliacao.getPlanoTratamento());
-}
+    public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
+        this.pacienteAtual = paciente;
+        this.historyListener = listener;
+        this.avaliacaoParaEditar = avaliacao; // Define o objeto a ser editado
+        inicializarEditores(); 
+
+        // Configura a UI
+        salvarButton.setText("Salvar Alterações");
+
+        // Preenche o formulário com os dados da avaliação
+        dataAvaliacaoPicker.setValue(avaliacao.getDataAvaliacao());
+        queixaPrincipalEditor.setHtmlText(avaliacao.getQueixaPrincipal());
+        hdaEditor.setHtmlText(avaliacao.getHistoricoDoencaAtual());
+        examesFisicosEditor.setHtmlText(avaliacao.getExamesFisicos());
+        diagnosticoEditor.setHtmlText(avaliacao.getDiagnosticoFisioterapeutico());
+        planoTratamentoEditor.setHtmlText(avaliacao.getPlanoTratamento());
+    }
 
     private void setMensagem(String mensagem, boolean isError) {
         mensagemLabel.setText(mensagem);
@@ -79,71 +87,69 @@ public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistor
         }
     }
 
-@FXML
-private void handleSalvarAvaliacao() {
-    if (pacienteAtual == null) {
-        setMensagem("Erro: Paciente não carregado.", true);
-        return;
-    }
-
-    LocalDate data = dataAvaliacaoPicker.getValue();
-    String queixa = queixaPrincipalEditor.getHtmlText();
-    String hda = hdaEditor.getHtmlText();
-    String exames = examesFisicosEditor.getHtmlText();
-    String diagnostico = diagnosticoEditor.getHtmlText();
-    String plano = planoTratamentoEditor.getHtmlText();
-    String resultado;
-
-    // Lógica de decisão: Criar ou Atualizar?
-    if (avaliacaoParaEditar == null) {
-        // MODO CRIAÇÃO
-        resultado = prontuarioService.cadastrarAvaliacao(pacienteAtual.getId(), data, queixa, hda, exames, diagnostico, plano);
-    } else {
-        // MODO EDIÇÃO
-        resultado = prontuarioService.atualizarAvaliacao(avaliacaoParaEditar.getId(), pacienteAtual.getId(), data, queixa, hda, exames, diagnostico, plano);
-    }
-
-    if (resultado.isEmpty()) {
-        setMensagem("Avaliação salva com sucesso!", false);
-        if (historyListener != null) {
-            historyListener.onHistoryChanged();
+    @FXML
+    private void handleSalvarAvaliacao() {
+        if (pacienteAtual == null) {
+            setMensagem("Erro: Paciente não carregado.", true);
+            return;
         }
-        // Após salvar, reseta o formulário para o modo de criação
-        configureParaCriacao(pacienteAtual, historyListener); 
-    } else {
-        setMensagem(resultado, true);
+
+        LocalDate data = dataAvaliacaoPicker.getValue();
+        String queixa = queixaPrincipalEditor.getHtmlText();
+        String hda = hdaEditor.getHtmlText();
+        String exames = examesFisicosEditor.getHtmlText();
+        String diagnostico = diagnosticoEditor.getHtmlText();
+        String plano = planoTratamentoEditor.getHtmlText();
+        String resultado;
+
+        // Lógica de decisão: Criar ou Atualizar?
+        if (avaliacaoParaEditar == null) {
+            // MODO CRIAÇÃO
+            resultado = prontuarioService.cadastrarAvaliacao(pacienteAtual.getId(), data, queixa, hda, exames, diagnostico, plano);
+        } else {
+            // MODO EDIÇÃO
+            resultado = prontuarioService.atualizarAvaliacao(avaliacaoParaEditar.getId(), pacienteAtual.getId(), data, queixa, hda, exames, diagnostico, plano);
+        }
+
+        if (resultado.isEmpty()) {
+            setMensagem("Avaliação salva com sucesso!", false);
+            if (historyListener != null) {
+                historyListener.onHistoryChanged();
+            }
+            // Após salvar, reseta o formulário para o modo de criação
+            configureParaCriacao(pacienteAtual, historyListener); 
+        } else {
+            setMensagem(resultado, true);
+        }
     }
-}
 
-private void limparCampos() {
-    dataAvaliacaoPicker.setValue(LocalDate.now());
-    queixaPrincipalEditor.setHtmlText("");
-    hdaEditor.setHtmlText("");
-    examesFisicosEditor.setHtmlText("");
-    diagnosticoEditor.setHtmlText("");
-    planoTratamentoEditor.setHtmlText("");
-}
-
-private void inicializarEditores() {
+    private void limparCampos() {
+        dataAvaliacaoPicker.setValue(LocalDate.now());
+        queixaPrincipalEditor.setHtmlText("");
+        hdaEditor.setHtmlText("");
+        examesFisicosEditor.setHtmlText("");
+        diagnosticoEditor.setHtmlText("");
+        planoTratamentoEditor.setHtmlText("");
+    }
   
-    // Usa o "carregamento lento": só cria os editores se eles ainda não existirem.
-    if (queixaPrincipalEditor == null) {
-        queixaPrincipalEditor = new HTMLEditor();
-        queixaPrincipalPlaceholder.getChildren().add(queixaPrincipalEditor);
+  private void inicializarEditores() {
 
-        hdaEditor = new HTMLEditor();
-        hdaPlaceholder.getChildren().add(hdaEditor);
+      // Usa o "carregamento lento": só cria os editores se eles ainda não existirem.
+      if (queixaPrincipalEditor == null) {
+          queixaPrincipalEditor = new HTMLEditor();
+          queixaPrincipalPlaceholder.getChildren().add(queixaPrincipalEditor);
 
-        examesFisicosEditor = new HTMLEditor();
-        examesFisicosPlaceholder.getChildren().add(examesFisicosEditor);
+          hdaEditor = new HTMLEditor();
+          hdaPlaceholder.getChildren().add(hdaEditor);
 
-        diagnosticoEditor = new HTMLEditor();
-        diagnosticoPlaceholder.getChildren().add(diagnosticoEditor);
+          examesFisicosEditor = new HTMLEditor();
+          examesFisicosPlaceholder.getChildren().add(examesFisicosEditor);
 
-        planoTratamentoEditor = new HTMLEditor();
-        planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
-    }
-}
+          diagnosticoEditor = new HTMLEditor();
+          diagnosticoPlaceholder.getChildren().add(diagnosticoEditor);
 
-    
+          planoTratamentoEditor = new HTMLEditor();
+          planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
+      }
+  }
 }
