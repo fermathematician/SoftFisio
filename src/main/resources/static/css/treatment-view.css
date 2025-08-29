@@ -109,6 +109,9 @@
     -fx-background-color: #d9534f;
     -fx-cursor: hand;
     -fx-shape: "M19 4h-3.5l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12z";
+
+    -fx-translate-x: 5px; /* Move 5px para a direita */
+    -fx-translate-y: -5px; /* Move 5px para cima */
 }
 
 .delete-icon:hover {
@@ -227,4 +230,15 @@
 
 .jfx-date-picker .arrow {
     -fx-background-color: #007AFF;
+}
+
+.anexo-card {
+    -fx-background-color: #ffffff;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 15, 0.0, 0, 4);
+}
+
+.anexo-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0.0, 0, 8);
 }

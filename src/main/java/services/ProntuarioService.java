@@ -218,25 +218,33 @@ public String adicionarAnexo(int idPaciente, File arquivoOrigem, String descrica
         }
     }
 
-public String deletarAnexo(int idAnexo) {
-    // 1. Buscar o anexo para obter o caminho do arquivo
-    Anexo anexo = anexoDAO.findById(idAnexo);
-    if (anexo == null) {
-        return "Anexo não encontrado no banco de dados.";
-    }
+    // --- MÉTODO PARA DELETAR ANEXOS (CONFORME SOLICITADO) ---
+    /**
+     * Deleta um anexo, removendo o arquivo físico do disco e o registro do banco de dados.
+     * @param idAnexo O ID do anexo a ser deletado.
+     * @return Uma string vazia em caso de sucesso, ou uma mensagem de erro.
+     */
+    public String deletarAnexo(int idAnexo) {
+        // 1. Busca o anexo no banco de dados para obter o caminho do arquivo.
+        Anexo anexoParaDeletar = anexoDAO.findById(idAnexo);
+        if (anexoParaDeletar == null) {
+            return "Anexo não encontrado no banco de dados."; // O anexo pode já ter sido deletado.
+        }
 
-    try {
-        // 2. Deletar o arquivo físico do disco
-        Path caminhoArquivo = Paths.get(anexo.getCaminhoArquivo());
-        Files.deleteIfExists(caminhoArquivo);
+        try {
+            // 2. Tenta deletar o arquivo físico da pasta .fisioterapia-app/media/
+            Path caminhoArquivo = Paths.get(anexoParaDeletar.getCaminhoArquivo());
+            Files.deleteIfExists(caminhoArquivo); // Usar deleteIfExists é mais seguro.
 
-        // 3. Deletar o registro do banco de dados
-        boolean sucesso = anexoDAO.delete(idAnexo);
-        return sucesso ? "" : "Erro ao deletar o registro do anexo do banco de dados.";
+            // 3. Se a exclusão do arquivo deu certo (ou se ele não existia), deleta o registro do banco.
+            boolean sucesso = anexoDAO.delete(idAnexo);
+            
+            return sucesso ? "" : "Erro ao deletar o registro do anexo do banco de dados.";
 
-    } catch (IOException e) {
-        e.printStackTrace();
-        return "Erro de I/O ao deletar o arquivo: " + e.getMessage();
-    }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Retorna um erro se houver uma falha de permissão ou outro problema de I/O.
+            return "Erro de I/O ao deletar o arquivo físico: " + e.getMessage();
+        }
     }
 }
