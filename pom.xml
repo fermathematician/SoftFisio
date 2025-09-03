@@ -18,12 +18,12 @@
     </properties>
 
     <dependencies>
+        <!-- JavaFX e JFoenix -->
         <dependency>
             <groupId>com.jfoenix</groupId>
             <artifactId>jfoenix</artifactId>
             <version>${jfoenix.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -39,29 +39,34 @@
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>11</version>
+        </dependency>
 
+        <!-- Banco de Dados -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.45.1.0</version>
         </dependency>
 
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-web</artifactId>
-        <version>11</version>
-    </dependency>
-
+        <!-- iText PDF e Módulos Relacionados -->
         <dependency>
             <groupId>com.itextpdf</groupId>
-            <artifactId>itext7-core</artifactId>
+            <artifactId>kernel</artifactId>
             <version>${itext.version}</version>
-            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>layout</artifactId>
             <version>${itext.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>html2pdf</artifactId>
+            <version>5.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
