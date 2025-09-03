@@ -14,9 +14,13 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider; 
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +47,7 @@ import models.HistoricoItem;
 import models.Paciente;
 import models.Sessao;
 import models.Usuario;
-import ui.AlertFactory; 
+import ui.AlertFactory;
 import ui.NavigationManager;
 import services.ProntuarioService;
 import services.SessaoUsuario;
@@ -160,29 +164,29 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         card.getChildren().addAll(header, new Separator());
 
         if (item instanceof Sessao) {
-    Sessao sessao = (Sessao) item;
-    deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
+            Sessao sessao = (Sessao) item;
+            deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
 
-    // Cria um WebView para a evolução da sessão
-    WebView webView = new WebView();
-    webView.getEngine().loadContent(sessao.getEvolucaoTexto());
-    webView.setPrefHeight(150); // Altura preferencial para o conteúdo
-    card.getChildren().add(webView);
+            // Cria um WebView para a evolução da sessão
+            WebView webView = new WebView();
+            webView.getEngine().loadContent(sessao.getEvolucaoTexto());
+            webView.setPrefHeight(150); // Altura preferencial para o conteúdo
+            card.getChildren().add(webView);
 
-} else if (item instanceof Avaliacao) {
-    Avaliacao avaliacao = (Avaliacao) item;
-    deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
+        } else if (item instanceof Avaliacao) {
+            Avaliacao avaliacao = (Avaliacao) item;
+            deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
 
-    // Cria um VBox para organizar os campos da avaliação
-    VBox detalhesAvaliacao = new VBox(8);
-detalhesAvaliacao.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-detalhesAvaliacao.getChildren().add(createCampoWebView("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-detalhesAvaliacao.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
-detalhesAvaliacao.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
-detalhesAvaliacao.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+            // Cria um VBox para organizar os campos da avaliação
+            VBox detalhesAvaliacao = new VBox(8);
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
 
-card.getChildren().add(detalhesAvaliacao);
-}
+            card.getChildren().add(detalhesAvaliacao);
+        }
 
         Region vSpacer = new Region();
         VBox.setVgrow(vSpacer, Priority.ALWAYS);
@@ -434,7 +438,6 @@ card.getChildren().add(detalhesAvaliacao);
     public void handleGerarPdf() {
         Usuario usuarioLogado = SessaoUsuario.getInstance().getUsuarioLogado();
         if (usuarioLogado == null) {
-            // <<--- CÓDIGO ALTERADO ---<<<
             AlertFactory.showError("Erro de Autenticação", "Nenhum usuário logado. Não é possível gerar o relatório.");
             return;
         }
@@ -445,9 +448,8 @@ card.getChildren().add(detalhesAvaliacao);
         historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
 
         if (historico.isEmpty()) {
-            // <<--- CÓDIGO ALTERADO ---<<<
             AlertFactory.showError("Atenção", "Não é possível gerar o relatório pois o paciente não possui nenhum histórico.");
-            return; 
+            return;
         }
 
         FileChooser fileChooser = new FileChooser();
@@ -464,6 +466,11 @@ card.getChildren().add(detalhesAvaliacao);
                 Document document = new Document(pdf);
                 document.setMargins(30, 30, 30, 30);
 
+                ConverterProperties converterProperties = new ConverterProperties();
+    
+                DefaultFontProvider fontProvider = new DefaultFontProvider();
+                converterProperties.setFontProvider(fontProvider);
+
                 Paragraph nomeFisio = new Paragraph(usuarioLogado.getNomeCompleto())
                         .setTextAlignment(TextAlignment.CENTER)
                         .setBold();
@@ -475,7 +482,7 @@ card.getChildren().add(detalhesAvaliacao);
                         .setFontSize(14)
                         .setMarginTop(10);
                 document.add(tituloRelatorio);
-
+                
                 Paragraph idTitulo = new Paragraph("IDENTIFICAÇÃO")
                         .setBold()
                         .setMarginTop(20);
@@ -491,34 +498,33 @@ card.getChildren().add(detalhesAvaliacao);
                         .setMarginTop(25)
                         .setMarginBottom(10);
                 document.add(historicoTitulo);
-
+                
                 historico.sort(Comparator.comparing(HistoricoItem::getData).reversed());
                 DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+                
                 for (HistoricoItem item : historico) {
                     document.add(new Paragraph(" ").setBorderTop(new SolidBorder(0.5f)).setMarginTop(10).setMarginBottom(10));
                     Paragraph tipoData = new Paragraph()
                             .add(new Text(item.getTipo().toUpperCase()).setBold())
                             .add(" - " + item.getData().format(formatterItem));
                     document.add(tipoData);
+                    
                     if (item instanceof Sessao) {
                         Sessao sessao = (Sessao) item;
-                        document.add(criarCampoPdf("Evolução:", sessao.getEvolucaoTexto()));
+                        adicionarCampoHtmlAoPdf(document, "Evolução:", sessao.getEvolucaoTexto(), converterProperties);
                     } else if (item instanceof Avaliacao) {
                         Avaliacao avaliacao = (Avaliacao) item;
-                        document.add(criarCampoPdf("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-                        document.add(criarCampoPdf("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-                        document.add(criarCampoPdf("Exames Físicos:", avaliacao.getExamesFisicos()));
-                        document.add(criarCampoPdf("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
-                        document.add(criarCampoPdf("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
+                        adicionarCampoHtmlAoPdf(document, "Queixa Principal:", avaliacao.getQueixaPrincipal(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Histórico da Doença:", avaliacao.getHistoricoDoencaAtual(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Exames Físicos:", avaliacao.getExamesFisicos(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Plano de Tratamento:", avaliacao.getPlanoTratamento(), converterProperties);
                     }
                 }
                 document.close();
-                // <<--- CÓDIGO ALTERADO ---<<<
                 AlertFactory.showSuccess("PDF Gerado", "O arquivo foi salvo com sucesso em:\n" + file.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
-                // <<--- CÓDIGO ALTERADO ---<<<
                 AlertFactory.showError("Erro ao Gerar PDF", "Ocorreu um erro: " + e.getMessage());
             }
         } else {
@@ -526,21 +532,59 @@ card.getChildren().add(detalhesAvaliacao);
         }
     }
 
+    private void adicionarCampoHtmlAoPdf(Document document, String titulo, String htmlContent, ConverterProperties converterProperties) {
+        if (htmlContent == null || htmlContent.trim().isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) {
+            return;
+        }
+
+        Paragraph pTitulo = new Paragraph();
+        Text tituloBold = new Text(titulo).setBold();
+        pTitulo.add(tituloBold);
+        document.add(pTitulo);
+
+        String htmlCorrigido = corrigirHtmlParaPdf(htmlContent);
+
+        List<IElement> elements = HtmlConverter.convertToElements(htmlCorrigido, converterProperties);
+
+        for (IElement element : elements) {
+            document.add((com.itextpdf.layout.element.BlockElement) element);
+        }
+    }
+
+    private String corrigirHtmlParaPdf(String html) {
+        if (html == null) {
+            return null;
+        }
+
+        String correctedHtml = html
+            .replace("<font size=\"1\">", "<span style=\"font-size: 8pt;\">")
+            .replace("<font size=\"2\">", "<span style=\"font-size: 10pt;\">")
+            .replace("<font size=\"3\">", "<span style=\"font-size: 12pt;\">")
+            .replace("<font size=\"4\">", "<span style=\"font-size: 14pt;\">")
+            .replace("<font size=\"5\">", "<span style=\"font-size: 18pt;\">")
+            .replace("<font size=\"6\">", "<span style=\"font-size: 24pt;\">")
+            .replace("<font size=\"7\">", "<span style=\"font-size: 36pt;\">")
+            .replace("</font>", "</span>")
+    
+            .replaceAll("font-size: -webkit-xxx-large", "font-size: 36pt");
+
+        return correctedHtml;
+    }
+
    private VBox createCampoWebView(String titulo, String htmlContent) {
-    VBox campo = new VBox(2);
-    Label tituloLabel = new Label(titulo);
-    tituloLabel.setStyle("-fx-font-weight: bold;");
+        VBox campo = new VBox(2);
+        Label tituloLabel = new Label(titulo);
+        tituloLabel.setStyle("-fx-font-weight: bold;");
 
-    WebView webView = new WebView();
+        WebView webView = new WebView();
 
-    // Se o conteúdo for nulo ou vazio, carrega uma página em branco.
-    // Senão, carrega o conteúdo.
-    String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) ? "" : htmlContent;
-    webView.getEngine().loadContent(contentToShow);
+ 
+        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) ? "" : htmlContent;
+        webView.getEngine().loadContent(contentToShow);
 
-    webView.setPrefHeight(75); // Altura padrão para cada campo
+        webView.setPrefHeight(75); // Altura padrão para cada campo
 
-    campo.getChildren().addAll(tituloLabel, webView);
-    return campo; // <-- SEMPRE retorna um VBox válido
-}
+        campo.getChildren().addAll(tituloLabel, webView);
+        return campo; // <-- SEMPRE retorna um VBox válido
+    }
 }
