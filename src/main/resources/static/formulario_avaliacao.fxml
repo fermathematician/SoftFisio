@@ -55,13 +55,16 @@
                         <Label styleClass="input-label" text="Plano de Tratamento" />
                         <StackPane fx:id="planoTratamentoPlaceholder" prefHeight="200.0" />
                      </children>
-                  </VBox>
-                  <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />
-                  <VBox alignment="CENTER_RIGHT">
+                    <HBox alignment="CENTER_RIGHT" spacing="15.0">
                      <children>
+                        <Button fx:id="backButton" onAction="#handleBackButton" mnemonicParsing="false" styleClass="cancel-button" text="Voltar" prefWidth="120.0" />
+                        
                         <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />
                      </children>
                      <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </HBox>
                         <Insets top="10.0" />
                      </VBox.margin>
                   </VBox>

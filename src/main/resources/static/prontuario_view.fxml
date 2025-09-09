@@ -42,7 +42,7 @@
             </Tab>
             <Tab text="Avaliação">
                <content>
-                  <fx:include fx:id="avaliacaoTabContent" source="avaliacao_view.fxml" />
+                  <fx:include fx:id="avaliacaoTabView" source="avaliacao_tab_view.fxml" />
                </content>
             </Tab>
             <Tab text="Histórico Completo">

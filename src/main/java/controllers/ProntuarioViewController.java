@@ -60,7 +60,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     @FXML private Label patientInfoLabel;
     @FXML private Button backButton;
     @FXML private BorderPane prontuarioRoot;
-    @FXML private AvaliacaoController avaliacaoTabContentController;
+    @FXML private AvaliacaoTabViewController avaliacaoTabViewController;
     @FXML private VBox historicoVBox;
     @FXML private TilePane anexosTilePane;
     @FXML private Button adicionarAnexoButton;
@@ -83,6 +83,11 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         if (sessoesTabContentController != null) {
             sessoesTabContentController.loadSessoes();
         }
+
+        // Adicione esta linha junto com as outras chamadas de atualização
+        if (avaliacaoTabViewController != null) {
+            avaliacaoTabViewController.loadAvaliacoes();
+}
     }
 
     public void initData(Paciente paciente) {
@@ -93,8 +98,8 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             sessoesTabContentController.initData(paciente, this);
         }
 
-        if (avaliacaoTabContentController != null) {
-            avaliacaoTabContentController.configureParaCriacao(paciente, this);
+        if (avaliacaoTabViewController != null) {
+            avaliacaoTabViewController.initData(paciente, this);
         }
 
         carregarHistoricoCompleto();
@@ -368,12 +373,11 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
     }
 
     private void handleEditA(Avaliacao avaliacao) {
-    // 1. Muda o foco para a aba de Avaliação (que é a segunda aba, de índice 1)
-    mainTabPane.getSelectionModel().select(1);
-
-    // 2. Manda o controlador daquela aba se configurar para o modo de edição
-    if (avaliacaoTabContentController != null) {
-        avaliacaoTabContentController.configureParaEdicao(avaliacao, this.pacienteAtual, this);
+    // Ação mais simples e intuitiva: apenas muda para a aba de Avaliações.
+    // O usuário verá a lista e poderá clicar em "Editar" no card desejado.
+    if (mainTabPane != null) {
+        // O índice '1' assume que "Avaliação" é a segunda aba (0 = Sessões, 1 = Avaliação)
+        mainTabPane.getSelectionModel().select(1);
     }
 }
 

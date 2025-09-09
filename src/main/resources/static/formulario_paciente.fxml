@@ -15,99 +15,90 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/cadastrar-paciente.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FormularioPacienteController">
-   <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FormularioAvaliacaoController">
+   <content>
+      <VBox alignment="TOP_CENTER" spacing="20.0">
          <children>
-            <Label styleClass="company-name" text="NOME DA EMPRESA" />
-         </children>
-         <padding>
-            <Insets left="40.0" />
-         </padding>
-      </HBox>
-   </top>
-   <center>
-      <VBox alignment="CENTER" spacing="20.0">
-         <children>
-            <Label fx:id="titleLabel" styleClass="title" text="Editar Paciente" />
-            <Label styleClass="subtitle" text="Altere os dados do paciente abaixo." />
-
-            <VBox spacing="25.0" styleClass="form-card">
+            <VBox alignment="TOP_CENTER" styleClass="header-container">
                <children>
-                  <GridPane hgap="20.0" vgap="15.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
+                  <HBox alignment="CENTER_LEFT" spacing="20.0">
                      <children>
-                        <VBox spacing="5.0">
-                           <children>
-                              <Label styleClass="input-label" text="Nome Completo" />
-                              <TextField fx:id="nameField" promptText="Digite o nome completo" styleClass="text-input" />
-                           </children>
-                        </VBox>
-                        <VBox spacing="5.0" GridPane.columnIndex="1">
-                           <children>
-                              <Label styleClass="input-label" text="CPF" />
-                              <TextField fx:id="cpfField" promptText="000.000.000-00" styleClass="text-input" />
-                           </children>
-                        </VBox>
-                        <VBox spacing="5.0" GridPane.rowIndex="1">
-                           <children>
-                              <Label styleClass="input-label" text="Data de Nascimento" />
-                              <JFXDatePicker fx:id="dobPicker" maxWidth="1.7976931348623157E308" defaultColor="#007BFF" promptText="Selecione a data" styleClass="text-input" />
-                           </children>
-                        </VBox>
-                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                           <children>
-                              <Label styleClass="input-label" text="Gênero" />
-                              <ComboBox fx:id="genderComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o gênero" styleClass="text-input" />
-                           </children>
-                        </VBox>
-                        <VBox spacing="5.0" GridPane.rowIndex="2">
-                           <children>
-                              <Label styleClass="input-label" text="Telefone" />
-                              <TextField fx:id="phoneField" promptText="(00) 99999-9999" styleClass="text-input" />
-                           </children>
-                        </VBox>
-                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                           <children>
-                              <Label styleClass="input-label" text="Email" />
-                              <TextField fx:id="emailField" promptText="exemplo@email.com" styleClass="text-input" />
-                           </children>
-                        </VBox>
-
-                        <CheckBox fx:id="pacienteCorridaCheckBox" mnemonicParsing="false" text="Paciente de Corrida" GridPane.rowIndex="3" />
-
+                        <Button fx:id="backButton" onAction="#handleBackButton" mnemonicParsing="false" styleClass="back-button" text="&lt; Voltar" />
+                        <Label fx:id="patientNameLabel" styleClass="header-title" text="Nome do Paciente Carregando..." />
                      </children>
-                  </GridPane>
+                  </HBox>
+               </children>
+               <VBox.margin>
+                  <Insets left="-40.0" right="-40.0" top="-25.0" />
+               </VBox.margin>
+            </VBox>
 
-                  <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" />
+            <VBox maxWidth="800.0" spacing="15.0" styleClass="patient-card">
+               <children>
+                  <Label styleClass="card-title" text="Avaliação Fisioterapêutica" />
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Data da Avaliação" />
+                        <JFXDatePicker fx:id="dataAvaliacaoPicker" defaultColor="#007AFF" maxWidth="1.7976931348623157E308" promptText="Selecione a data" styleClass="text-input" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Queixa Principal" />
+                        <StackPane fx:id="queixaPrincipalPlaceholder" prefHeight="200.0" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Histórico da Doença Atual (HDA)" />
+                        <StackPane fx:id="hdaPlaceholder" prefHeight="200.0" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Exames Físicos" />
+                        <StackPane fx:id="examesFisicosPlaceholder" prefHeight="200.0" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
+                        <StackPane fx:id="diagnosticoPlaceholder" prefHeight="200.0" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="input-label" text="Plano de Tratamento" />
+                        <StackPane fx:id="planoTratamentoPlaceholder" prefHeight="200.0" />
+                     </children>
+                  </VBox>
+
+                  <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />
 
                   <HBox alignment="CENTER_RIGHT" spacing="15.0">
                      <children>
-                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" styleClass="secondary-button" text="Voltar" />
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSave" styleClass="save-button" text="Salvar Alterações" />
+                        <Button fx:id="secondaryButton" onAction="#handleBackButton" mnemonicParsing="false" styleClass="secondary-button" text="Voltar" prefWidth="120.0" />
+                        <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />
                      </children>
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin>
                   </HBox>
                </children>
-               <padding>
-                  <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
-               </padding>
             </VBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
          </padding>
       </VBox>
-   </center>
-</BorderPane>
+   </content>
+</ScrollPane>

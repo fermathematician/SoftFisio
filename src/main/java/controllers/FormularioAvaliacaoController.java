@@ -11,9 +11,18 @@ import javafx.scene.layout.StackPane;
 import com.jfoenix.controls.JFXDatePicker;
 import models.Avaliacao;
 import javafx.scene.web.HTMLEditor;
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import ui.AlertFactory;
+import ui.NavigationManager;
 
 
-public class AvaliacaoController {
+
+
+public class FormularioAvaliacaoController {
     @FXML private Label mensagemLabel;
     @FXML private StackPane examesFisicosPlaceholder;
     @FXML private StackPane diagnosticoPlaceholder;
@@ -22,6 +31,8 @@ public class AvaliacaoController {
     @FXML private StackPane hdaPlaceholder;
     @FXML private Button salvarButton;
     @FXML private JFXDatePicker dataAvaliacaoPicker;
+    @FXML private Button backButton;
+    @FXML private Label patientNameLabel;
     private HTMLEditor queixaPrincipalEditor;
     private HTMLEditor hdaEditor;
     private HTMLEditor examesFisicosEditor;
@@ -34,13 +45,14 @@ public class AvaliacaoController {
 
 
 
-    public AvaliacaoController() {
+    public FormularioAvaliacaoController() {
         this.prontuarioService = new ProntuarioService();
     }
 
   public void configureParaCriacao(Paciente paciente, OnHistoryChangedListener listener) {
       inicializarEditores(); 
       this.pacienteAtual = paciente;
+      patientNameLabel.setText(paciente.getNomeCompleto());
       this.historyListener = listener;
       this.avaliacaoParaEditar = null; // Garante que estamos no modo de criação
 
@@ -52,6 +64,7 @@ public class AvaliacaoController {
     public void configureParaEdicao(Avaliacao avaliacao, Paciente paciente, OnHistoryChangedListener listener) {
         this.pacienteAtual = paciente;
         this.historyListener = listener;
+        patientNameLabel.setText(paciente.getNomeCompleto());
         this.avaliacaoParaEditar = avaliacao; // Define o objeto a ser editado
         inicializarEditores(); 
 
@@ -143,4 +156,28 @@ public class AvaliacaoController {
           planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
       }
   }
+
+  @FXML
+private void handleBackButton() {
+    try {
+        // Pega o caminho da tela anterior no histórico de navegação
+        String fxmlPath = NavigationManager.getInstance().getPreviousPage();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent prontuarioView = loader.load();
+
+        // Pega o controller da tela de prontuário para recarregar os dados
+        ProntuarioViewController controller = loader.getController();
+        controller.initData(this.pacienteAtual); // Passa o paciente de volta
+
+        // Pega o palco (janela) atual e muda a cena para a tela anterior
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.setScene(new Scene(prontuarioView, 1280, 720));
+        stage.setTitle("SoftFisio - Prontuário de " + this.pacienteAtual.getNomeCompleto());
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        AlertFactory.showError("Erro de Navegação", "Não foi possível voltar para a tela de prontuário.");
+    }
+}
 }
