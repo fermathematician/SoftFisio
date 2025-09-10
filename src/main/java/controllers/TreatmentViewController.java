@@ -91,9 +91,18 @@ public class TreatmentViewController {
 
         // Cria um WebView para renderizar o HTML
         WebView webView = new WebView();
-// Carrega o conteúdo HTML salvo no banco
+            webView.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+            // Cria um novo evento de scroll com os mesmos parâmetros do original,
+            // mas direcionado para o VBox principal das sessões (sessionsVBox).
+            sessionsVBox.fireEvent(event.copyFor(event.getSource(), sessionsVBox));
+            
+            // Consome o evento original para que o WebView não tente processá-lo.
+            event.consume();
+        });
+
+        // Carrega o conteúdo HTML salvo no banco
         webView.getEngine().loadContent(sessao.getEvolucaoTexto());
-// Ajusta a altura máxima para não ocupar muito espaço
+        // Ajusta a altura máxima para não ocupar muito espaço
         webView.setMaxHeight(150);
 
         HBox bottomBar = new HBox();
