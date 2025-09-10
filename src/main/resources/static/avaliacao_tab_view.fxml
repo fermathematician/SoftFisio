@@ -7,13 +7,17 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoTabViewController">
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@css/treatment-view.css" fx:controller="controllers.AvaliacaoTabViewController">
    <children>
       <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox alignment="CENTER_RIGHT">
                <children>
+                  <Label styleClass="section-title" text="Avaliações Anteriores" />
+                  <Region HBox.hgrow="ALWAYS" />
                   <Button fx:id="novaAvaliacaoButton" mnemonicParsing="false" onAction="#handleNovaAvaliacao" styleClass="primary-button" text="+ Nova Avaliação" />
                </children>
             </HBox>
@@ -22,7 +26,15 @@
                   <VBox fx:id="avaliacoesVBox" spacing="15.0" />
                </content>
             </ScrollPane>
-            <Label fx:id="emptyAvaliacoesLabel" alignment="CENTER" styleClass="empty-list-label" text="Este paciente ainda não possui nenhuma avaliação." textAlignment="CENTER" visible="false" VBox.vgrow="ALWAYS" />
+            <StackPane>
+                  <children>
+                     <Label fx:id="emptyAvaliacoesLabel" alignment="CENTER" styleClass="empty-message-label" text="Este paciente ainda não possui nenhuma avaliação." managed="false" visible="false" StackPane.alignment="CENTER" />
+                  </children>
+                  <VBox.margin>
+                     <Insets top="30.0" />
+                  </VBox.margin>
+            </StackPane>
+
          </children>
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
