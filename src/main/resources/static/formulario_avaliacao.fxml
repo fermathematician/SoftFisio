@@ -5,75 +5,94 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.web.HTMLEditor?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AvaliacaoController">
-   <content>
-      <VBox alignment="TOP_CENTER" spacing="20.0">
+<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FormularioAvaliacaoController">
+   <top>
+      <VBox spacing="5.0" styleClass="header-bar">
          <children>
-            <VBox maxWidth="800.0" spacing="15.0" styleClass="patient-card">
+            <HBox alignment="CENTER_LEFT">
                <children>
-                  <Label styleClass="card-title" text="Nova Avaliação Fisioterapêutica" />
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Data da Avaliação" />
-                        <JFXDatePicker fx:id="dataAvaliacaoPicker" defaultColor="#007AFF" maxWidth="1.7976931348623157E308" promptText="Selecione a data" styleClass="text-input" />
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="10.0" top="10.0" />
-                     </VBox.margin>
-                  </VBox>
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Queixa Principal" />
-                        <StackPane fx:id="queixaPrincipalPlaceholder" prefHeight="200.0" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Histórico da Doença Atual (HDA)" />
-                        <StackPane fx:id="hdaPlaceholder" prefHeight="200.0" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Exames Físicos" />
-                        <StackPane fx:id="examesFisicosPlaceholder" prefHeight="200.0" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
-                        <StackPane fx:id="diagnosticoPlaceholder" prefHeight="200.0" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label styleClass="input-label" text="Plano de Tratamento" />
-                        <StackPane fx:id="planoTratamentoPlaceholder" prefHeight="200.0" />
-                     </children>
-                    <HBox alignment="CENTER_RIGHT" spacing="15.0">
-                     <children>
-                        <Button fx:id="backButton" onAction="#handleBackButton" mnemonicParsing="false" styleClass="cancel-button" text="Voltar" prefWidth="120.0" />
-                        
-                        <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="10.0" />
-                     </VBox.margin>
-                  </HBox>
-                        <Insets top="10.0" />
-                     </VBox.margin>
-                  </VBox>
+                  <Label fx:id="patientNameLabel" styleClass="page-title" text="Nome do Paciente" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBackButton" styleClass="secondary-button" text="Voltar" />
                </children>
-            </VBox>
+            </HBox>
+            <Label fx:id="subtitleLabel" styleClass="card-subtitle" text="Nova Avaliação" />
          </children>
          <padding>
-            <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
+            <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
          </padding>
       </VBox>
-   </content>
-</ScrollPane>
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
+         <content>
+            <VBox alignment="TOP_CENTER">
+               <children>
+                  <VBox maxWidth="800.0" spacing="15.0" styleClass="patient-card">
+                     <children>
+                        <Label fx:id="formTitleLabel" styleClass="card-title" text="Cadastrar Avaliação" />
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Data da Avaliação" />
+                              <JFXDatePicker fx:id="dataAvaliacaoPicker" defaultColor="#007AFF" maxWidth="1.7976931348623157E308" promptText="Selecione a data" styleClass="text-input" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Queixa Principal" />
+                              <StackPane fx:id="queixaPrincipalPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Histórico da Doença Atual (HDA)" />
+                              <StackPane fx:id="hdaPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Exames Físicos" />
+                              <StackPane fx:id="examesFisicosPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
+                              <StackPane fx:id="diagnosticoPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Plano de Tratamento" />
+                              <StackPane fx:id="planoTratamentoPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />
+                        <HBox alignment="CENTER_RIGHT">
+                           <children>
+                              <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
