@@ -110,10 +110,15 @@ public class DatabaseManager {
         "id_avaliacao INTEGER PRIMARY KEY AUTOINCREMENT," +
         "id_paciente INTEGER NOT NULL," +
         "data_avaliacao TEXT NOT NULL," +
-        "queixa_principal TEXT," +
-        "historico_doenca_atual TEXT," +
-        "exames_fisicos TEXT," +
-        "diagnostico_fisioterapeutico TEXT," +
+        "doenca_atual TEXT," +
+        "historia_pregressa TEXT," +
+        "inspecao_palpacao TEXT," +
+        "adm TEXT," +
+        "forca_muscular TEXT," +
+        "avaliacao_funcional TEXT," +
+        "testes_especiais TEXT," +
+        "escalas_funcionais TEXT," +
+        "diagnostico_cinesiologico TEXT," +
         "plano_tratamento TEXT," +
         "FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente)" +
         ");";

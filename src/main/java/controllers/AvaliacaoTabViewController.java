@@ -67,6 +67,7 @@ public class AvaliacaoTabViewController {
         scrollPane.setManaged(!isEmpty);
     }
 
+    // SUBSTITUA SEU MÉTODO createAvaliacaoCard POR ESTE:
     private VBox createAvaliacaoCard(Avaliacao avaliacao) {
         VBox card = new VBox(5);
         card.getStyleClass().add("patient-card");
@@ -90,13 +91,18 @@ public class AvaliacaoTabViewController {
         Separator separator = new Separator();
         separator.setPadding(new Insets(10, 0, 5, 0));
         
-        // VBox para os detalhes da avaliação
+        // VBox para os detalhes (AGORA USANDO OS MÉTODOS NOVOS)
         VBox detalhesVBox = new VBox(8);
-        detalhesVBox.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-        detalhesVBox.getChildren().add(createCampoWebView("Histórico da Doença Atual:", avaliacao.getHistoricoDoencaAtual()));
-        detalhesVBox.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
+        detalhesVBox.getChildren().add(createCampoWebView("Doença Atual (HDA):", avaliacao.getDoencaAtual()));
+        detalhesVBox.getChildren().add(createCampoWebView("História Pregressa:", avaliacao.getHistoriaPregressa()));
+        detalhesVBox.getChildren().add(createCampoWebView("Inspeção e Palpação:", avaliacao.getInspecaoPalpacao()));
+        detalhesVBox.getChildren().add(createCampoWebView("ADM:", avaliacao.getAdm()));
+        detalhesVBox.getChildren().add(createCampoWebView("Força Muscular:", avaliacao.getForcaMuscular()));
+        detalhesVBox.getChildren().add(createCampoWebView("Avaliação Funcional:", avaliacao.getAvaliacaoFuncional()));
+        detalhesVBox.getChildren().add(createCampoWebView("Testes Especiais:", avaliacao.getTestesEspeciais()));
+        detalhesVBox.getChildren().add(createCampoWebView("Escalas Funcionais:", avaliacao.getEscalasFuncionais()));
+        detalhesVBox.getChildren().add(createCampoWebView("Diagnóstico Cinesiológico:", avaliacao.getDiagnosticoCinesiologico()));
         detalhesVBox.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
-        detalhesVBox.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
 
         HBox bottomBar = new HBox();
         bottomBar.setAlignment(Pos.CENTER_RIGHT);
