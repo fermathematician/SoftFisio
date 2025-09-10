@@ -1,11 +1,25 @@
 package controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+// --- Imports de iTextPDF e outros ---
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.IElement;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.properties.TextAlignment;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,13 +34,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import models.Avaliacao;
 import models.HistoricoItem;
 import models.Paciente;
 import models.Sessao;
+import models.Usuario;
 import services.ProntuarioService;
+import services.SessaoUsuario;
 import ui.AlertFactory;
 import ui.NavigationManager;
 
@@ -162,16 +179,6 @@ public class HistoricoTabViewController {
         return campo;
     }
 
-    @FXML
-    private void handleGerarPdf() {
-        // Mova toda a lógica do método handleGerarPdf do ProntuarioViewController para cá
-        System.out.println("Gerando PDF para o paciente: " + pacienteAtual.getNomeCompleto());
-    }
-
-    // =======================================================================
-    // MÉTODOS DE EDITAR E DELETAR MIGRADOS
-    // =======================================================================
-
     private void handleDelete(Sessao sessao) {
         AlertFactory.showConfirmation(
             "Confirmar Exclusão",
@@ -244,5 +251,151 @@ public class HistoricoTabViewController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+     @FXML
+    public void handleGerarPdf() {
+        Usuario usuarioLogado = SessaoUsuario.getInstance().getUsuarioLogado();
+        if (usuarioLogado == null) {
+            AlertFactory.showError("Erro de Autenticação", "Nenhum usuário logado. Não é possível gerar o relatório.");
+            return;
+        }
+
+        List<HistoricoItem> historico = new ArrayList<>();
+        historico.addAll(prontuarioService.getSessoes(pacienteAtual.getId()));
+        historico.addAll(prontuarioService.getAvaliacoes(pacienteAtual.getId()));
+
+        if (historico.isEmpty()) {
+            AlertFactory.showError("Atenção", "Não é possível gerar o relatório pois o paciente não possui nenhum histórico.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar Relatório em PDF");
+        fileChooser.setInitialFileName("relatorio_" + pacienteAtual.getNomeCompleto().replaceAll("\\s+", "_") + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos PDF (*.pdf)", "*.pdf"));
+        
+        // --- AJUSTE IMPORTANTE: Pegando o Stage a partir de um elemento da aba de histórico ---
+        Stage stage = (Stage) historicoVBox.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            try {
+                PdfWriter writer = new PdfWriter(file);
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
+                document.setMargins(30, 30, 30, 30);
+
+                ConverterProperties converterProperties = new ConverterProperties();
+                DefaultFontProvider fontProvider = new DefaultFontProvider();
+                converterProperties.setFontProvider(fontProvider);
+
+                Paragraph nomeFisio = new Paragraph(usuarioLogado.getNomeCompleto())
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setBold();
+                document.add(nomeFisio);
+
+                Paragraph tituloRelatorio = new Paragraph("RELATÓRIO FISIOTERAPÊUTICO")
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setBold()
+                        .setFontSize(14)
+                        .setMarginTop(10);
+                document.add(tituloRelatorio);
+                
+                Paragraph idTitulo = new Paragraph("IDENTIFICAÇÃO")
+                        .setBold()
+                        .setMarginTop(20);
+                document.add(idTitulo);
+                document.add(criarCampoPdf("Nome:", pacienteAtual.getNomeCompleto()));
+                DateTimeFormatter formatterData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                document.add(criarCampoPdf("Data de Nascimento:", pacienteAtual.getDataNascimento().format(formatterData)));
+                document.add(criarCampoPdf("Sexo:", pacienteAtual.getGenero()));
+                document.add(criarCampoPdf("Telefone:", pacienteAtual.getTelefone()));
+
+                Paragraph historicoTitulo = new Paragraph("HISTÓRICO COMPLETO")
+                        .setBold()
+                        .setMarginTop(25)
+                        .setMarginBottom(10);
+                document.add(historicoTitulo);
+                
+                historico.sort(Comparator.comparing(HistoricoItem::getData).reversed());
+                DateTimeFormatter formatterItem = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                
+                for (HistoricoItem item : historico) {
+                    document.add(new Paragraph(" ").setBorderTop(new SolidBorder(0.5f)).setMarginTop(10).setMarginBottom(10));
+                    Paragraph tipoData = new Paragraph()
+                            .add(new Text(item.getTipo().toUpperCase()).setBold())
+                            .add(" - " + item.getData().format(formatterItem));
+                    document.add(tipoData);
+                    
+                    if (item instanceof Sessao) {
+                        Sessao sessao = (Sessao) item;
+                        adicionarCampoHtmlAoPdf(document, "Evolução:", sessao.getEvolucaoTexto(), converterProperties);
+                    } else if (item instanceof Avaliacao) {
+                        Avaliacao avaliacao = (Avaliacao) item;
+                        adicionarCampoHtmlAoPdf(document, "Queixa Principal:", avaliacao.getQueixaPrincipal(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Histórico da Doença:", avaliacao.getHistoricoDoencaAtual(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Exames Físicos:", avaliacao.getExamesFisicos(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Plano de Tratamento:", avaliacao.getPlanoTratamento(), converterProperties);
+                    }
+                }
+                document.close();
+                AlertFactory.showSuccess("PDF Gerado", "O arquivo foi salvo com sucesso em:\n" + file.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                AlertFactory.showError("Erro ao Gerar PDF", "Ocorreu um erro: " + e.getMessage());
+            }
+        }
+    }
+
+    private Paragraph criarCampoPdf(String titulo, String texto) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return null;
+        }
+        Paragraph p = new Paragraph();
+        Text tituloBold = new Text(titulo).setBold();
+        p.add(tituloBold);
+        p.add(" " + texto);
+        return p;
+    }
+
+    private void adicionarCampoHtmlAoPdf(Document document, String titulo, String htmlContent, ConverterProperties converterProperties) {
+        if (htmlContent == null || htmlContent.trim().isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) {
+            return;
+        }
+
+        Paragraph pTitulo = new Paragraph();
+        Text tituloBold = new Text(titulo).setBold();
+        pTitulo.add(tituloBold);
+        document.add(pTitulo);
+
+        String htmlCorrigido = corrigirHtmlParaPdf(htmlContent);
+
+        List<IElement> elements = HtmlConverter.convertToElements(htmlCorrigido, converterProperties);
+
+        for (IElement element : elements) {
+            document.add((com.itextpdf.layout.element.BlockElement) element);
+        }
+    }
+
+    private String corrigirHtmlParaPdf(String html) {
+        if (html == null) {
+            return "";
+        }
+        String correctedHtml = html
+            .replace("<font size=\"1\">", "<span style=\"font-size: 8pt;\">")
+            .replace("<font size=\"2\">", "<span style=\"font-size: 10pt;\">")
+            .replace("<font size=\"3\">", "<span style=\"font-size: 12pt;\">")
+            .replace("<font size=\"4\">", "<span style=\"font-size: 14pt;\">")
+            .replace("<font size=\"5\">", "<span style=\"font-size: 18pt;\">")
+            .replace("<font size=\"6\">", "<span style=\"font-size: 24pt;\">")
+            .replace("<font size=\"7\">", "<span style=\"font-size: 36pt;\">")
+            .replace("</font>", "</span>")
+    
+            .replaceAll("font-size: -webkit-xxx-large", "font-size: 36pt");
+
+        return correctedHtml;
+    
     }
 }
