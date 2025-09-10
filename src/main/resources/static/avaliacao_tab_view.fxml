@@ -14,7 +14,7 @@
          <children>
             <HBox alignment="CENTER_RIGHT">
                <children>
-                  <Button fx:id="novaAvaliacaoButton" mnemonicParsing="false" onAction="#handleNovaAvaliacao" styleClass="primary-button" text="+Nova Avaliação" />
+                  <Button fx:id="novaAvaliacaoButton" mnemonicParsing="false" onAction="#handleNovaAvaliacao" styleClass="primary-button" text="+ Nova Avaliação" />
                </children>
             </HBox>
             <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">

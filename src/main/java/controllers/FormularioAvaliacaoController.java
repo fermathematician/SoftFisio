@@ -33,6 +33,7 @@ public class FormularioAvaliacaoController {
     @FXML private JFXDatePicker dataAvaliacaoPicker;
     @FXML private Button backButton;
     @FXML private Label patientNameLabel;
+    @FXML private Label subtitleLabel; // <-- ADICIONE ESTA LINHA
     private HTMLEditor queixaPrincipalEditor;
     private HTMLEditor hdaEditor;
     private HTMLEditor examesFisicosEditor;
@@ -42,6 +43,7 @@ public class FormularioAvaliacaoController {
     private Paciente pacienteAtual;
     private OnHistoryChangedListener historyListener;
     private Avaliacao avaliacaoParaEditar;
+    
 
 
 
@@ -55,6 +57,8 @@ public class FormularioAvaliacaoController {
       patientNameLabel.setText(paciente.getNomeCompleto());
       this.historyListener = listener;
       this.avaliacaoParaEditar = null; // Garante que estamos no modo de criação
+      subtitleLabel.setText("Cadastrando Nova Avaliação");
+
 
       // Configura a UI
       salvarButton.setText("Salvar Avaliação");
@@ -65,6 +69,8 @@ public class FormularioAvaliacaoController {
         this.pacienteAtual = paciente;
         this.historyListener = listener;
         patientNameLabel.setText(paciente.getNomeCompleto());
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("'Editando Avaliação de' dd 'de' MMMM 'de' yyyy");
+        subtitleLabel.setText(avaliacao.getDataAvaliacao().format(formatter));
         this.avaliacaoParaEditar = avaliacao; // Define o objeto a ser editado
         inicializarEditores(); 
 
