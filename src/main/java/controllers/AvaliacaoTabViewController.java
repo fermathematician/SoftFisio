@@ -93,6 +93,9 @@ public class AvaliacaoTabViewController {
         // VBox para os detalhes da avaliação
         VBox detalhesVBox = new VBox(8);
         detalhesVBox.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
+        detalhesVBox.getChildren().add(createCampoWebView("Histórico da Doença Atual:", avaliacao.getHistoricoDoencaAtual()));
+        detalhesVBox.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
+        detalhesVBox.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
         detalhesVBox.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
 
         HBox bottomBar = new HBox();
