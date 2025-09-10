@@ -155,7 +155,6 @@ public class TreatmentViewController {
         );
     }
     
-
     @FXML
     private void handleEdit(Sessao sessao) {
         try {
