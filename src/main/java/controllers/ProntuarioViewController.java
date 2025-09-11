@@ -87,7 +87,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         // Adicione esta linha junto com as outras chamadas de atualização
         if (avaliacaoTabViewController != null) {
             avaliacaoTabViewController.loadAvaliacoes();
-}
+    }
     }
 
     public void initData(Paciente paciente) {
@@ -385,7 +385,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         // O índice '1' assume que "Avaliação" é a segunda aba (0 = Sessões, 1 = Avaliação)
         mainTabPane.getSelectionModel().select(1);
     }
-}
+    }
 
     private void abrirVisualizador(Anexo anexo) {
         try {
@@ -614,6 +614,8 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
 
         webView.getEngine().loadContent(contentToShow);
         
+        // AQUI ESTÁ A MUDANÇA: definimos uma altura fixa maior
+        webView.setPrefHeight(250); // Você pode ajustar este valor (ex: 200, 150) se achar necessário
         campo.getChildren().addAll(tituloLabel, webView);
         return campo;
     }

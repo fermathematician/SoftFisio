@@ -124,10 +124,16 @@ public class AvaliacaoTabViewController {
         tituloLabel.setStyle("-fx-font-weight: bold;");
 
         WebView webView = new WebView();
-        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) 
-                                ? "<i>Não informado</i>" : htmlContent;
+        webView.setContextMenuEnabled(false);
+        
+        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.trim().equals("<body contenteditable=\"true\"></body>"))
+                ? "<i>Não informado</i>"
+                : htmlContent;
+
         webView.getEngine().loadContent(contentToShow);
-        webView.setPrefHeight(75);
+        
+        // AQUI ESTÁ A MUDANÇA: definimos uma altura fixa maior
+        webView.setPrefHeight(250); // Você pode ajustar este valor se achar necessário
 
         campo.getChildren().addAll(tituloLabel, webView);
         return campo;
