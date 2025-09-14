@@ -108,7 +108,8 @@ public class RegisterController {
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) registerButton.getScene().getWindow();
-            stage.setScene(new Scene(loginView, 1280, 720));
+            stage.setScene(new Scene(loginView));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();

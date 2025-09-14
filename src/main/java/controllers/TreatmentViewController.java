@@ -174,7 +174,8 @@ public class TreatmentViewController {
             controller.initData(sessao, pacienteAtual, historyListener);
 
             Stage stage = (Stage) novaSessaoButton.getScene().getWindow();
-            stage.setScene(new Scene(newPatient, 1280, 720));
+            stage.setScene(new Scene(newPatient));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Editar Sessão");
 
         } catch (IOException e) {
@@ -198,7 +199,8 @@ public class TreatmentViewController {
             cadastrarSessaoController.initData(pacienteAtual, historyListener);
 
             Stage stage = (Stage) novaSessaoButton.getScene().getWindow();
-            stage.setScene(new Scene(newSession, 1280, 720));
+            stage.setScene(new Scene(newSession));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Nova Sessão");
         } catch (IOException e) {
             e.printStackTrace();

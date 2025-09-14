@@ -3,18 +3,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Region?>
 
-<BorderPane fx:id="prontuarioRoot" prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProntuarioViewController">
+<BorderPane fx:id="prontuarioRoot" prefHeight="1080.0" prefWidth="1920.0" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProntuarioViewController">
    <top>
       <VBox spacing="5.0" styleClass="header">
          <children>
@@ -52,34 +48,7 @@
             </Tab>
             <Tab text="Anexos">
                <content>
-                  <BorderPane>
-                     <center>
-                        <StackPane>
-                           <children>
-                              <Label fx:id="emptyAnexosLabel" styleClass="empty-message-label" text="Não há anexos para este paciente." managed="false" visible="false" StackPane.alignment="CENTER" />
-                              <ScrollPane fx:id="anexosScrollPane" fitToWidth="true" hbarPolicy="NEVER">
-                                 <content>
-                                    <TilePane fx:id="anexosTilePane" hgap="20" vgap="20">
-                                       <padding>
-                                          <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
-                                       </padding>
-                                    </TilePane>
-                                 </content>
-                              </ScrollPane>
-                           </children>
-                        </StackPane>
-                     </center>
-                     <bottom>
-                        <HBox alignment="CENTER" style="-fx-background-color: #f4f4f4; -fx-border-color: #e0e0e0 transparent transparent transparent;">
-                           <padding>
-                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                           </padding>
-                           <children>
-                              <Button fx:id="adicionarAnexoButton" onAction="#handleAdicionarAnexo" styleClass="primary-button" text="+ Adicionar Anexo" />
-                           </children>
-                        </HBox>
-                     </bottom>
-                  </BorderPane>
+                  <fx:include fx:id="anexosTabView" source="anexos_tab_view.fxml" />
                </content>
             </Tab>
          </tabs>

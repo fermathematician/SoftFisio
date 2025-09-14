@@ -3,7 +3,7 @@ package controllers;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import com.jfoenix.controls.JFXDatePicker;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,6 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+
+import com.jfoenix.controls.JFXDatePicker;
+
 import models.Avaliacao;
 import models.Paciente;
 import services.ProntuarioService;
@@ -21,7 +25,6 @@ import ui.NavigationManager;
 
 public class FormularioAvaliacaoController {
 
-    // --- FXML FIELDS ---
     @FXML private Button backButton;
     @FXML private Button salvarButton;
     @FXML private JFXDatePicker dataAvaliacaoPicker;
@@ -29,8 +32,8 @@ public class FormularioAvaliacaoController {
     @FXML private Label mensagemLabel;
     @FXML private Label patientNameLabel;
     @FXML private Label subtitleLabel;
+    @FXML private VBox scrollContentVBox;
     
-    // Novos Placeholders
     @FXML private StackPane doencaAtualPlaceholder;
     @FXML private StackPane historiaPregressaPlaceholder;
     @FXML private StackPane inspecaoPalpacaoPlaceholder;
@@ -42,7 +45,6 @@ public class FormularioAvaliacaoController {
     @FXML private StackPane diagnosticoCinesiologicoPlaceholder;
     @FXML private StackPane planoTratamentoPlaceholder;
 
-    // Novos Editores
     private HTMLEditor doencaAtualEditor;
     private HTMLEditor historiaPregressaEditor;
     private HTMLEditor inspecaoPalpacaoEditor;
@@ -130,27 +132,47 @@ public class FormularioAvaliacaoController {
         }
     }
 
+    
     private void inicializarEditores() {
         if (doencaAtualEditor == null) {
             doencaAtualEditor = new HTMLEditor();
+            doencaAtualEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             doencaAtualPlaceholder.getChildren().add(doencaAtualEditor);
+
             historiaPregressaEditor = new HTMLEditor();
+            historiaPregressaEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             historiaPregressaPlaceholder.getChildren().add(historiaPregressaEditor);
+            
             inspecaoPalpacaoEditor = new HTMLEditor();
+            inspecaoPalpacaoEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             inspecaoPalpacaoPlaceholder.getChildren().add(inspecaoPalpacaoEditor);
+            
             admEditor = new HTMLEditor();
+            admEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             admPlaceholder.getChildren().add(admEditor);
+            
             forcaMuscularEditor = new HTMLEditor();
+            forcaMuscularEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             forcaMuscularPlaceholder.getChildren().add(forcaMuscularEditor);
+            
             avaliacaoFuncionalEditor = new HTMLEditor();
+            avaliacaoFuncionalEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             avaliacaoFuncionalPlaceholder.getChildren().add(avaliacaoFuncionalEditor);
+            
             testesEspeciaisEditor = new HTMLEditor();
+            testesEspeciaisEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             testesEspeciaisPlaceholder.getChildren().add(testesEspeciaisEditor);
+            
             escalasFuncionaisEditor = new HTMLEditor();
+            escalasFuncionaisEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             escalasFuncionaisPlaceholder.getChildren().add(escalasFuncionaisEditor);
+            
             diagnosticoCinesiologicoEditor = new HTMLEditor();
+            diagnosticoCinesiologicoEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             diagnosticoCinesiologicoPlaceholder.getChildren().add(diagnosticoCinesiologicoEditor);
+            
             planoTratamentoEditor = new HTMLEditor();
+            planoTratamentoEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, e -> { scrollContentVBox.fireEvent(e.copyFor(e.getSource(), scrollContentVBox)); e.consume(); });
             planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
         }
     }
@@ -178,7 +200,8 @@ public class FormularioAvaliacaoController {
             ProntuarioViewController controller = loader.getController();
             controller.initData(this.pacienteAtual);
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(prontuarioView, 1280, 720));
+            stage.setScene(new Scene(prontuarioView));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Prontuário de " + this.pacienteAtual.getNomeCompleto());
         } catch (IOException e) {
             e.printStackTrace();

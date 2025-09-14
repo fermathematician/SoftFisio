@@ -50,7 +50,7 @@ public class AnexoCardController {
             Region videoIcon = new Region();
             videoIcon.getStyleClass().add("video-icon");
             videoIcon.setPrefSize(200, 150);
-            anexoContent.getChildren().add(0, videoIcon); // Adiciona no início do VBox
+            anexoContent.getChildren().add(0, videoIcon); 
         }
 
         // Adiciona o evento de clique ao card inteiro para abrir o visualizador

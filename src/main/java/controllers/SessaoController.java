@@ -98,7 +98,8 @@ public class SessaoController {
             controller.initData(this.paciente);
 
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(prontuarioView, 1280, 720));
+            stage.setScene(new Scene(prontuarioView));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
         } catch (IOException e) {
             e.printStackTrace();

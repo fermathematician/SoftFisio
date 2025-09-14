@@ -78,7 +78,8 @@ public class PatientCardController {
             controller.initData(this.paciente);
 
             Stage stage = (Stage) viewRecordButton.getScene().getWindow();
-            stage.setScene(new Scene(prontuarioView, 1280, 720));
+            stage.setScene(new Scene(prontuarioView));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
         } catch (IOException e) {
             System.err.println("### ERRO DE IO AO CARREGAR A TELA DE PRONTUÁRIO ###");
@@ -130,7 +131,8 @@ private void handleEdit() {
         cadastrarPacienteController.initData(this.paciente);
 
         Stage stage = (Stage) editButton.getScene().getWindow();
-        stage.setScene(new Scene(editPatient, 1280, 720));
+        stage.setScene(new Scene(editPatient));
+        stage.setMaximized(true);
         stage.setTitle("SoftFisio - Editar Paciente");
 
     } catch (IOException e) {

@@ -29,7 +29,8 @@ public class MainApp extends Application {
             Parent root = FXMLLoader.load(fxmlUrl);
 
             primaryStage.setTitle("SoftFisio - Login");
-            primaryStage.setScene(new Scene(root, 1280, 720));
+            primaryStage.setScene(new Scene(root));
+            primaryStage.setMaximized(true);
             primaryStage.show();
 
         } catch (IOException e) {

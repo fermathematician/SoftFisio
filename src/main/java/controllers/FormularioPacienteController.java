@@ -120,7 +120,8 @@ public class FormularioPacienteController {
 
             Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) cancelButton.getScene().getWindow();
-            stage.setScene(new Scene(patientsView, 1280, 720));
+            stage.setScene(new Scene(patientsView));
+            stage.setMaximized(true);
 
             if(fxmlPath.equals("/static/main_view.fxml")) {
                 stage.setTitle("SoftFisio - Lista de Pacientes");

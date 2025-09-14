@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FormularioAvaliacaoController">
+<BorderPane prefHeight="1080.0" prefWidth="1920.0" styleClass="root" stylesheets="@css/treatment-view.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FormularioAvaliacaoController">
    <top>
-      <VBox spacing="5.0" styleClass="header-bar">
+      <VBox spacing="5.0" styleClass="header">
          <children>
             <HBox alignment="CENTER_LEFT">
                <children>
@@ -48,26 +48,56 @@
                         </VBox>
                         <VBox spacing="5.0">
                            <children>
-                              <Label styleClass="input-label" text="Queixa Principal" />
-                              <StackPane fx:id="queixaPrincipalPlaceholder" prefHeight="200.0" />
+                              <Label styleClass="input-label" text="Doença Atual" />
+                              <StackPane fx:id="doencaAtualPlaceholder" prefHeight="200.0" />
                            </children>
                         </VBox>
                         <VBox spacing="5.0">
                            <children>
-                              <Label styleClass="input-label" text="Histórico da Doença Atual (HDA)" />
-                              <StackPane fx:id="hdaPlaceholder" prefHeight="200.0" />
+                              <Label styleClass="input-label" text="História Pregressa" />
+                              <StackPane fx:id="historiaPregressaPlaceholder" prefHeight="200.0" />
                            </children>
                         </VBox>
                         <VBox spacing="5.0">
                            <children>
-                              <Label styleClass="input-label" text="Exames Físicos" />
-                              <StackPane fx:id="examesFisicosPlaceholder" prefHeight="200.0" />
+                              <Label styleClass="input-label" text="Inspeção e Palpação" />
+                              <StackPane fx:id="inspecaoPalpacaoPlaceholder" prefHeight="200.0" />
                            </children>
                         </VBox>
                         <VBox spacing="5.0">
                            <children>
-                              <Label styleClass="input-label" text="Diagnóstico Fisioterapêutico" />
-                              <StackPane fx:id="diagnosticoPlaceholder" prefHeight="200.0" />
+                              <Label styleClass="input-label" text="ADM (Amplitude de Movimento)" />
+                              <StackPane fx:id="admPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Força Muscular" />
+                              <StackPane fx:id="forcaMuscularPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Avaliação Funcional" />
+                              <StackPane fx:id="avaliacaoFuncionalPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Testes Especiais" />
+                              <StackPane fx:id="testesEspeciaisPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Escalas Funcionais" />
+                              <StackPane fx:id="escalasFuncionaisPlaceholder" prefHeight="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="input-label" text="Diagnóstico Cinesiológico Funcional" />
+                              <StackPane fx:id="diagnosticoCinesiologicoPlaceholder" prefHeight="200.0" />
                            </children>
                         </VBox>
                         <VBox spacing="5.0">
@@ -76,10 +106,10 @@
                               <StackPane fx:id="planoTratamentoPlaceholder" prefHeight="200.0" />
                            </children>
                         </VBox>
-                        <Label fx:id="mensagemLabel" alignment="CENTER" maxWidth="Infinity" styleClass="error-label" managed="false" visible="false" />
+                        <Label fx:id="mensagemLabel" alignment="CENTER" managed="false" maxWidth="Infinity" styleClass="error-label" visible="false" />
                         <HBox alignment="CENTER_RIGHT">
                            <children>
-                              <Button fx:id="salvarButton" onAction="#handleSalvarAvaliacao" mnemonicParsing="false" styleClass="primary-button" text="Salvar" prefWidth="200.0" />
+                              <Button fx:id="salvarButton" mnemonicParsing="false" onAction="#handleSalvarAvaliacao" prefWidth="200.0" styleClass="primary-button" text="Salvar" />
                            </children>
                            <VBox.margin>
                               <Insets top="10.0" />

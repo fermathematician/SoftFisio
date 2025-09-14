@@ -64,7 +64,6 @@ public class AvaliacaoTabViewController {
         avaliacoesVBox.setManaged(!isEmpty); // Alterado de scrollPane para avaliacoesVBox
     }
 
-    // SUBSTITUA SEU MÉTODO createAvaliacaoCard POR ESTE:
     private VBox createAvaliacaoCard(Avaliacao avaliacao) {
         VBox card = new VBox(5);
         card.getStyleClass().add("patient-card");
@@ -113,7 +112,6 @@ public class AvaliacaoTabViewController {
         return card;
     }
 
-    // Método auxiliar para criar os campos com WebView
     private VBox createCampoWebView(String titulo, String htmlContent) {
         VBox campo = new VBox(2);
         Label tituloLabel = new Label(titulo);
@@ -176,7 +174,8 @@ public class AvaliacaoTabViewController {
 
             Stage stage = (Stage) novaAvaliacaoButton.getScene().getWindow();
             // A navegação para uma nova "cena" (tela cheia) é uma opção
-            stage.setScene(new Scene(formView, 1280, 720));
+            stage.setScene(new Scene(formView));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Editar Avaliação");
 
         } catch (IOException e) {
@@ -199,7 +198,8 @@ public class AvaliacaoTabViewController {
             formController.configureParaCriacao(pacienteAtual, historyListener);
             
             Stage stage = (Stage) novaAvaliacaoButton.getScene().getWindow();
-            stage.setScene(new Scene(formView, 1280, 720));
+            stage.setScene(new Scene(formView));
+            stage.setMaximized(true);
             stage.setTitle("SoftFisio - Nova Avaliação");
         } catch (IOException e) {
             e.printStackTrace();
