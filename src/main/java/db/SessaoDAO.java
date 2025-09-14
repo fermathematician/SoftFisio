@@ -110,4 +110,28 @@ public class SessaoDAO {
             return false;
         }
     }
+
+    public Sessao findById(int idSessao) {
+        String sql = "SELECT * FROM sessoes WHERE id_sessao = ?";
+        Sessao sessao = null;
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idSessao);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                sessao = new Sessao(
+                    rs.getInt("id_sessao"),
+                    rs.getInt("id_paciente"),
+                    LocalDate.parse(rs.getString("data_sessao")),
+                    rs.getString("evolucao_texto"),
+                    rs.getString("observacoes_sessao")
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar sessão por ID: " + e.getMessage());
+        }
+        return sessao;
+    }
 }

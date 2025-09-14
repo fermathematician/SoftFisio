@@ -64,6 +64,7 @@ public class AvaliacaoTabViewController {
         avaliacoesVBox.setManaged(!isEmpty); // Alterado de scrollPane para avaliacoesVBox
     }
 
+    // SUBSTITUA SEU MÉTODO createAvaliacaoCard POR ESTE:
     private VBox createAvaliacaoCard(Avaliacao avaliacao) {
         VBox card = new VBox(5);
         card.getStyleClass().add("patient-card");
@@ -88,11 +89,16 @@ public class AvaliacaoTabViewController {
         separator.setPadding(new Insets(10, 0, 5, 0));
         
         VBox detalhesVBox = new VBox(8);
-        detalhesVBox.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-        detalhesVBox.getChildren().add(createCampoWebView("Histórico da Doença Atual:", avaliacao.getHistoricoDoencaAtual()));
-        detalhesVBox.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
+        detalhesVBox.getChildren().add(createCampoWebView("Doença Atual (HDA):", avaliacao.getDoencaAtual()));
+        detalhesVBox.getChildren().add(createCampoWebView("História Pregressa:", avaliacao.getHistoriaPregressa()));
+        detalhesVBox.getChildren().add(createCampoWebView("Inspeção e Palpação:", avaliacao.getInspecaoPalpacao()));
+        detalhesVBox.getChildren().add(createCampoWebView("ADM:", avaliacao.getAdm()));
+        detalhesVBox.getChildren().add(createCampoWebView("Força Muscular:", avaliacao.getForcaMuscular()));
+        detalhesVBox.getChildren().add(createCampoWebView("Avaliação Funcional:", avaliacao.getAvaliacaoFuncional()));
+        detalhesVBox.getChildren().add(createCampoWebView("Testes Especiais:", avaliacao.getTestesEspeciais()));
+        detalhesVBox.getChildren().add(createCampoWebView("Escalas Funcionais:", avaliacao.getEscalasFuncionais()));
+        detalhesVBox.getChildren().add(createCampoWebView("Diagnóstico Cinesiológico:", avaliacao.getDiagnosticoCinesiologico()));
         detalhesVBox.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
-        detalhesVBox.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
 
         HBox bottomBar = new HBox();
         bottomBar.setAlignment(Pos.CENTER_RIGHT);
@@ -115,20 +121,24 @@ public class AvaliacaoTabViewController {
 
         WebView webView = new WebView();
 
-
         webView.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
             avaliacoesVBox.fireEvent(event.copyFor(event.getSource(), avaliacoesVBox));
             event.consume();
         });
+      
+        webView.setContextMenuEnabled(false);
 
         String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) 
                                 ? "<i>Não informado</i>" : htmlContent;
+
         webView.getEngine().loadContent(contentToShow);
-        webView.setPrefHeight(75);
+        
+        webView.setPrefHeight(250); 
 
         campo.getChildren().addAll(tituloLabel, webView);
         return campo;
     }
+  
     @FXML
     private void handleDelete(Avaliacao avaliacao) {
         AlertFactory.showConfirmation(
