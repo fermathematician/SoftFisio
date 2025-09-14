@@ -7,6 +7,7 @@ import models.Paciente;
 import services.ProntuarioService;
 import java.time.LocalDate;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 import com.jfoenix.controls.JFXDatePicker;
 import models.Avaliacao;
@@ -33,7 +34,10 @@ public class FormularioAvaliacaoController {
     @FXML private JFXDatePicker dataAvaliacaoPicker;
     @FXML private Button backButton;
     @FXML private Label patientNameLabel;
-    @FXML private Label subtitleLabel; // <-- ADICIONE ESTA LINHA
+    @FXML private Label subtitleLabel; 
+    @FXML private VBox scrollContentVBox;
+
+
     private HTMLEditor queixaPrincipalEditor;
     private HTMLEditor hdaEditor;
     private HTMLEditor examesFisicosEditor;
@@ -142,48 +146,71 @@ public class FormularioAvaliacaoController {
         planoTratamentoEditor.setHtmlText("");
     }
   
-  private void inicializarEditores() {
+    private void inicializarEditores() {
+        if (queixaPrincipalEditor == null) {
+            // -- Editor 1: Queixa Principal --
+            queixaPrincipalEditor = new HTMLEditor();
+            queixaPrincipalEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+                scrollContentVBox.fireEvent(event.copyFor(event.getSource(), scrollContentVBox));
+                event.consume();
+            });
+            queixaPrincipalPlaceholder.getChildren().add(queixaPrincipalEditor);
 
-      // Usa o "carregamento lento": só cria os editores se eles ainda não existirem.
-      if (queixaPrincipalEditor == null) {
-          queixaPrincipalEditor = new HTMLEditor();
-          queixaPrincipalPlaceholder.getChildren().add(queixaPrincipalEditor);
+            // -- Editor 2: HDA --
+            hdaEditor = new HTMLEditor();
+            hdaEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+                scrollContentVBox.fireEvent(event.copyFor(event.getSource(), scrollContentVBox));
+                event.consume();
+            });
+            hdaPlaceholder.getChildren().add(hdaEditor);
 
-          hdaEditor = new HTMLEditor();
-          hdaPlaceholder.getChildren().add(hdaEditor);
+            // -- Editor 3: Exames Físicos --
+            examesFisicosEditor = new HTMLEditor();
+            examesFisicosEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+                scrollContentVBox.fireEvent(event.copyFor(event.getSource(), scrollContentVBox));
+                event.consume();
+            });
+            examesFisicosPlaceholder.getChildren().add(examesFisicosEditor);
 
-          examesFisicosEditor = new HTMLEditor();
-          examesFisicosPlaceholder.getChildren().add(examesFisicosEditor);
+            // -- Editor 4: Diagnóstico --
+            diagnosticoEditor = new HTMLEditor();
+            diagnosticoEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+                scrollContentVBox.fireEvent(event.copyFor(event.getSource(), scrollContentVBox));
+                event.consume();
+            });
+            diagnosticoPlaceholder.getChildren().add(diagnosticoEditor);
 
-          diagnosticoEditor = new HTMLEditor();
-          diagnosticoPlaceholder.getChildren().add(diagnosticoEditor);
-
-          planoTratamentoEditor = new HTMLEditor();
-          planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
-      }
-  }
-
-  @FXML
-private void handleBackButton() {
-    try {
-        // Pega o caminho da tela anterior no histórico de navegação
-        String fxmlPath = NavigationManager.getInstance().getPreviousPage();
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-        Parent prontuarioView = loader.load();
-
-        // Pega o controller da tela de prontuário para recarregar os dados
-        ProntuarioViewController controller = loader.getController();
-        controller.initData(this.pacienteAtual); // Passa o paciente de volta
-
-        // Pega o palco (janela) atual e muda a cena para a tela anterior
-        Stage stage = (Stage) backButton.getScene().getWindow();
-        stage.setScene(new Scene(prontuarioView, 1280, 720));
-        stage.setTitle("SoftFisio - Prontuário de " + this.pacienteAtual.getNomeCompleto());
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        AlertFactory.showError("Erro de Navegação", "Não foi possível voltar para a tela de prontuário.");
+            // -- Editor 5: Plano de Tratamento --
+            planoTratamentoEditor = new HTMLEditor();
+            planoTratamentoEditor.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+                scrollContentVBox.fireEvent(event.copyFor(event.getSource(), scrollContentVBox));
+                event.consume();
+            });
+            planoTratamentoPlaceholder.getChildren().add(planoTratamentoEditor);
+        }
     }
-}
+
+    @FXML
+    private void handleBackButton() {
+    try {
+            // Pega o caminho da tela anterior no histórico de navegação
+            String fxmlPath = NavigationManager.getInstance().getPreviousPage();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent prontuarioView = loader.load();
+
+            // Pega o controller da tela de prontuário para recarregar os dados
+            ProntuarioViewController controller = loader.getController();
+            controller.initData(this.pacienteAtual); // Passa o paciente de volta
+
+            // Pega o palco (janela) atual e muda a cena para a tela anterior
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.setScene(new Scene(prontuarioView, 1280, 720));
+            stage.setTitle("SoftFisio - Prontuário de " + this.pacienteAtual.getNomeCompleto());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            AlertFactory.showError("Erro de Navegação", "Não foi possível voltar para a tela de prontuário.");
+        }
+    }
 }
