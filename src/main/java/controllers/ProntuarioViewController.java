@@ -87,7 +87,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         // Adicione esta linha junto com as outras chamadas de atualização
         if (avaliacaoTabViewController != null) {
             avaliacaoTabViewController.loadAvaliacoes();
-}
+    }
     }
 
     public void initData(Paciente paciente) {
@@ -183,11 +183,17 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
 
             // Cria um VBox para organizar os campos da avaliação
+            // BLOCO NOVO E CORRETO
             VBox detalhesAvaliacao = new VBox(8);
-            detalhesAvaliacao.getChildren().add(createCampoWebView("Queixa Principal:", avaliacao.getQueixaPrincipal()));
-            detalhesAvaliacao.getChildren().add(createCampoWebView("Histórico da Doença:", avaliacao.getHistoricoDoencaAtual()));
-            detalhesAvaliacao.getChildren().add(createCampoWebView("Exames Físicos:", avaliacao.getExamesFisicos()));
-            detalhesAvaliacao.getChildren().add(createCampoWebView("Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Doença Atual (HDA):", avaliacao.getDoencaAtual()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("História Pregressa:", avaliacao.getHistoriaPregressa()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Inspeção e Palpação:", avaliacao.getInspecaoPalpacao()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("ADM:", avaliacao.getAdm()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Força Muscular:", avaliacao.getForcaMuscular()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Avaliação Funcional:", avaliacao.getAvaliacaoFuncional()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Testes Especiais:", avaliacao.getTestesEspeciais()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Escalas Funcionais:", avaliacao.getEscalasFuncionais()));
+            detalhesAvaliacao.getChildren().add(createCampoWebView("Diagnóstico Cinesiológico:", avaliacao.getDiagnosticoCinesiologico()));
             detalhesAvaliacao.getChildren().add(createCampoWebView("Plano de Tratamento:", avaliacao.getPlanoTratamento()));
 
             card.getChildren().add(detalhesAvaliacao);
@@ -379,7 +385,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         // O índice '1' assume que "Avaliação" é a segunda aba (0 = Sessões, 1 = Avaliação)
         mainTabPane.getSelectionModel().select(1);
     }
-}
+    }
 
     private void abrirVisualizador(Anexo anexo) {
         try {
@@ -518,11 +524,16 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
                         adicionarCampoHtmlAoPdf(document, "Evolução:", sessao.getEvolucaoTexto(), converterProperties);
                     } else if (item instanceof Avaliacao) {
                         Avaliacao avaliacao = (Avaliacao) item;
-                        adicionarCampoHtmlAoPdf(document, "Queixa Principal:", avaliacao.getQueixaPrincipal(), converterProperties);
-                        adicionarCampoHtmlAoPdf(document, "Histórico da Doença:", avaliacao.getHistoricoDoencaAtual(), converterProperties);
-                        adicionarCampoHtmlAoPdf(document, "Exames Físicos:", avaliacao.getExamesFisicos(), converterProperties);
-                        adicionarCampoHtmlAoPdf(document, "Diagnóstico Fisioterapêutico:", avaliacao.getDiagnosticoFisioterapeutico(), converterProperties);
-                        adicionarCampoHtmlAoPdf(document, "Plano de Tratamento:", avaliacao.getPlanoTratamento(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Doença Atual (HDA):", avaliacao.getDoencaAtual(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "História Pregressa e Comorbidades:", avaliacao.getHistoriaPregressa(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Inspeção e Palpação:", avaliacao.getInspecaoPalpacao(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Avaliação de ADM:", avaliacao.getAdm(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Avaliação de Força Muscular:", avaliacao.getForcaMuscular(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Avaliação Funcional:", avaliacao.getAvaliacaoFuncional(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Testes Especiais:", avaliacao.getTestesEspeciais(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Escalas Funcionais:", avaliacao.getEscalasFuncionais(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Diagnóstico Cinesiológico Funcional:", avaliacao.getDiagnosticoCinesiologico(), converterProperties);
+                        adicionarCampoHtmlAoPdf(document, "Conduta Inicial / Plano de Tratamento:", avaliacao.getPlanoTratamento(), converterProperties);
                     }
                 }
                 document.close();
@@ -581,14 +592,31 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
         tituloLabel.setStyle("-fx-font-weight: bold;");
 
         WebView webView = new WebView();
+        // Desabilita o menu de contexto (clique direito) para uma aparência mais limpa
+        webView.setContextMenuEnabled(false); 
+        
+        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.trim().equals("<body contenteditable=\"true\"></body>"))
+                ? "<i>Não informado</i>"
+                : htmlContent;
 
- 
-        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) ? "" : htmlContent;
+        // Listener que ajusta a altura dinamicamente
+        webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                // Executa um script JavaScript para obter a altura real do conteúdo
+                Object height = webView.getEngine().executeScript("document.body.scrollHeight");
+                if (height instanceof Integer) {
+                    Integer intHeight = (Integer) height;
+                    // Adiciona um pouco de preenchimento para garantir que tudo apareça
+                    webView.setPrefHeight(intHeight + 15);
+                }
+            }
+        });
+
         webView.getEngine().loadContent(contentToShow);
-
-        webView.setPrefHeight(75); // Altura padrão para cada campo
-
+        
+        // AQUI ESTÁ A MUDANÇA: definimos uma altura fixa maior
+        webView.setPrefHeight(250); // Você pode ajustar este valor (ex: 200, 150) se achar necessário
         campo.getChildren().addAll(tituloLabel, webView);
-        return campo; // <-- SEMPRE retorna um VBox válido
+        return campo;
     }
 }

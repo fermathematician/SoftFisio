@@ -120,22 +120,16 @@ public String deletarAvaliacao(int idAvaliacao) {
  */
 // Em ProntuarioService.java
 
-    public String cadastrarAvaliacao(int idPaciente, LocalDate dataAvaliacao, String queixaPrincipal, String historicoDoencaAtual, String examesFisicos, String diagnosticoFisioterapeutico, String planoTratamento) {
-        // Validação da data
+    public String cadastrarAvaliacao(int idPaciente, LocalDate dataAvaliacao, String doencaAtual, String historiaPregressa,
+                                     String inspecaoPalpacao, String adm, String forcaMuscular, String avaliacaoFuncional,
+                                     String testesEspeciais, String escalasFuncionais, String diagnosticoCinesiologico, String planoTratamento) {
         if (dataAvaliacao == null) {
             return "A data da avaliação precisa ser selecionada.";
         }
-        if (queixaPrincipal == null || queixaPrincipal.trim().isEmpty()) {
-            return "O campo 'Queixa Principal' é obrigatório na avaliação.";
-        }
+        Avaliacao novaAvaliacao = new Avaliacao(0, idPaciente, dataAvaliacao, doencaAtual, historiaPregressa,
+                inspecaoPalpacao, adm, forcaMuscular, avaliacaoFuncional, testesEspeciais, escalasFuncionais, diagnosticoCinesiologico, planoTratamento);
 
-        Avaliacao novaAvaliacao = new Avaliacao(
-            0, idPaciente, dataAvaliacao, queixaPrincipal, historicoDoencaAtual,
-            examesFisicos, diagnosticoFisioterapeutico, planoTratamento
-        );
-
-        boolean sucesso = avaliacaoDAO.save(novaAvaliacao);
-        return sucesso ? "" : "Ocorreu um erro ao salvar a avaliação no banco de dados.";
+        return avaliacaoDAO.save(novaAvaliacao) ? "" : "Ocorreu um erro ao salvar a avaliação.";
     }
 
 /**
@@ -150,24 +144,16 @@ public List<Avaliacao> getAvaliacoes(int idPaciente) {
 
 // Em ProntuarioService.java
 
-    public String atualizarAvaliacao(int idAvaliacao, int idPaciente, LocalDate dataAvaliacao, String queixaPrincipal,
-                                    String historicoDoencaAtual, String examesFisicos,
-                                    String diagnosticoFisioterapeutico, String planoTratamento) {
-        // Validação da data
+    public String atualizarAvaliacao(int idAvaliacao, int idPaciente, LocalDate dataAvaliacao, String doencaAtual, String historiaPregressa,
+                                     String inspecaoPalpacao, String adm, String forcaMuscular, String avaliacaoFuncional,
+                                     String testesEspeciais, String escalasFuncionais, String diagnosticoCinesiologico, String planoTratamento) {
         if (dataAvaliacao == null) {
             return "A data da avaliação precisa ser selecionada.";
         }
-        if (queixaPrincipal == null || queixaPrincipal.trim().isEmpty()) {
-            return "O campo 'Queixa Principal' é obrigatório na avaliação.";
-        }
+        Avaliacao avaliacaoAtualizada = new Avaliacao(idAvaliacao, idPaciente, dataAvaliacao, doencaAtual, historiaPregressa,
+                inspecaoPalpacao, adm, forcaMuscular, avaliacaoFuncional, testesEspeciais, escalasFuncionais, diagnosticoCinesiologico, planoTratamento);
 
-        Avaliacao avaliacaoAtualizada = new Avaliacao(
-            idAvaliacao, idPaciente, dataAvaliacao, queixaPrincipal, historicoDoencaAtual,
-            examesFisicos, diagnosticoFisioterapeutico, planoTratamento
-        );
-
-        boolean sucesso = avaliacaoDAO.update(avaliacaoAtualizada);
-        return sucesso ? "" : "Ocorreu um erro ao atualizar a avaliação no banco de dados.";
+        return avaliacaoDAO.update(avaliacaoAtualizada) ? "" : "Ocorreu um erro ao atualizar a avaliação.";
     }
 
     // --- MÉTODOS PARA ANEXOS ---
