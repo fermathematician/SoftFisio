@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -33,7 +31,6 @@ public class AvaliacaoTabViewController {
     @FXML private VBox avaliacoesVBox;
     @FXML private Button novaAvaliacaoButton;
     @FXML private Label emptyAvaliacoesLabel;
-    @FXML private ScrollPane scrollPane;
 
     private ProntuarioService prontuarioService;
     private Paciente pacienteAtual;
@@ -63,8 +60,8 @@ public class AvaliacaoTabViewController {
         boolean isEmpty = avaliacoesVBox.getChildren().isEmpty();
         emptyAvaliacoesLabel.setVisible(isEmpty);
         emptyAvaliacoesLabel.setManaged(isEmpty);
-        scrollPane.setVisible(!isEmpty);
-        scrollPane.setManaged(!isEmpty);
+        avaliacoesVBox.setVisible(!isEmpty); // Alterado de scrollPane para avaliacoesVBox
+        avaliacoesVBox.setManaged(!isEmpty); // Alterado de scrollPane para avaliacoesVBox
     }
 
     // SUBSTITUA SEU MÉTODO createAvaliacaoCard POR ESTE:
@@ -91,7 +88,6 @@ public class AvaliacaoTabViewController {
         Separator separator = new Separator();
         separator.setPadding(new Insets(10, 0, 5, 0));
         
-        // VBox para os detalhes (AGORA USANDO OS MÉTODOS NOVOS)
         VBox detalhesVBox = new VBox(8);
         detalhesVBox.getChildren().add(createCampoWebView("Doença Atual (HDA):", avaliacao.getDoencaAtual()));
         detalhesVBox.getChildren().add(createCampoWebView("História Pregressa:", avaliacao.getHistoriaPregressa()));
@@ -116,7 +112,7 @@ public class AvaliacaoTabViewController {
         card.getChildren().addAll(topBar, separator, detalhesVBox, bottomBar);
         return card;
     }
-    
+
     // Método auxiliar para criar os campos com WebView
     private VBox createCampoWebView(String titulo, String htmlContent) {
         VBox campo = new VBox(2);
@@ -124,21 +120,25 @@ public class AvaliacaoTabViewController {
         tituloLabel.setStyle("-fx-font-weight: bold;");
 
         WebView webView = new WebView();
+
+        webView.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+            avaliacoesVBox.fireEvent(event.copyFor(event.getSource(), avaliacoesVBox));
+            event.consume();
+        });
+      
         webView.setContextMenuEnabled(false);
-        
-        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.trim().equals("<body contenteditable=\"true\"></body>"))
-                ? "<i>Não informado</i>"
-                : htmlContent;
+
+        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.contains("<body contenteditable=\"true\"></body>")) 
+                                ? "<i>Não informado</i>" : htmlContent;
 
         webView.getEngine().loadContent(contentToShow);
         
-        // AQUI ESTÁ A MUDANÇA: definimos uma altura fixa maior
-        webView.setPrefHeight(250); // Você pode ajustar este valor se achar necessário
+        webView.setPrefHeight(250); 
 
         campo.getChildren().addAll(tituloLabel, webView);
         return campo;
     }
-
+  
     @FXML
     private void handleDelete(Avaliacao avaliacao) {
         AlertFactory.showConfirmation(

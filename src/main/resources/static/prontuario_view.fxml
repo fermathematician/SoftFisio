@@ -47,33 +47,7 @@
             </Tab>
             <Tab text="Histórico Completo">
                <content>
-                  <VBox styleClass="content-pane">
-                     <padding>
-                        <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
-                     </padding>
-                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                           <children>
-                              <Label styleClass="section-title" text="Histórico Completo" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Button fx:id="gerarPdfButton" onAction="#handleGerarPdf" styleClass="secondary-button" text="Gerar PDF" />
-                           </children>
-                           <VBox.margin>
-                              <Insets bottom="25.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <StackPane VBox.vgrow="ALWAYS">
-                           <children>
-                              <Label fx:id="emptyHistoryLabel" styleClass="empty-message-label" text="Não há histórico de sessões ou avaliações para este paciente." managed="false" visible="false" StackPane.alignment="CENTER" />
-                              <ScrollPane fx:id="historyScrollPane" fitToWidth="true" hbarPolicy="NEVER">
-                                 <content>
-                                    <VBox fx:id="historicoVBox" spacing="20.0" />
-                                 </content>
-                              </ScrollPane>
-                           </children>
-                        </StackPane>
-                     </children>
-                  </VBox>
+                  <fx:include fx:id="historicoTabView" source="historico_tab_view.fxml" />
                </content>
             </Tab>
             <Tab text="Anexos">

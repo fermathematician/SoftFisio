@@ -70,12 +70,13 @@ public class TreatmentViewController {
         VBox card = new VBox(5);
         card.getStyleClass().add("patient-card");
 
-        HBox topBar = new HBox();
-        topBar.setAlignment(Pos.CENTER_LEFT);
+        Label tipoLabel = new Label("Sessão");
+        tipoLabel.getStyleClass().add("card-title");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Sessão de' dd 'de' MMMM 'de' yyyy");
-        Label dateLabel = new Label(sessao.getDataSessao().format(formatter));
-        dateLabel.getStyleClass().add("session-date-label");
+        // 2. Ajustar o formatador para exibir apenas a data, sem o texto "Sessão de".
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
+        Label dataLabel = new Label(sessao.getDataSessao().format(formatter));
+        dataLabel.getStyleClass().add("card-subtitle"); // 3. Aplicar o estilo de subtítulo.
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -84,16 +85,27 @@ public class TreatmentViewController {
         deleteIcon.getStyleClass().add("delete-icon");
         deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
 
-        topBar.getChildren().addAll(dateLabel, spacer, deleteIcon);
+        // 4. Montar o HBox na nova ordem: Título - Data [Espaçador] Ícone
+        HBox topBar = new HBox(tipoLabel, new Label(" - "), dataLabel, spacer, deleteIcon);
+        topBar.setAlignment(Pos.CENTER_LEFT);
 
         Separator separator = new Separator();
         separator.setPadding(new Insets(10, 0, 5, 0));
 
         // Cria um WebView para renderizar o HTML
         WebView webView = new WebView();
-// Carrega o conteúdo HTML salvo no banco
+            webView.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
+            // Cria um novo evento de scroll com os mesmos parâmetros do original,
+            // mas direcionado para o VBox principal das sessões (sessionsVBox).
+            sessionsVBox.fireEvent(event.copyFor(event.getSource(), sessionsVBox));
+            
+            // Consome o evento original para que o WebView não tente processá-lo.
+            event.consume();
+        });
+
+        // Carrega o conteúdo HTML salvo no banco
         webView.getEngine().loadContent(sessao.getEvolucaoTexto());
-// Ajusta a altura máxima para não ocupar muito espaço
+        // Ajusta a altura máxima para não ocupar muito espaço
         webView.setMaxHeight(150);
 
         HBox bottomBar = new HBox();
@@ -146,7 +158,6 @@ public class TreatmentViewController {
         );
     }
     
-
     @FXML
     private void handleEdit(Sessao sessao) {
         try {
