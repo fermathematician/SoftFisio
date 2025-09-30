@@ -156,7 +156,7 @@ public class DatabaseManager {
             int adminId = -1;
             try (ResultSet rs = stmt.executeQuery("SELECT id_usuario FROM usuarios WHERE login = 'admin';")) {
                 if (!rs.next()) {
-                    stmt.execute("INSERT INTO usuarios (login, senha, nome_completo) VALUES ('admin', 'admin123', 'Administrador do Sistema');");
+                    stmt.execute("INSERT INTO usuarios (login, senha, nome_completo) VALUES ('admin', '$2a$10$dsOrNrnHDAVYRkdBzcCfGeGE8efSsOnC2wk/eg4DBA9YH2RPQBESm', 'Administrador do Sistema');");
                     System.out.println("Usuário 'admin' padrão criado.");
                     try (ResultSet rsAdmin = stmt.executeQuery("SELECT id_usuario FROM usuarios WHERE login = 'admin';")) {
                         if (rsAdmin.next()) {

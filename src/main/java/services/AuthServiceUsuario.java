@@ -3,6 +3,7 @@ package services;
 
 import db.UsuarioDAO;
 import models.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthServiceUsuario {
 
@@ -29,8 +30,9 @@ public class AuthServiceUsuario {
             return null; // Usuário não encontrado
         }
 
-        if (usuario.getSenha().equals(senha)) {
-            return usuario;
+        // Compara a senha fornecida (em texto puro) com o hash salvo no banco
+        if (BCrypt.checkpw(senha, usuario.getSenha())) {
+            return usuario; // A senha confere
         } else {
             return null; // Senha incorreta
         }
@@ -71,10 +73,9 @@ public class AuthServiceUsuario {
         // Você usaria uma biblioteca como jBCrypt para criar um "hash".
         // String senhaHasheada = BCrypt.hashpw(senha, BCrypt.gensalt());
         // Por simplicidade, vamos manter o texto plano por enquanto.
-        String senhaParaSalvar = senha;
+         String senhaHasheada = BCrypt.hashpw(senha, BCrypt.gensalt());
 
-        // 3. Criar o objeto e salvar
-        Usuario novoUsuario = new Usuario(0, login, senhaParaSalvar, nomeCompleto);
+        Usuario novoUsuario = new Usuario(0, login, senhaHasheada, nomeCompleto);
         boolean sucesso = usuarioDAO.save(novoUsuario);
 
         return sucesso ? "" : "Ocorreu um erro inesperado ao cadastrar o usuário no banco de dados.";
