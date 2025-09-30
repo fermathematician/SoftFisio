@@ -28,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -50,6 +51,8 @@ public class HistoricoTabViewController {
     @FXML private VBox historicoVBox;
     @FXML private Label emptyHistoryLabel;
     @FXML private Button gerarPdfButton;
+    @FXML private ScrollPane historyScrollPane; // <-- ADICIONE ESTA LINHA
+
 
     private Paciente pacienteAtual;
     private OnHistoryChangedListener historyListener;
@@ -87,38 +90,36 @@ public class HistoricoTabViewController {
         historicoVBox.setManaged(!isEmpty);
     }
     
-    private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
+     private VBox createHistoryCard(HistoricoItem item, DateTimeFormatter formatter) {
         VBox card = new VBox(10);
         card.getStyleClass().add("patient-card");
 
+        // --- CABEÇALHO DO CARD ---
+        
+        // DECLARAÇÕES MOVIDAS PARA O TOPO (CORREÇÃO)
         Label tipoLabel = new Label(item.getTipo());
         tipoLabel.getStyleClass().add("card-title");
+        
         Label dataLabel = new Label(item.getData().format(formatter));
         dataLabel.getStyleClass().add("card-subtitle");
         
         Region hSpacer = new Region();
         HBox.setHgrow(hSpacer, Priority.ALWAYS);
+        
         Region deleteIcon = new Region();
         deleteIcon.getStyleClass().add("delete-icon");
 
+        // AGORA AS VARIÁVEIS JÁ EXISTEM QUANDO O HBOX É CRIADO
         HBox header = new HBox(tipoLabel, new Label(" - "), dataLabel, hSpacer, deleteIcon);
         header.setAlignment(Pos.CENTER_LEFT);
+        
         card.getChildren().addAll(header, new Separator());
 
+        // --- CORPO DO CARD ---
         if (item instanceof Sessao) {
             Sessao sessao = (Sessao) item;
             deleteIcon.setOnMouseClicked(event -> handleDelete(sessao));
-            WebView webView = new WebView();
-            webView.setContextMenuEnabled(false);
-            
-            webView.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
-                historicoVBox.fireEvent(event.copyFor(event.getSource(), historicoVBox));
-                event.consume();
-            });
-
-            webView.getEngine().loadContent(sessao.getEvolucaoTexto());
-            webView.setPrefHeight(150);
-            card.getChildren().add(webView);
+            card.getChildren().add(createCampoWebView("Evolução:", sessao.getEvolucaoTexto()));
         } else if (item instanceof Avaliacao) {
             Avaliacao avaliacao = (Avaliacao) item;
             deleteIcon.setOnMouseClicked(event -> handleDeleteA(avaliacao));
@@ -136,6 +137,7 @@ public class HistoricoTabViewController {
             card.getChildren().add(detalhesAvaliacao);
         }
         
+        // --- RODAPÉ DO CARD ---
         Region vSpacer = new Region();
         VBox.setVgrow(vSpacer, Priority.ALWAYS);
         card.getChildren().add(vSpacer);
@@ -158,21 +160,31 @@ public class HistoricoTabViewController {
         VBox campo = new VBox(2);
         Label tituloLabel = new Label(titulo);
         tituloLabel.setStyle("-fx-font-weight: bold;");
+
         WebView webView = new WebView();
-        
         webView.setContextMenuEnabled(false);
+        
+        // Adiciona o filtro de scroll para uma melhor experiência de usuário
         webView.addEventFilter(javafx.scene.input.ScrollEvent.ANY, event -> {
-                historicoVBox.fireEvent(event.copyFor(event.getSource(), historicoVBox));
+                // O historicoVBox precisa ser o fx:id do VBox que contém os cards
+                if (historicoVBox != null) {
+                    historicoVBox.fireEvent(event.copyFor(event.getSource(), historicoVBox));
+                }
                 event.consume();
         });
 
-        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.trim().equals("<body contenteditable=\"true\"></body>")) ? "<i>Não informado</i>" : htmlContent;
+        String contentToShow = (htmlContent == null || htmlContent.isEmpty() || htmlContent.trim().equals("<body contenteditable=\"true\"></body>")) 
+                                ? "<i>Não informado</i>" 
+                                : htmlContent;
+
         webView.getEngine().loadContent(contentToShow);
-        webView.setPrefHeight(75);
+        
+        // AQUI ESTÁ A ÚNICA MUDANÇA: VOLTAMOS PARA UMA ALTURA FIXA
+        webView.setPrefHeight(200); // Altura preferencial como era antes
+
         campo.getChildren().addAll(tituloLabel, webView);
         return campo;
     }
-
     private void handleDelete(Sessao sessao) {
         AlertFactory.showConfirmation("Confirmar Exclusão", "Deseja deletar a sessão de " + sessao.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "?", "Esta ação é permanente.", () -> {
             String resultado = prontuarioService.deletarSessao(sessao.getId());
