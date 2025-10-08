@@ -6,7 +6,6 @@ import javafx.scene.layout.Region;
 import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -78,8 +77,7 @@ public class PatientCardController {
             controller.initData(this.paciente);
 
             Stage stage = (Stage) viewRecordButton.getScene().getWindow();
-            stage.setScene(new Scene(prontuarioView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(prontuarioView);
             stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
         } catch (IOException e) {
             System.err.println("### ERRO DE IO AO CARREGAR A TELA DE PRONTUÁRIO ###");
@@ -131,8 +129,7 @@ private void handleEdit() {
         cadastrarPacienteController.initData(this.paciente);
 
         Stage stage = (Stage) editButton.getScene().getWindow();
-        stage.setScene(new Scene(editPatient));
-        stage.setMaximized(true);
+        stage.getScene().setRoot(editPatient);
         stage.setTitle("SoftFisio - Editar Paciente");
 
     } catch (IOException e) {

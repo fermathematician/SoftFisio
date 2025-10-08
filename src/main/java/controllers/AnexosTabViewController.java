@@ -95,7 +95,6 @@ public class AnexosTabViewController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initOwner(anexosTilePane.getScene().getWindow());
             stage.setScene(new Scene(root));
-            stage.setMaximized(true);
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();

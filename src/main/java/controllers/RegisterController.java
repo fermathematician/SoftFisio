@@ -3,7 +3,6 @@ package controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -108,8 +107,7 @@ public class RegisterController {
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) registerButton.getScene().getWindow();
-            stage.setScene(new Scene(loginView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(loginView);
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();

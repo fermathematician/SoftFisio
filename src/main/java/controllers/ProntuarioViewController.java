@@ -7,7 +7,6 @@ import java.time.Period;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
@@ -63,8 +62,7 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
             String fxmlPath = NavigationManager.getInstance().getPreviousPage();
             Parent previousView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(previousView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(previousView);
         } catch (IOException e) {
             e.printStackTrace();
         }

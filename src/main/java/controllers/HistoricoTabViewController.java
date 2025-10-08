@@ -23,7 +23,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -205,8 +204,7 @@ public class HistoricoTabViewController {
             SessaoController controller = loader.getController();
             controller.initData(sessao, this.pacienteAtual, this.historyListener);
             Stage stage = (Stage) historicoVBox.getScene().getWindow();
-            stage.setScene(new Scene(formView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(formView);
             stage.setTitle("SoftFisio - Editar Sessão");
         } catch (IOException e) {
             e.printStackTrace();
@@ -233,8 +231,7 @@ public class HistoricoTabViewController {
             FormularioAvaliacaoController controller = loader.getController();
             controller.configureParaEdicao(avaliacao, this.pacienteAtual, this.historyListener);
             Stage stage = (Stage) historicoVBox.getScene().getWindow();
-            stage.setScene(new Scene(formView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(formView);
             stage.setTitle("SoftFisio - Editar Avaliação");
         } catch (IOException e) {
             e.printStackTrace();

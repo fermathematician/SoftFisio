@@ -10,13 +10,12 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.Region?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
+<BorderPane styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
          <children>
-            <Label styleClass="company-name" text="NOME DA EMPRESA" />
+            <Label styleClass="company-name" text="IntegralMov" />
          </children>
          <padding>
             <Insets left="40.0" />
@@ -29,7 +28,7 @@
             <Label styleClass="title" text="LOGIN" />
             <Label styleClass="subtitle" text="Insira suas credenciais."/>
             
-            <VBox alignment="TOP_LEFT" spacing="15.0" styleClass="login-card">
+            <VBox alignment="TOP_LEFT" spacing="15.0" styleClass="login-card" maxWidth="450">
                <children>
                   <Label styleClass="input-label" text="Digite seu nome de usuário" />
                   <TextField fx:id="loginField" promptText="Seu nome de usuário" styleClass="text-input-line" />

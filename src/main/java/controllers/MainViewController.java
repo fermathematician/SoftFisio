@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node; 
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane; 
@@ -150,8 +149,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
 
             Parent corridaView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) pacienteCorridaButton.getScene().getWindow();
-            stage.setScene(new Scene(corridaView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(corridaView);
             stage.setTitle("SoftFisio - Pacientes de corrida");
         } catch (IOException e) {
             System.err.println("Erro ao carregar a tela de pacientes de corrida. Verifique se o arquivo 'pacientes_corrida.fxml' existe.");
@@ -175,8 +173,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
             cadastrarPacienteController.initData();
 
             Stage stage = (Stage) newPatientButton.getScene().getWindow();
-            stage.setScene(new Scene(newPatient));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(newPatient);
             stage.setTitle("SoftFisio - Cadastrar Paciente");
             
         } catch (IOException e) {
@@ -192,8 +189,7 @@ public class MainViewController implements PatientCardController.OnPatientDelete
 
             Parent loginView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new Scene(loginView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(loginView);
             stage.setTitle("SoftFisio - Login");
         } catch (IOException e) {
             e.printStackTrace();

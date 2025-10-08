@@ -12,11 +12,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
+<BorderPane prefHeight="1080" prefWidth="1920" styleClass="root" stylesheets="@css/login-register.css" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RegisterController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
          <children>
-            <Label styleClass="company-name" text="NOME DA EMPRESA" />
+            <Label styleClass="company-name" text="IntegralMov" />
          </children>
          <padding>
             <Insets left="40.0" />

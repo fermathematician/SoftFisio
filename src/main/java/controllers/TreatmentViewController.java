@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -174,8 +173,7 @@ public class TreatmentViewController {
             controller.initData(sessao, pacienteAtual, historyListener);
 
             Stage stage = (Stage) novaSessaoButton.getScene().getWindow();
-            stage.setScene(new Scene(newPatient));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(newPatient);
             stage.setTitle("SoftFisio - Editar Sessão");
 
         } catch (IOException e) {
@@ -199,8 +197,7 @@ public class TreatmentViewController {
             cadastrarSessaoController.initData(pacienteAtual, historyListener);
 
             Stage stage = (Stage) novaSessaoButton.getScene().getWindow();
-            stage.setScene(new Scene(newSession));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(newSession);
             stage.setTitle("SoftFisio - Nova Sessão");
         } catch (IOException e) {
             e.printStackTrace();

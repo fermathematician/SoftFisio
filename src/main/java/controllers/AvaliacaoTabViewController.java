@@ -9,7 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -174,8 +173,7 @@ public class AvaliacaoTabViewController {
 
             Stage stage = (Stage) novaAvaliacaoButton.getScene().getWindow();
             // A navegação para uma nova "cena" (tela cheia) é uma opção
-            stage.setScene(new Scene(formView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(formView);
             stage.setTitle("SoftFisio - Editar Avaliação");
 
         } catch (IOException e) {
@@ -198,8 +196,7 @@ public class AvaliacaoTabViewController {
             formController.configureParaCriacao(pacienteAtual, historyListener);
             
             Stage stage = (Stage) novaAvaliacaoButton.getScene().getWindow();
-            stage.setScene(new Scene(formView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(formView);
             stage.setTitle("SoftFisio - Nova Avaliação");
         } catch (IOException e) {
             e.printStackTrace();

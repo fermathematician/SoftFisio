@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -98,8 +97,7 @@ public class SessaoController {
             controller.initData(this.paciente);
 
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(prontuarioView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(prontuarioView);
             stage.setTitle("SoftFisio - Prontuário de " + this.paciente.getNomeCompleto());
         } catch (IOException e) {
             e.printStackTrace();

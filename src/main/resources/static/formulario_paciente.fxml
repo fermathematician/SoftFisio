@@ -19,7 +19,7 @@
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" styleClass="header">
          <children>
-            <Label styleClass="company-name" text="NOME DA EMPRESA" />
+            <Label styleClass="company-name" text="IntegralMov" />
          </children>
          <padding>
             <Insets left="40.0" />

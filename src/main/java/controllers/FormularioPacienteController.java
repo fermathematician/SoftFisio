@@ -7,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -120,8 +119,7 @@ public class FormularioPacienteController {
 
             Parent patientsView = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) cancelButton.getScene().getWindow();
-            stage.setScene(new Scene(patientsView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(patientsView);
 
             if(fxmlPath.equals("/static/main_view.fxml")) {
                 stage.setTitle("SoftFisio - Lista de Pacientes");

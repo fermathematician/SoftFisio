@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -200,8 +199,7 @@ public class FormularioAvaliacaoController {
             ProntuarioViewController controller = loader.getController();
             controller.initData(this.pacienteAtual);
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(prontuarioView));
-            stage.setMaximized(true);
+            stage.getScene().setRoot(prontuarioView);
             stage.setTitle("SoftFisio - Prontuário de " + this.pacienteAtual.getNomeCompleto());
         } catch (IOException e) {
             e.printStackTrace();

@@ -17,7 +17,7 @@
    <top>
       <HBox alignment="CENTER_LEFT" styleClass="header">
          <children>
-            <Label styleClass="company-name" text="NOME DA EMPRESA" />
+            <Label styleClass="company-name" text="IntegralMov" />
             <Region HBox.hgrow="ALWAYS" />
             <HBox alignment="CENTER_RIGHT" spacing="15.0">
                <children>
