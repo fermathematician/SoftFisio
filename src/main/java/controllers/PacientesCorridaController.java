@@ -88,7 +88,6 @@ public class PacientesCorridaController implements PatientCardController.OnPatie
                     e.printStackTrace();
                 }
             }
-            System.out.println("Cards de pacientes de corrida carregados: " + pacientesDoUsuario.size());
         } else {
             System.err.println("Nenhum usuário logado. Nenhum card para carregar.");
         }

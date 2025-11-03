@@ -9,7 +9,8 @@
 
 <StackPane fx:id="cardRoot" prefHeight="200.0" prefWidth="200.0" styleClass="anexo-card" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AnexoCardController">
    <children>
-      <VBox alignment="CENTER" spacing="10.0" styleClass="anexo-content">
+      
+      <VBox fx:id="anexoContent" alignment="CENTER" spacing="10.0" styleClass="anexo-content">
          <children>
             <ImageView fx:id="thumbnailImageView" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" />
             <Label fx:id="descriptionLabel" text="Descrição do Anexo" wrapText="true" />

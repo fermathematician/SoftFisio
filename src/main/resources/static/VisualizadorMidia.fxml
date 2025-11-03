@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.media.MediaView?>
 
-<StackPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: rgba(0, 0, 0, 0.8);" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.VisualizadorMidiaController">
-   <children>
-       <MediaView fx:id="mediaView" fitHeight="550.0" fitWidth="750.0" />
+<BorderPane xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.VisualizadorMidiaController"
+           style="-fx-background-color: black;">
 
-      <ImageView fx:id="imageView" fitHeight="550.0" fitWidth="750.0" pickOnBounds="true" preserveRatio="true" />
-      <Button fx:id="closeButton" onAction="#handleClose" styleClass="close-button" text="X" StackPane.alignment="TOP_RIGHT">
-         <StackPane.margin>
-            <Insets right="10.0" top="10.0" />
-         </StackPane.margin>
-      </Button>
-   </children>
-</StackPane>
+    <center>
+        <StackPane fx:id="mediaContainer">
+            <MediaView fx:id="mediaView" preserveRatio="true" />
+            <ImageView fx:id="imageView" preserveRatio="true" />
+        </StackPane>
+    </center>
+
+    <bottom>
+       <HBox fx:id="controlsBox"
+             spacing="10.0"
+             alignment="CENTER"
+             minHeight="60.0"
+             prefHeight="60.0"
+             style="-fx-background-color: #2c2c2c; -fx-border-color: #444444; -fx-border-width: 1 0 0 0;">
+          <padding>
+             <Insets top="10" right="10" bottom="10" left="10"/>
+          </padding>
+
+          <Button fx:id="playPauseButton" text="⏸" 
+                  minWidth="40" prefWidth="40"
+                  style="-fx-font-size: 16px; -fx-background-color: #444444; -fx-text-fill: white;" />
+          <Button fx:id="rewindButton" text="⏪" 
+                  minWidth="40" prefWidth="40"
+                  style="-fx-font-size: 16px; -fx-background-color: #444444; -fx-text-fill: white;" />
+          <Button fx:id="forwardButton" text="⏩" 
+                  minWidth="40" prefWidth="40"
+                  style="-fx-font-size: 16px; -fx-background-color: #444444; -fx-text-fill: white;" />
+          <Slider fx:id="progressSlider" HBox.hgrow="ALWAYS" />
+          <Slider fx:id="volumeSlider" prefWidth="100.0" />
+       </HBox>
+    </bottom>
+
+</BorderPane>

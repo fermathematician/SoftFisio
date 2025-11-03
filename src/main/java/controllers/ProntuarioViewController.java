@@ -34,7 +34,6 @@ public class ProntuarioViewController implements OnHistoryChangedListener {
 
     @Override
     public void onHistoryChanged() {
-        System.out.println("DEBUG: Evento de atualização recebido. Recarregando abas...");
         if (sessoesTabContentController != null) sessoesTabContentController.loadSessoes();
         if (avaliacaoTabViewController != null) avaliacaoTabViewController.loadAvaliacoes();
         if (historicoTabViewController != null) historicoTabViewController.carregarHistoricoCompleto();

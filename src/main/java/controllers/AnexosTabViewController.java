@@ -88,19 +88,28 @@ public class AnexosTabViewController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/static/VisualizadorMidia.fxml"));
             Parent root = loader.load();
+            
             VisualizadorMidiaController controller = loader.getController();
             controller.initData(anexo.getCaminhoArquivo());
+            
             Stage stage = new Stage();
-            stage.setTitle("Visualizador de Anexo");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initOwner(anexosTilePane.getScene().getWindow());
+            // ... (stage.setTitle, initModality, etc.)
             stage.setScene(new Scene(root));
+
+            // --- ESTA É A CORREÇÃO MAIS IMPORTANTE ---
+            // Diz ao Stage o que fazer quando o "X" da janela for clicado:
+            // Chamar o MESMO método que o botão "X" interno chama.
+            stage.setOnCloseRequest(event -> {
+                controller.stopAndClose();
+            });
+            // ------------------------------------------
+
             stage.showAndWait();
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     @FXML
     private void handleAdicionarAnexo() {
         FileChooser fileChooser = new FileChooser();

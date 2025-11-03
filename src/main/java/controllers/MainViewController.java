@@ -86,7 +86,6 @@ public class MainViewController implements PatientCardController.OnPatientDelete
                     e.printStackTrace();
                 }
             }
-            System.out.println("Cards de pacientes comuns carregados: " + pacientesDoUsuario.size());
         } else {
             System.err.println("Nenhum usuário logado. Nenhum card para carregar.");
         }

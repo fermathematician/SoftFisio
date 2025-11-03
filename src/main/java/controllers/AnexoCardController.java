@@ -38,6 +38,7 @@ public class AnexoCardController {
                 thumbnailImageView.setFitHeight(150);
                 thumbnailImageView.setFitWidth(200);
                 thumbnailImageView.setPreserveRatio(true);
+                thumbnailImageView.setStyle("-fx-cursor: hand;");
             } catch (Exception e) {
                 // Em caso de erro, você pode colocar uma imagem de erro padrão
                 // Image errorImage = new Image(getClass().getResourceAsStream("/assets/error-image.png"));
@@ -45,19 +46,29 @@ public class AnexoCardController {
                 System.err.println("Erro ao carregar imagem do anexo: " + anexo.getCaminhoArquivo());
             }
         } else if (anexo.getTipoMidia().equalsIgnoreCase("VIDEO")) {
-            // Se for vídeo, esconde o ImageView e coloca um Region com o estilo no lugar
-            anexoContent.getChildren().remove(thumbnailImageView); // Remove o ImageView
-            Region videoIcon = new Region();
-            videoIcon.getStyleClass().add("video-icon");
-            videoIcon.setPrefSize(200, 150);
-            anexoContent.getChildren().add(0, videoIcon); 
-        }
+            // Remove o ImageView, caso exista
+            anexoContent.getChildren().remove(thumbnailImageView);
 
-        // Adiciona o evento de clique ao card inteiro para abrir o visualizador
+            // Cria um StackPane para centralizar o ícone de play
+            StackPane videoContainer = new StackPane();
+            videoContainer.getStyleClass().add("video-icon");
+            videoContainer.setPrefSize(200, 150);
+
+            // Cria o ícone vetorial de "play"
+            Region playIcon = new Region();
+            playIcon.getStyleClass().add("play-icon");
+            playIcon.setPrefSize(35, 35); // Tamanho do ícone
+
+            // Adiciona o ícone no centro do container
+            videoContainer.getChildren().add(playIcon);
+
+            // Adiciona o container no layout
+            anexoContent.getChildren().add(0, videoContainer);            
+        }
         cardRoot.setOnMouseClicked(event -> {
-            if (viewHandler != null) {
-                viewHandler.accept(anexo);
-            }
+                if (viewHandler != null) {
+                    viewHandler.accept(anexo);
+                }
         });
     }
 
